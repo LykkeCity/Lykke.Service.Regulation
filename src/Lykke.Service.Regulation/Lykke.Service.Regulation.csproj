@@ -56,6 +56,10 @@
     <ProjectReference Include="..\Lykke.Service.Regulation.Core\Lykke.Service.Regulation.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.Regulation.Services\Lykke.Service.Regulation.Services.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Responses\" />
+  </ItemGroup>
 
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <ItemGroup>
