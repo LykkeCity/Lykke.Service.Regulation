@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
 
-namespace Lykke.Service.Regulation.Core.Repositories
+namespace Lykke.Service.Regulation.Core.Services
 {
-    public interface IRegulationRepository
+    public interface IRegulationService
     {
         Task<IRegulation> GetAsync(string regulationId);
 
@@ -12,7 +12,7 @@ namespace Lykke.Service.Regulation.Core.Repositories
 
         Task AddAsync(IRegulation regulation);
 
-        Task RemoveAsync(string regulationId);
+        Task RemoveAsync(string id);
 
         Task UpdateAsync(IRegulation regulation);
     }

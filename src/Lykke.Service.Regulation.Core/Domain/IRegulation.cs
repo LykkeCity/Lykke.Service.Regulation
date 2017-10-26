@@ -3,7 +3,7 @@
     public interface IRegulation
     {
         string Id { get; }
-        string Name { get; }
+
         bool RequiresKYC { get; }
     }
 }

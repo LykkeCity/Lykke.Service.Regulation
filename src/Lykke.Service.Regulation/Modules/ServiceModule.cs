@@ -1,6 +1,11 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AzureStorage.Tables;
 using Common.Log;
+using Lykke.Service.Regulation.AzureRepositories;
+using Lykke.Service.Regulation.Core.Domain;
+using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Core.Settings.ServiceSettings;
 using Lykke.Service.Regulation.Services;
@@ -46,9 +51,39 @@ namespace Lykke.Service.Regulation.Modules
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
 
-            // TODO: Add your dependencies here
+            RegisterRepositories(builder);
+            RegisterServices(builder);
 
             builder.Populate(_services);
+        }
+
+        private void RegisterRepositories(ContainerBuilder builder)
+        {
+            const string tableName = "Regulations";
+
+            builder.Register(c => new RegulationRepository(
+                    AzureTableStorage<RegulationEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
+                        tableName, _log)))
+                .As<IRegulationRepository>();
+
+            builder.Register(c => new ClientRegulationRepository(
+                    AzureTableStorage<ClientRegulationEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
+                        tableName, _log)))
+                .As<IClientRegulationRepository>();
+
+            builder.Register(c => new ClientAvailableRegulationRepository(
+                    AzureTableStorage<ClientAvailableRegulationEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
+                        tableName, _log)))
+                .As<IClientAvailableRegulationRepository>();
+        }
+
+        private void RegisterServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<ClientRegulationService>()
+                .As<IClientRegulationService>();
+
+            builder.RegisterType<RegulationService>()
+                .As<IRegulationService>();
         }
     }
 }

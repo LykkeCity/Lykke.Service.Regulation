@@ -2,53 +2,94 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
+using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
+using Lykke.Service.Regulation.Core.Domain;
 
 namespace Lykke.Service.Regulation.Controllers
 {
     [Route("api/[controller]")]
     public class RegulationController : Controller
     {
-        [HttpPost]
-        [SwaggerOperation("AddNewRegulation")]
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
-        public Task<IActionResult> AddRegulation([FromBody] RegulationDto regulation)
+        private readonly IRegulationService _regulationService;
+
+        public RegulationController(IRegulationService regulationService)
         {
-            throw new NotImplementedException();
+            _regulationService = regulationService;
         }
 
         [HttpGet]
-        [SwaggerOperation("GetAllRegulation")]
-        [ProducesResponseType(typeof(IEnumerable<RegulationDto>), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> GetAllAsync()
+        [Route("{id}")]
+        [SwaggerOperation("Get")]
+        [ProducesResponseType(typeof(RegulationModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetAsync(string id)
         {
-            throw new NotImplementedException();
+            IRegulation regulation = await _regulationService.GetAsync(id);
+
+            if (regulation == null)
+            {
+                return NotFound(ErrorResponse.Create("Regulation not found"));
+            }
+
+            var model = Mapper.Map<RegulationModel>(regulation);
+
+            return Ok(model);
         }
 
-        [HttpGet("{id}")]
-        [SwaggerOperation("GetRegulationById")]
-        [ProducesResponseType(typeof(RegulationDto), (int)HttpStatusCode.OK)]
-        public Task<IActionResult> GetAsync(string id)
+        [HttpGet]
+        [SwaggerOperation("GetAll")]
+        [ProducesResponseType(typeof(IEnumerable<RegulationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetAllAsync()
         {
-            throw new NotImplementedException();
+            IEnumerable<IRegulation> regulations = await _regulationService.GetAllAsync();
+
+            IEnumerable<RegulationModel> model =
+                Mapper.Map<IEnumerable<IRegulation>, IEnumerable<RegulationModel>>(regulations);
+
+            return Ok(model);
         }
 
-        [HttpDelete("{id}")]
-        [SwaggerOperation("RemoveRegulationById")]
-        [ProducesResponseType(typeof(IEnumerable<RegulationDto>), (int)HttpStatusCode.OK)]
-        public Task RemoveAsync(string id)
+        [HttpPost]
+        [SwaggerOperation("Add")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public async Task AddRegulation([FromBody] RegulationModel regulation)
         {
-            throw new NotImplementedException();
+            var model = Mapper.Map<Core.Domain.Regulation>(regulation);
+            await _regulationService.AddAsync(model);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [SwaggerOperation("Remove")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> RemoveAsync(string id)
+        {
+            // TODO: Make custom exception
+            try
+            {
+                await _regulationService.RemoveAsync(id);
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+
+            return Ok();
         }
 
         [HttpPut]
-        [SwaggerOperation("UpdateRegulation")]
-        [ProducesResponseType(typeof(IEnumerable<RegulationDto>), (int)HttpStatusCode.OK)]
-        public Task UpdateAsync(RegulationDto asset)
+        [SwaggerOperation("Update")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        public async Task UpdateAsync([FromBody] RegulationModel regulation)
         {
-            throw new NotImplementedException();
+            var model = Mapper.Map<Core.Domain.Regulation>(regulation);
+
+            await _regulationService.UpdateAsync(model);
         }
     }
 }

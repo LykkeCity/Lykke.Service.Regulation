@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Common.ApiLibrary.Middleware;
@@ -51,6 +53,8 @@ namespace Lykke.Service.Regulation
                 {
                     options.DefaultLykkeConfiguration("v1", "Regulation API");
                 });
+
+                Mapper.Initialize(x => x.AddProfiles(GetType().Assembly));
 
                 var builder = new ContainerBuilder();
                 var appSettings = Configuration.LoadSettings<AppSettings>();

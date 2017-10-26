@@ -6,9 +6,10 @@ namespace Lykke.Service.Regulation.Core.Repositories
 {
     public interface IClientRegulationRepository
     {
-        Task<IEnumerable<IRegulation>> GetAvailableRegulation(string clientId);
-        Task AddAvailableRegulation(string clientId, string regulationId);
-        Task<IRegulation> SetRegulation(string clientId, string regulationId);
-        Task<IRegulation> GetRegulation(string clientId);
+        Task<IClientRegulation> GetAsync(string clientId);
+
+        Task AddAsync(IClientRegulation clientAvailableRegulation);
+
+        Task RemoveAsync(string clientId);
     }
 }
