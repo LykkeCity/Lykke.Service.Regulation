@@ -10,7 +10,7 @@ namespace Lykke.Service.Regulation.Core.Services
         Task<IEnumerable<string>> GetAvailableAsync(string clientId);
         Task AddAsync(IClientAvailableRegulation regulation);
         Task SetAsync(IClientRegulation regulation);
-        Task Remove(string clientId);
-        Task RemoveAvailable(string clientId, string regulationId);
+        Task RemoveAsync(string clientId);
+        Task RemoveAvailableAsync(string clientId, string regulationId);
     }
 }

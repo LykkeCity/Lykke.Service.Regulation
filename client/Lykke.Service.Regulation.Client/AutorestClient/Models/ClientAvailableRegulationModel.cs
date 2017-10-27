@@ -7,27 +7,27 @@
 namespace Lykke.Service.Regulation.Client.AutorestClient.Models
 {
     using Newtonsoft.Json;
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Linq;
 
-    public partial class ErrorResponse
+    public partial class ClientAvailableRegulationModel
     {
         /// <summary>
-        /// Initializes a new instance of the ErrorResponse class.
+        /// Initializes a new instance of the ClientAvailableRegulationModel
+        /// class.
         /// </summary>
-        public ErrorResponse()
+        public ClientAvailableRegulationModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the ErrorResponse class.
+        /// Initializes a new instance of the ClientAvailableRegulationModel
+        /// class.
         /// </summary>
-        public ErrorResponse(string errorMessage = default(string), IDictionary<string, IList<string>> modelErrors = default(IDictionary<string, IList<string>>))
+        public ClientAvailableRegulationModel(string clientId = default(string), string regulationId = default(string))
         {
-            ErrorMessage = errorMessage;
-            ModelErrors = modelErrors;
+            ClientId = clientId;
+            RegulationId = regulationId;
             CustomInit();
         }
 
@@ -38,13 +38,13 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "ErrorMessage")]
-        public string ErrorMessage { get; private set; }
+        [JsonProperty(PropertyName = "ClientId")]
+        public string ClientId { get; set; }
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "ModelErrors")]
-        public IDictionary<string, IList<string>> ModelErrors { get; private set; }
+        [JsonProperty(PropertyName = "RegulationId")]
+        public string RegulationId { get; set; }
 
     }
 }
