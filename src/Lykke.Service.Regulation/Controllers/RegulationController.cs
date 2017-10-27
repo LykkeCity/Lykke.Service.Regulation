@@ -38,7 +38,7 @@ namespace Lykke.Service.Regulation.Controllers
             if (regulation == null)
             {
                 await _log.WriteWarningAsync(nameof(RegulationController), nameof(Get),
-                    $"Regulation not found. RegulationId: ${regulationId}. IP: {HttpContext.GetIp()}");
+                    $"Regulation not found. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return NotFound(ErrorResponse.Create("Regulation not found"));
             }
@@ -64,14 +64,14 @@ namespace Lykke.Service.Regulation.Controllers
         [HttpPost]
         [SwaggerOperation("AddRegulation")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task AddRegulation([FromBody] RegulationModel model)
+        public async Task Add([FromBody] RegulationModel model)
         {
             var regulation = Mapper.Map<Core.Domain.Regulation>(model);
 
             await _regulationService.AddAsync(regulation);
 
-            await _log.WriteInfoAsync(nameof(RegulationController), nameof(AddRegulation),
-                $"Regulation added. Model: ${model.ToJson()}. IP: {HttpContext.GetIp()}");
+            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Add),
+                $"Regulation added. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
         }
 
         [HttpDelete]
@@ -105,7 +105,11 @@ namespace Lykke.Service.Regulation.Controllers
         public async Task Update([FromBody] RegulationModel model)
         {
             var regulation = Mapper.Map<Core.Domain.Regulation>(model);
+
             await _regulationService.UpdateAsync(regulation);
+
+            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Remove),
+                $"Regulation updated. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
         }
     }
 }

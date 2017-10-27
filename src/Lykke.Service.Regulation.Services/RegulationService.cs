@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
+using Lykke.Service.Regulation.Services.Exceptions;
 
 namespace Lykke.Service.Regulation.Services
 {
@@ -43,7 +43,7 @@ namespace Lykke.Service.Regulation.Services
 
             if (clientAvailableRegulations.Any())
             {
-                throw new Exception("Can not remove regulation. It assosiated with one or more clients.");
+                throw new ServiceException("Can not remove regulation. It assosiated with one or more clients.");
             }
 
             await _regulationRepository.RemoveAsync(regulationId);

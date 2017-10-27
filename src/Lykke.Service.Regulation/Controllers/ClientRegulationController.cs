@@ -71,7 +71,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _clientRegulationService.AddAsync(clientAvailableRegulation);
             
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Add),
-                $"New available regulation added to client. Model ${model.ToJson()}. IP: {HttpContext.GetIp()}");
+                $"New available regulation added to client. Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             string regulationId = await _clientRegulationService.GetAsync(model.ClientId);
             IRegulation regulation = null;
@@ -90,7 +90,7 @@ namespace Lykke.Service.Regulation.Controllers
                 });
 
                 await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Add),
-                    $"Regulation assigned to client. Model ${model.ToJson()}. IP: {HttpContext.GetIp()}");
+                    $"Regulation assigned to client. Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
             }
         }
 
@@ -110,13 +110,13 @@ namespace Lykke.Service.Regulation.Controllers
             catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Set),
-                    $"{exception.Message} Model ${model.ToJson()}. IP: {HttpContext.GetIp()}");
+                    $"{exception.Message} Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Set),
-                $"Regulation assigned to client. Model ${model.ToJson()}. IP: {HttpContext.GetIp()}");
+                $"Regulation assigned to client. Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return Ok();
         }
@@ -130,7 +130,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _clientRegulationService.RemoveAsync(clientId);
 
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Remove),
-                $"Client current regulation removed. ClientId ${clientId}. IP: {HttpContext.GetIp()}");
+                $"Client current regulation removed. ClientId {clientId}. IP: {HttpContext.GetIp()}");
         }
 
         [HttpDelete]
@@ -147,13 +147,13 @@ namespace Lykke.Service.Regulation.Controllers
             catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(RemoveAvailable),
-                    $"{exception.Message} ClientId: ${clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+                    $"{exception.Message} ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(RemoveAvailable),
-                $"Client available regulation removed. ClientId: ${clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+                $"Client available regulation removed. ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
             return Ok();
         }
