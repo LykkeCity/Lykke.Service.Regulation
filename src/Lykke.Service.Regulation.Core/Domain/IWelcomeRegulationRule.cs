@@ -1,9 +1,9 @@
 ﻿namespace Lykke.Service.Regulation.Core.Domain
 {
-    public interface IClientAvailableRegulation
+    public interface IWelcomeRegulationRule
     {
-        string ClientId { get; }
-
+        string Id { get; }
+        string Country { get; }
         string RegulationId { get; }
     }
 }

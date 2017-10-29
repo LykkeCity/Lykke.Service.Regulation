@@ -40,7 +40,7 @@ namespace Lykke.Service.Regulation.Controllers
                 await _log.WriteWarningAsync(nameof(RegulationController), nameof(Get),
                     $"Regulation not found. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
-                return NotFound(ErrorResponse.Create("Regulation not found"));
+                return NotFound(ErrorResponse.Create("Regulation not found."));
             }
 
             var model = Mapper.Map<RegulationModel>(regulation);
@@ -64,52 +64,47 @@ namespace Lykke.Service.Regulation.Controllers
         [HttpPost]
         [SwaggerOperation("AddRegulation")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task Add([FromBody] RegulationModel model)
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Add([FromBody] RegulationModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ErrorResponse.Create("Invalid model.", ModelState));
+            }
+
             var regulation = Mapper.Map<Core.Domain.Regulation>(model);
 
             await _regulationService.AddAsync(regulation);
 
             await _log.WriteInfoAsync(nameof(RegulationController), nameof(Add),
                 $"Regulation added. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+
+            return Ok();
         }
 
         [HttpDelete]
         [Route("{regulationId}")]
-        [SwaggerOperation("RemoveRegulation")]
+        [SwaggerOperation("DeleteRegulation")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Remove(string regulationId)
+        public async Task<IActionResult> Delete(string regulationId)
         {
             try
             {
-                await _regulationService.RemoveAsync(regulationId);
+                await _regulationService.DeleteAsync(regulationId);
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Remove),
+                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Delete),
                     $"{exception.Message} RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Remove),
-                $"Regulation removed. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Delete),
+                $"Regulation deleted. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
             return Ok();
-        }
-
-        [HttpPut]
-        [SwaggerOperation("UpdateRegulation")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task Update([FromBody] RegulationModel model)
-        {
-            var regulation = Mapper.Map<Core.Domain.Regulation>(model);
-
-            await _regulationService.UpdateAsync(regulation);
-
-            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Remove),
-                $"Regulation updated. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
         }
     }
 }

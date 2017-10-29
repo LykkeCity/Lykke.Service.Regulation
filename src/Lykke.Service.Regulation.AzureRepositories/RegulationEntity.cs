@@ -6,9 +6,7 @@ namespace Lykke.Service.Regulation.AzureRepositories
     public class RegulationEntity : TableEntity, IRegulation
     {
         public string Id => RowKey;
-
-        public bool RequiresKYC { get; set; }
-
+        
         internal static string GeneratePartitionKey()
         {
             return "Regulation";
@@ -19,13 +17,12 @@ namespace Lykke.Service.Regulation.AzureRepositories
             return id;
         }
 
-        internal static RegulationEntity Create(string id, bool requiresKYC)
+        internal static RegulationEntity Create(string id)
         {
             return new RegulationEntity
             {
                 RowKey = GenerateRowKey(id),
                 PartitionKey = GeneratePartitionKey(),
-                RequiresKYC = requiresKYC
             };
         }
     }

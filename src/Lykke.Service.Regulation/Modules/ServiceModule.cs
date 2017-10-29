@@ -1,10 +1,8 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common.Log;
 using Lykke.Service.Regulation.AzureRepositories;
-using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Core.Settings.ServiceSettings;
@@ -71,16 +69,19 @@ namespace Lykke.Service.Regulation.Modules
                         tableName, _log)))
                 .As<IClientRegulationRepository>();
 
-            builder.Register(c => new ClientAvailableRegulationRepository(
-                    AzureTableStorage<ClientAvailableRegulationEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
+            builder.Register(c => new WelcomeRegulationRuleRepository(
+                    AzureTableStorage<WelcomeRegulationRuleEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
                         tableName, _log)))
-                .As<IClientAvailableRegulationRepository>();
+                .As<IWelcomeRegulationRuleRepository>();
         }
 
         private void RegisterServices(ContainerBuilder builder)
         {
             builder.RegisterType<ClientRegulationService>()
                 .As<IClientRegulationService>();
+
+            builder.RegisterType<WelcomeRegulationRuleService>()
+                .As<IWelcomeRegulationRuleService>();
 
             builder.RegisterType<RegulationService>()
                 .As<IRegulationService>();

@@ -2,10 +2,12 @@
 
 namespace Lykke.Service.Regulation.Models
 {
-    public class ClientAvailableRegulationModel
+    public class WelcomeRegulationRuleModel
     {
+        public string Id { get; set; }
+
         [Required]
-        public string ClientId { get; set; }
+        public string Country { get; set; }
 
         [Required]
         public string RegulationId { get; set; }

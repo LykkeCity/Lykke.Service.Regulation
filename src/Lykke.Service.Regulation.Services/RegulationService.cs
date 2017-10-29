@@ -11,14 +11,17 @@ namespace Lykke.Service.Regulation.Services
     public class RegulationService : IRegulationService
     {
         private readonly IRegulationRepository _regulationRepository;
-        private readonly IClientAvailableRegulationRepository _clientAvailableRegulationRepository;
+        private readonly IClientRegulationRepository _clientRegulationRepository;
+        private readonly IWelcomeRegulationRuleRepository _welcomeRegulationRuleRepository;
 
         public RegulationService(
             IRegulationRepository regulationRepository,
-            IClientAvailableRegulationRepository clientAvailableRegulationRepository)
+            IClientRegulationRepository clientRegulationRepository,
+            IWelcomeRegulationRuleRepository welcomeRegulationRuleRepository)
         {
             _regulationRepository = regulationRepository;
-            _clientAvailableRegulationRepository = clientAvailableRegulationRepository;
+            _clientRegulationRepository = clientRegulationRepository;
+            _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
         }
         
         public Task<IRegulation> GetAsync(string regulationId)
@@ -36,22 +39,25 @@ namespace Lykke.Service.Regulation.Services
             return _regulationRepository.AddAsync(regulation);
         }
 
-        public async Task RemoveAsync(string regulationId)
+        public async Task DeleteAsync(string regulationId)
         {
-            IEnumerable<IClientAvailableRegulation> clientAvailableRegulations =
-                await _clientAvailableRegulationRepository.GetByRegulationIdAsync(regulationId);
+            IEnumerable<IClientRegulation> clientAvailableRegulations =
+                await _clientRegulationRepository.GetByRegulationIdAsync(regulationId);
 
             if (clientAvailableRegulations.Any())
             {
-                throw new ServiceException("Can not remove regulation. It assosiated with one or more clients.");
+                throw new ServiceException("Can not delete regulation associated with one or more clients.");
             }
 
-            await _regulationRepository.RemoveAsync(regulationId);
-        }
+            IEnumerable<IWelcomeRegulationRule> welcomeRegulationRules =
+                await _welcomeRegulationRuleRepository.GetByRegulationIdAsync(regulationId);
 
-        public Task UpdateAsync(IRegulation regulation)
-        {
-            return _regulationRepository.UpdateAsync(regulation);
+            if (welcomeRegulationRules.Any())
+            {
+                throw new ServiceException("Can not delete regulation associated with one or more welcome rules.");
+            }
+
+            await _regulationRepository.DeleteAsync(regulationId);
         }
     }
 }

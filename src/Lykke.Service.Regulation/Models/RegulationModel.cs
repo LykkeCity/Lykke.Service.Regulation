@@ -6,8 +6,5 @@ namespace Lykke.Service.Regulation.Models
     {
         [Required]
         public string Id { get; set; }
-
-        [Required]
-        public bool RequiresKYC { get; set; }
     }
 }

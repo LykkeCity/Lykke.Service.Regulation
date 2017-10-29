@@ -32,29 +32,17 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public Task AddAsync(IRegulation regulation)
         {
-            RegulationEntity entity = RegulationEntity.Create(regulation.Id, regulation.RequiresKYC);
+            RegulationEntity entity = RegulationEntity.Create(regulation.Id);
 
             return _tableStorage.InsertOrReplaceAsync(entity);
         }
 
-        public async Task RemoveAsync(string regulationId)
+        public async Task DeleteAsync(string regulationId)
         {
             var partitionKey = RegulationEntity.GeneratePartitionKey();
             var rowKey = RegulationEntity.GenerateRowKey(regulationId);
 
             await _tableStorage.DeleteAsync(partitionKey, rowKey);
-        }
-
-        public async Task UpdateAsync(IRegulation regulation)
-        {
-            var partitionKey = RegulationEntity.GeneratePartitionKey();
-            var rowKey = RegulationEntity.GenerateRowKey(regulation.Id);
-
-            await _tableStorage.MergeAsync(partitionKey, rowKey, item =>
-            {
-                item.RequiresKYC = regulation.RequiresKYC;
-                return item;
-            });
         }
     }
 }

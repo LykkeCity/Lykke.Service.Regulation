@@ -11,7 +11,10 @@ namespace Lykke.Service.Regulation.Assets.AutoMapperProfiles
             CreateMap<RegulationModel, Core.Domain.Regulation>();
             CreateMap<IRegulation, RegulationModel>();
             CreateMap<ClientRegulationModel, ClientRegulation>();
-            CreateMap<ClientAvailableRegulationModel, ClientAvailableRegulation>();
+            CreateMap<IWelcomeRegulationRule, WelcomeRegulationRuleModel>();
+            CreateMap<WelcomeRegulationRuleModel, WelcomeRegulationRule>();
+            CreateMap<IClientRegulation, ClientRegulationModel>();
+            CreateMap<ClientRegulationModel, ClientRegulation>();
         }
 
         public override string ProfileName => "Default profile";

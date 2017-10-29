@@ -17,143 +17,212 @@ namespace Lykke.Service.Regulation.Controllers
     [Route("api/[controller]")]
     public class ClientRegulationController : Controller
     {
-        private readonly IRegulationService _regulationService;
         private readonly IClientRegulationService _clientRegulationService;
         private readonly ILog _log;
 
         public ClientRegulationController(
-            IRegulationService regulationService,
             IClientRegulationService clientRegulationService,
             ILog log)
         {
-            _regulationService = regulationService;
             _clientRegulationService = clientRegulationService;
             _log = log;
         }
 
         [HttpGet]
-        [Route("{clientId}")]
+        [Route("{clientId}/{regulationId}")]
         [SwaggerOperation("GetClientRegulation")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ClientRegulationModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> Get(string clientId)
+        public async Task<IActionResult> Get(string clientId, string regulationId)
         {
-            string regulation = await _clientRegulationService.GetAsync(clientId);
+            IClientRegulation clientRegulation =
+                await _clientRegulationService.GetAsync(clientId, regulationId);
 
-            if (string.IsNullOrEmpty(regulation))
+            if (clientRegulation == null)
             {
                 await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Get),
                     $"Client '{clientId}' have not regulation. IP: {HttpContext.GetIp()}");
-                return NotFound(ErrorResponse.Create("Client have not regulation"));
+                return NotFound(ErrorResponse.Create("Client regulation not found."));
             }
 
-            return Ok(regulation);
+            var model = Mapper.Map<ClientRegulationModel>(clientRegulation);
+
+            return Ok(model);
+        }
+
+        [HttpGet]
+        [Route("client/{clientId}")]
+        [SwaggerOperation("GetClientRegulationsByClientId")]
+        [ProducesResponseType(typeof(IEnumerable<ClientRegulationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetByClientId(string clientId)
+        {
+            IEnumerable<IClientRegulation> clientRegulation = 
+                await _clientRegulationService.GetByClientIdAsync(clientId);
+
+            var model = Mapper.Map<IEnumerable<ClientRegulationModel>>(clientRegulation);
+
+            return Ok(model);
+        }
+
+        [HttpGet]
+        [Route("regulation/{regulationId}")]
+        [SwaggerOperation("GetClientRegulationsByRegulationId")]
+        [ProducesResponseType(typeof(IEnumerable<ClientRegulationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetByRegulationId(string regulationId)
+        {
+            IEnumerable<IClientRegulation> clientRegulations =
+                await _clientRegulationService.GetByRegulationIdAsync(regulationId);
+
+            var model = Mapper.Map<IEnumerable<ClientRegulationModel>>(clientRegulations);
+
+            return Ok(model);
+        }
+
+        [HttpGet]
+        [Route("active/{clientId}")]
+        [SwaggerOperation("GetClientRegulationsActiveByClientId")]
+        [ProducesResponseType(typeof(IEnumerable<ClientRegulationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetActiveByClientId(string clientId)
+        {
+            IEnumerable<IClientRegulation> clientRegulations =
+                await _clientRegulationService.GetActiveByClientIdAsync(clientId);
+
+            var model = Mapper.Map<IEnumerable<ClientRegulationModel>>(clientRegulations);
+
+            return Ok(model);
         }
 
         [HttpGet]
         [Route("available/{clientId}")]
-        [SwaggerOperation("GetClientAvailableRegulations")]
-        [ProducesResponseType(typeof(IEnumerable<string>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GetAvailable(string clientId)
+        [SwaggerOperation("GetClientRegulationsAvailableByClientId")]
+        [ProducesResponseType(typeof(IEnumerable<ClientRegulationModel>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetAvailableByClientId(string clientId)
         {
-            IEnumerable<string> regulations = await _clientRegulationService.GetAvailableAsync(clientId);
+            IEnumerable<IClientRegulation> clientRegulations =
+                await _clientRegulationService.GetAvailableByClientIdAsync(clientId);
 
-            return Ok(regulations);
+            var model = Mapper.Map<IEnumerable<ClientRegulationModel>>(clientRegulations);
+
+            return Ok(model);
         }
 
         [HttpPost]
-        [Route("available/add")]
-        [SwaggerOperation("AddClientAvailableRegulation")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task Add([FromBody] ClientAvailableRegulationModel model)
-        {
-            var clientAvailableRegulation = Mapper.Map<ClientAvailableRegulation>(model);
-            await _clientRegulationService.AddAsync(clientAvailableRegulation);
-            
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Add),
-                $"New available regulation added to client. Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
-
-            string regulationId = await _clientRegulationService.GetAsync(model.ClientId);
-            IRegulation regulation = null;
-
-            if (!string.IsNullOrEmpty(regulationId))
-            {
-                regulation = await _regulationService.GetAsync(regulationId);
-            }
-
-            if (regulation == null || !regulation.RequiresKYC)
-            {
-                await _clientRegulationService.SetAsync(new ClientRegulation
-                {
-                    RegulationId = model.RegulationId,
-                    ClientId = model.ClientId
-                });
-
-                await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Add),
-                    $"Regulation assigned to client. Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
-            }
-        }
-
-        [HttpPost]
-        [Route("set")]
-        [SwaggerOperation("SetClientRegulation")]
+        [Route("add")]
+        [SwaggerOperation("AddClientRegulation")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Set([FromBody] ClientRegulationModel model)
+        public async Task<IActionResult> Add([FromBody] ClientRegulationModel model)
         {
-            var regulation = Mapper.Map<ClientRegulation>(model);
-
-            try
+            if (!ModelState.IsValid)
             {
-                await _clientRegulationService.SetAsync(regulation);
-            }
-            catch (ServiceException exception)
-            {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Set),
-                    $"{exception.Message} Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
-
-                return BadRequest(ErrorResponse.Create(exception.Message));
+                return BadRequest(ErrorResponse.Create("Invalid model.", ModelState));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Set),
-                $"Regulation assigned to client. Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
+            var clientRegulation = Mapper.Map<ClientRegulation>(model);
+            await _clientRegulationService.AddAsync(clientRegulation);
+            
+            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Add),
+                $"Client regulation added. Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return Ok();
         }
 
-        [HttpDelete]
-        [Route("{clientId}")]
-        [SwaggerOperation("RemoveClientRegulation")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task Remove(string clientId)
-        {
-            await _clientRegulationService.RemoveAsync(clientId);
-
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Remove),
-                $"Client current regulation removed. ClientId {clientId}. IP: {HttpContext.GetIp()}");
-        }
-
-        [HttpDelete]
-        [Route("available/{clientId}/{regulationId}")]
-        [SwaggerOperation("RemoveClientAvailableRegulation")]
+        [HttpPost]
+        [Route("kyc/{clientId}/{regulationId}")]
+        [SwaggerOperation("SetClientRegulationKyc")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> RemoveAvailable(string clientId, string regulationId)
+        public async Task<IActionResult> SetKyc(string clientId, string regulationId)
         {
             try
             {
-                await _clientRegulationService.RemoveAvailableAsync(clientId, regulationId);
+                await _clientRegulationService.SetKycAsync(clientId, regulationId);
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(RemoveAvailable),
+                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(SetKyc),
                     $"{exception.Message} ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(RemoveAvailable),
-                $"Client available regulation removed. ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(SetKyc),
+                $"Client regulation KYC updated. ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("activate/{clientId}/{regulationId}")]
+        [SwaggerOperation("ActivateClientRegulation")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Activate(string clientId, string regulationId)
+        {
+            try
+            {
+                await _clientRegulationService.SetActiveAsync(clientId, regulationId, true);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Activate),
+                    $"{exception.Message} ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+
+            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Activate),
+                $"Client regulation activated. ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("deactivate/{clientId}/{regulationId}")]
+        [SwaggerOperation("ActivateClientRegulation")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Deactivate(string clientId, string regulationId)
+        {
+            try
+            {
+                await _clientRegulationService.SetActiveAsync(clientId, regulationId, false);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Deactivate),
+                    $"{exception.Message} ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+
+            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Deactivate),
+                $"Client regulation deactivated. ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("{clientId}/{regulationId}")]
+        [SwaggerOperation("DeleteClientRegulation")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Delete(string clientId, string regulationId)
+        {
+            try
+            {
+                await _clientRegulationService.DeleteAsync(clientId, regulationId);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Delete),
+                    $"{exception.Message} ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+
+            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Delete),
+                $"Client current regulation deleted. ClientId {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
             return Ok();
         }
