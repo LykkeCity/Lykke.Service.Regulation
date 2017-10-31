@@ -14,6 +14,9 @@ using Lykke.Service.Regulation.Services.Exceptions;
 
 namespace Lykke.Service.Regulation.Controllers
 {
+    /// <summary>
+    /// Provides methods for working with regulations.
+    /// </summary>
     [Route("api/[controller]")]
     public class RegulationController : Controller
     {
@@ -26,9 +29,16 @@ namespace Lykke.Service.Regulation.Controllers
             _log = log;
         }
 
+        /// <summary>
+        /// Returns a regulation details by specified id.
+        /// </summary>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns>The regulation if exists, otherwise <see cref="ErrorResponse"/>.</returns>
+        /// <response code="200">The regulation.</response>
+        /// <response code="404">Regulation not found.</response>
         [HttpGet]
         [Route("{regulationId}")]
-        [SwaggerOperation("GetRegulationById")]
+        [SwaggerOperation("GetRegulation")]
         [ProducesResponseType(typeof(RegulationModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Get(string regulationId)
@@ -48,6 +58,11 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Returns all regulations.
+        /// </summary>
+        /// <returns>The list of regulations.</returns>
+        /// <response code="200">The list of regulations.</response>
         [HttpGet]
         [SwaggerOperation("GetRegulations")]
         [ProducesResponseType(typeof(IEnumerable<RegulationModel>), (int)HttpStatusCode.OK)]
@@ -61,6 +76,13 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Adds the regulation.
+        /// </summary>
+        /// <param name="model">The model what describe a regulation.</param>
+        /// <returns></returns>
+        /// <response code="204">Regulation successfully added.</response>
+        /// <response code="400">Invalid model what describe a regulation.</response>
         [HttpPost]
         [SwaggerOperation("AddRegulation")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -82,6 +104,14 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok();
         }
 
+
+        /// <summary>
+        /// Deletes the regulation by specified id.
+        /// </summary>
+        /// <param name="regulationId">The id of regulation to delete.</param>
+        /// <returns></returns>
+        /// <response code="204">Regulation successfully deleted.</response>
+        /// <response code="400">Can not delete regulation associated with client or welcome regulation rule.</response>
         [HttpDelete]
         [Route("{regulationId}")]
         [SwaggerOperation("DeleteRegulation")]

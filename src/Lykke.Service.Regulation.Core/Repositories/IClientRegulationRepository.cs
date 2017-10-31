@@ -18,6 +18,8 @@ namespace Lykke.Service.Regulation.Core.Repositories
 
         Task AddAsync(IClientRegulation clientRegulation);
 
+        Task AddAsync(IEnumerable<IClientRegulation> clientRegulations);
+
         Task UpdateAsync(IClientRegulation clientRegulation);
 
         Task DeleteAsync(string clientId, string regulationId);

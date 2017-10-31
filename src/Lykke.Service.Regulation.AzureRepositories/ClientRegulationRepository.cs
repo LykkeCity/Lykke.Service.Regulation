@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
 using Lykke.Service.Regulation.Core.Domain;
@@ -110,6 +111,14 @@ namespace Lykke.Service.Regulation.AzureRepositories
                 ClientRegulationEntity.Create(clientRegulation.ClientId, clientRegulation.RegulationId);
 
             return _tableStorage.InsertOrReplaceAsync(entity);
+        }
+
+        public Task AddAsync(IEnumerable<IClientRegulation> clientRegulations)
+        {
+            IEnumerable<ClientRegulationEntity> entities =
+                clientRegulations.Select(o => ClientRegulationEntity.Create(o.ClientId, o.RegulationId));
+
+            return _tableStorage.InsertOrReplaceBatchAsync(entities);
         }
 
         public Task UpdateAsync(IClientRegulation clientRegulation)

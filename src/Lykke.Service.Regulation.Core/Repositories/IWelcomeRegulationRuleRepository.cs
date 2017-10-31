@@ -14,6 +14,6 @@ namespace Lykke.Service.Regulation.Core.Repositories
 
         Task AddAsync(IWelcomeRegulationRule welcomeRegulationRule);
 
-        Task DeleteAsync(string id);
+        Task DeleteAsync(string regulationId);
     }
 }

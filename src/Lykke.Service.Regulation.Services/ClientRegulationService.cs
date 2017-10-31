@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
@@ -11,13 +12,16 @@ namespace Lykke.Service.Regulation.Services
     {
         private readonly IRegulationRepository _regulationRepository;
         private readonly IClientRegulationRepository _clientRegulationRepository;
+        private readonly IWelcomeRegulationRuleRepository _welcomeRegulationRuleRepository;
 
         public ClientRegulationService(
             IRegulationRepository regulationRepository,
-            IClientRegulationRepository clientRegulationRepository)
+            IClientRegulationRepository clientRegulationRepository,
+            IWelcomeRegulationRuleRepository welcomeRegulationRuleRepository)
         {
             _regulationRepository = regulationRepository;
             _clientRegulationRepository = clientRegulationRepository;
+            _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
         }
 
         public Task<IClientRegulation> GetAsync(string clientId, string regulationId)
@@ -53,8 +57,38 @@ namespace Lykke.Service.Regulation.Services
             {
                 throw new ServiceException("Regulation not found.");
             }
-            
+
             await _clientRegulationRepository.AddAsync(clientRegulation);
+        }
+
+        public async Task SetDefaultAsync(string clientId, string country)
+        {
+            IEnumerable<IClientRegulation> clientRegulations =
+                await _clientRegulationRepository.GetByClientIdAsync(clientId);
+
+            if (clientRegulations.Any())
+            {
+                throw new ServiceException("Client already have regulations.");
+            }
+
+            List<IWelcomeRegulationRule> welcomeRegulationRules =
+                (await _welcomeRegulationRuleRepository.GetByCountryAsync(country)).ToList();
+
+            if (!welcomeRegulationRules.Any())
+            {
+                throw new ServiceException("No default regulations for country.");
+            }
+
+            IEnumerable<ClientRegulation> defaultClientRegulations =
+                welcomeRegulationRules.Select(o => new ClientRegulation
+                {
+                    ClientId = clientId,
+                    RegulationId = o.RegulationId,
+                    Active = false,
+                    Kyc = false
+                });
+
+            await _clientRegulationRepository.AddAsync(defaultClientRegulations);
         }
 
         public async Task SetKycAsync(string clientId, string regulationId)
@@ -67,7 +101,7 @@ namespace Lykke.Service.Regulation.Services
             }
 
             clientRegulation.Kyc = true;
-            
+
             await _clientRegulationRepository.UpdateAsync(clientRegulation);
         }
 
@@ -89,7 +123,7 @@ namespace Lykke.Service.Regulation.Services
         {
             IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
 
-            if(clientRegulation == null)
+            if (clientRegulation == null)
                 return;
 
             if (clientRegulation.Kyc)

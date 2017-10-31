@@ -22,10 +22,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// <summary>
         /// Initializes a new instance of the RegulationModel class.
         /// </summary>
-        public RegulationModel(bool requiresKYC, string id = default(string))
+        public RegulationModel(string id = default(string))
         {
             Id = id;
-            RequiresKYC = requiresKYC;
             CustomInit();
         }
 
@@ -39,20 +38,5 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         [JsonProperty(PropertyName = "Id")]
         public string Id { get; set; }
 
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "RequiresKYC")]
-        public bool RequiresKYC { get; set; }
-
-        /// <summary>
-        /// Validate the object.
-        /// </summary>
-        /// <exception cref="Microsoft.Rest.ValidationException">
-        /// Thrown if validation fails
-        /// </exception>
-        public virtual void Validate()
-        {
-            //Nothing to validate
-        }
     }
 }

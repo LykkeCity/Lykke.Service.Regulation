@@ -63,11 +63,11 @@ namespace Lykke.Service.Regulation.AzureRepositories
             return _tableStorage.InsertOrReplaceAsync(entity);
         }
 
-        public async Task DeleteAsync(string id)
+        public async Task DeleteAsync(string regulationId)
         {
             var partitionKey = WelcomeRegulationRuleEntity.GeneratePartitionKey();
             
-            await _tableStorage.DeleteAsync(partitionKey, id);
+            await _tableStorage.DeleteAsync(partitionKey, regulationId);
         }
     }
 }

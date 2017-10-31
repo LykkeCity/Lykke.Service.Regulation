@@ -8,8 +8,7 @@ namespace Lykke.Service.Regulation.Client
         {
             return new RegulationModel
             {
-                Id = model.Id,
-                RequiresKYC = model.RequiresKYC
+                Id = model.Id
             };
         }
 
@@ -17,17 +16,21 @@ namespace Lykke.Service.Regulation.Client
         {
             return new ClientRegulationModel
             {
+                Id = model.Id,
                 ClientId = model.ClientId,
-                RegulationId = model.RegulationId
+                RegulationId = model.RegulationId,
+                Kyc = model.Kyc,
+                Active = model.Active
             };
         }
 
-        public static ClientAvailableRegulationModel ToModel(this AutorestClient.Models.ClientAvailableRegulationModel model)
+        public static WelcomeRegulationRuleModel ToModel(this AutorestClient.Models.WelcomeRegulationRuleModel model)
         {
-            return new ClientAvailableRegulationModel
+            return new WelcomeRegulationRuleModel
             {
-                ClientId = model.ClientId,
-                RegulationId = model.RegulationId
+                Id = model.Id,
+                RegulationId = model.RegulationId,
+                Country = model.Country
             };
         }
     }

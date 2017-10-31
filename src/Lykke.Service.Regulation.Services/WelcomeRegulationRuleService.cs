@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
@@ -44,12 +45,20 @@ namespace Lykke.Service.Regulation.Services
                 throw new ServiceException("Regulation not found.");
             }
 
+            IEnumerable<IWelcomeRegulationRule> regulationRules =
+                await _welcomeRegulationRuleRepository.GetByCountryAsync(welcomeRegulationRule.Country);
+
+            if (regulationRules.Any(o => o.RegulationId == welcomeRegulationRule.RegulationId))
+            {
+                throw new ServiceException("Rule already exist.");
+            }
+            
             await _welcomeRegulationRuleRepository.AddAsync(welcomeRegulationRule);
         }
 
-        public Task DeleteAsync(string id)
+        public Task DeleteAsync(string regulationId)
         {
-            return _welcomeRegulationRuleRepository.DeleteAsync(id);
+            return _welcomeRegulationRuleRepository.DeleteAsync(regulationId);
         }
     }
 }

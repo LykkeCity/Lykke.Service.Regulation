@@ -6,7 +6,7 @@ using Common.Log;
 using Lykke.Service.Regulation.Client.AutorestClient;
 using Lykke.Service.Regulation.Client.AutorestClient.Models;
 using Lykke.Service.Regulation.Client.Exceptions;
-using ClientAvailableRegulationModel = Lykke.Service.Regulation.Client.Models.ClientAvailableRegulationModel;
+using WelcomeRegulationRuleModel = Lykke.Service.Regulation.Client.Models.WelcomeRegulationRuleModel;
 using ClientRegulationModel = Lykke.Service.Regulation.Client.Models.ClientRegulationModel;
 using RegulationModel = Lykke.Service.Regulation.Client.Models.RegulationModel;
 
@@ -15,7 +15,7 @@ namespace Lykke.Service.Regulation.Client
     /// <summary>
     /// Contains methods for work with regulation service.
     /// </summary>
-    public class RegulationClient : IRegulationClient, IDisposable
+    public class RegulationClient : IDisposable, IRegulationClient
     {
         private readonly ILog _log;
         private RegulationAPI _service;
@@ -40,15 +40,15 @@ namespace Lykke.Service.Regulation.Client
         }
 
         /// <summary>
-        /// Returns regulation by id.
+        /// Returns regulation details by specified id.
         /// </summary>
         /// <param name="regulationId">The regulation id.</param>
         /// <returns>The <see cref="RegulationModel"/>.</returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
-        public async Task<RegulationModel> GetRegulationByIdAsync(string regulationId)
+        public async Task<RegulationModel> GetRegulationAsync(string regulationId)
         {
-            object result = await _service.GetRegulationByIdAsync(regulationId);
+            object result = await _service.GetRegulationAsync(regulationId);
 
             if (result is AutorestClient.Models.RegulationModel regulationModel)
                 return regulationModel.ToModel();
@@ -71,45 +71,109 @@ namespace Lykke.Service.Regulation.Client
         }
 
         /// <summary>
-        /// Adds regulations.
+        /// Adds the regulation.
         /// </summary>
         /// <param name="model">The model what describe a regulation.</param>
         /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         public async Task AddRegulationAsync(RegulationModel model)
         {
-            await _service.AddRegulationAsync(new AutorestClient.Models.RegulationModel(model.RequiresKYC, model.Id));
+            ErrorResponse errorResponse =
+                await _service.AddRegulationAsync(new AutorestClient.Models.RegulationModel(model.Id));
+
+            if(errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
         }
 
         /// <summary>
-        /// Removes the regulation.
+        /// Deletes the regulation by specified id.
         /// </summary>
-        /// <param name="regulationId">The regulation id for remove.</param>
+        /// <param name="regulationId">The id of regulation to delete.</param>
         /// <returns></returns>
-        public async Task RemoveRegulationAsync(string regulationId)
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task DeleteRegulationAsync(string regulationId)
         {
-            await _service.RemoveRegulationAsync(regulationId);
+            ErrorResponse errorResponse = await _service.DeleteRegulationAsync(regulationId);
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
         }
 
         /// <summary>
-        /// Updates regulation.
+        /// Returns all welcome regulation rules.
         /// </summary>
-        /// <param name="model">The model what describe a regulation.</param>
-        /// <returns></returns>
-        public async Task UpdateRegulationAsync(RegulationModel model)
+        /// <returns>The list of welcome regulation rules.</returns>
+        public async Task<IEnumerable<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesAsync()
         {
-            await _service.UpdateRegulationAsync(new AutorestClient.Models.RegulationModel(model.RequiresKYC, model.Id));
+            IEnumerable<AutorestClient.Models.WelcomeRegulationRuleModel> regulations = 
+                await _service.GetWelcomeRegulationRulesAsync();
+
+            return regulations.Select(o => o.ToModel());
         }
 
         /// <summary>
-        /// Returns client current regulation.
+        /// Returns all welcome regulation rules associated with specified country.
+        /// </summary>
+        /// <param name="country">The country name.</param>
+        /// <returns>The list of welcome regulation rules.</returns>
+        public async Task<IEnumerable<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesByCountryAsync(string country)
+        {
+            IEnumerable<AutorestClient.Models.WelcomeRegulationRuleModel> regulations =
+                await _service.GetWelcomeRegulationRulesByCountryAsync(country);
+
+            return regulations.Select(o => o.ToModel());
+        }
+
+        /// <summary>
+        /// Returns all welcome regulation rules associated with specified regulation.
+        /// </summary>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns>The list of welcome regulation rules.</returns>
+        public async Task<IEnumerable<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesByRegulationIdAsync(string regulationId)
+        {
+            IEnumerable<AutorestClient.Models.WelcomeRegulationRuleModel> regulations =
+                await _service.GetWelcomeRegulationRulesByRegulationIdAsync(regulationId);
+
+            return regulations.Select(o => o.ToModel());
+        }
+
+        /// <summary>
+        /// Adds the welcome regulation rule.
+        /// </summary>
+        /// <param name="model">The model what describe a welcome regulation rule.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task AddWelcomeRegulationRuleAsync(WelcomeRegulationRuleModel model)
+        {
+            ErrorResponse errorResponse =
+                await _service.AddWelcomeRegulationRuleAsync(
+                    new AutorestClient.Models.WelcomeRegulationRuleModel(model.Id, model.Country, model.RegulationId));
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Deletes the welcome regulation rule by specified regulation id.
+        /// </summary>
+        /// <param name="regulationId">The regulation id associated with welcome regulation rule.</param>
+        /// <returns></returns>
+        public Task DeleteWelcomeRegulationRuleAsync(string regulationId)
+        {
+            return _service.DeleteWelcomeRegulationRuleAsync(regulationId);
+        }
+
+        /// <summary>
+        /// Returns a client regulation by specified client id and regulation id.
         /// </summary>
         /// <param name="clientId">The client id.</param>
-        /// <returns>Client current regulation id.</returns>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns>Client regulation.</returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
-        public async Task<string> GetClientRegulationAsync(string clientId)
+        public async Task<string> GetClientRegulationAsync(string clientId, string regulationId)
         {
-            object result = await _service.GetClientRegulationAsync(clientId);
+            object result = await _service.GetClientRegulationAsync(clientId, regulationId);
 
             if (result is string regulation)
                 return regulation;
@@ -121,61 +185,154 @@ namespace Lykke.Service.Regulation.Client
         }
 
         /// <summary>
-        /// Returns client available regulations.
+        /// Returns a regulations associated with client.
         /// </summary>
         /// <param name="clientId">The client id.</param>
-        /// <returns>The list of client available regulations.</returns>
-        public Task<IList<string>> GetClientAvailableRegulationsAsync(string clientId)
+        /// <returns>The list of client regulations.</returns>
+        public async Task<IEnumerable<ClientRegulationModel>> GetClientRegulationsByClientIdAsync(string clientId)
         {
-            return _service.GetClientAvailableRegulationsAsync(clientId);
+            IEnumerable<AutorestClient.Models.ClientRegulationModel> regulations
+                = await _service.GetClientRegulationsByClientIdAsync(clientId);
+
+            return regulations.Select(o => o.ToModel());
         }
 
         /// <summary>
-        /// Adds client available regulation.
+        /// Returns a regulations associated with regulation.
         /// </summary>
-        /// <param name="model">The model what describe a client available regulation.</param>
-        /// <returns></returns>
-        public Task AddClientAvailableRegulationAsync(ClientAvailableRegulationModel model)
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns>The list of client regulations.</returns>
+        public async Task<IEnumerable<ClientRegulationModel>> GetClientRegulationsByRegulationIdAsync(string regulationId)
         {
-            return _service.AddClientAvailableRegulationAsync(
-                new AutorestClient.Models.ClientAvailableRegulationModel(model.ClientId, model.RegulationId));
+            IEnumerable<AutorestClient.Models.ClientRegulationModel> regulations
+                = await _service.GetClientRegulationsByRegulationIdAsync(regulationId);
+
+            return regulations.Select(o => o.ToModel());
         }
 
         /// <summary>
-        /// Sets client regulation.
+        /// Returns an active client regulations associated with client.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns>The list of client regulations.</returns>
+        public async Task<IEnumerable<ClientRegulationModel>> GetActiveClientRegulationsByClientIdAsync(string clientId)
+        {
+            IEnumerable<AutorestClient.Models.ClientRegulationModel> regulations
+                = await _service.GetActiveClientRegulationsByClientIdAsync(clientId);
+
+            return regulations.Select(o => o.ToModel());
+        }
+
+        /// <summary>
+        /// Returns an active and KYC client regulations associated with client.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns>The list of client regulations.</returns>
+        public async Task<IEnumerable<ClientRegulationModel>> GetAvailableClientRegulationsByClientIdAsync(string clientId)
+        {
+            IEnumerable<AutorestClient.Models.ClientRegulationModel> regulations
+                = await _service.GetAvailableClientRegulationsByClientIdAsync(clientId);
+
+            return regulations.Select(o => o.ToModel());
+        }
+
+        /// <summary>
+        /// Adds the client regulation.
         /// </summary>
         /// <param name="model">The model what describe a client regulation.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
-        public async Task SetClientRegulationAsync(ClientRegulationModel model)
+        public async Task AddClientRegulationAsync(ClientRegulationModel model)
         {
-            ErrorResponse errorResponse = await _service.SetClientRegulationAsync(
-                new AutorestClient.Models.ClientRegulationModel(model.ClientId, model.RegulationId));
+            ErrorResponse errorResponse =
+                await _service.AddClientRegulationAsync(
+                    new AutorestClient.Models.ClientRegulationModel
+                    {
+                        Id = model.Id,
+                        ClientId = model.ClientId,
+                        RegulationId = model.RegulationId,
+                        Kyc = model.Kyc,
+                        Active = model.Active
+                    });
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
         }
 
         /// <summary>
-        /// Removes client regulation.
+        /// Adds default regulations to client associated with country.
         /// </summary>
         /// <param name="clientId">The client id.</param>
+        /// <param name="country">The country name.</param>
         /// <returns></returns>
-        public Task RemoveClientRegulationAsync(string clientId)
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task SetDefaultClientRegulationsAsync(string clientId, string country)
         {
-            return _service.RemoveClientRegulationAsync(clientId);
+            ErrorResponse errorResponse =
+                await _service.SetDefaultClientRegulationsAsync(clientId, country);
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
         }
 
         /// <summary>
-        /// Removes client available regulation.
+        /// Sets the client regulation KYC status to <c>true</c>.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="regulationId">The regulation id.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
-        public async Task RemoveClientAvailableRegulationAsync(string clientId, string regulationId)
+        public async Task SetClientRegulationKycAsync(string clientId, string regulationId)
         {
-            ErrorResponse errorResponse = await _service.RemoveClientAvailableRegulationAsync(clientId, regulationId);
+            ErrorResponse errorResponse =
+                await _service.SetClientRegulationKycAsync(clientId, regulationId);
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Sets the client regulation active status to <c>true</c>.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task ActivateClientRegulationAsync(string clientId, string regulationId)
+        {
+            ErrorResponse errorResponse =
+                await _service.ActivateClientRegulationAsync(clientId, regulationId);
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Sets the client regulation active status to <c>false</c>.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task DeactivateClientRegulationAsync(string clientId, string regulationId)
+        {
+            ErrorResponse errorResponse =
+                await _service.DeactivateClientRegulationAsync(clientId, regulationId);
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Deletes the regulation associated with client by specified id.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task DeleteClientRegulationAsync(string clientId, string regulationId)
+        {
+            ErrorResponse errorResponse = await _service.DeleteClientRegulationAsync(clientId, regulationId);
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);

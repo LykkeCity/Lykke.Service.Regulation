@@ -14,6 +14,9 @@ using Swashbuckle.SwaggerGen.Annotations;
 
 namespace Lykke.Service.Regulation.Controllers
 {
+    /// <summary>
+    /// Provides methods for working with client regulations.
+    /// </summary>
     [Route("api/[controller]")]
     public class ClientRegulationController : Controller
     {
@@ -28,6 +31,14 @@ namespace Lykke.Service.Regulation.Controllers
             _log = log;
         }
 
+        /// <summary>
+        /// Returns a client regulation by specified client id and regulation id.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns>The client regulation.</returns>
+        /// <response code="200">The client regulation.</response>
+        /// <response code="404">Client regulation not found.</response>
         [HttpGet]
         [Route("{clientId}/{regulationId}")]
         [SwaggerOperation("GetClientRegulation")]
@@ -50,6 +61,12 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Returns a client regulations associated with client.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns>The list of client regulations.</returns>
+        /// <response code="200">The list of client regulations.</response>
         [HttpGet]
         [Route("client/{clientId}")]
         [SwaggerOperation("GetClientRegulationsByClientId")]
@@ -64,6 +81,12 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Returns a client regulations associated with regulation.
+        /// </summary>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns>The list of client regulations.</returns>
+        /// <response code="200">The list of client regulations.</response>
         [HttpGet]
         [Route("regulation/{regulationId}")]
         [SwaggerOperation("GetClientRegulationsByRegulationId")]
@@ -78,9 +101,15 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Returns an active client regulations associated with client.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns>The list of client regulations.</returns>
+        /// <response code="200">The list of client regulations.</response>
         [HttpGet]
         [Route("active/{clientId}")]
-        [SwaggerOperation("GetClientRegulationsActiveByClientId")]
+        [SwaggerOperation("GetActiveClientRegulationsByClientId")]
         [ProducesResponseType(typeof(IEnumerable<ClientRegulationModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetActiveByClientId(string clientId)
         {
@@ -92,9 +121,15 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Returns an active and KYC client regulations associated with client.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns>The list of client regulations.</returns>
+        /// <response code="200">The list of client regulations.</response>
         [HttpGet]
         [Route("available/{clientId}")]
-        [SwaggerOperation("GetClientRegulationsAvailableByClientId")]
+        [SwaggerOperation("GetAvailableClientRegulationsByClientId")]
         [ProducesResponseType(typeof(IEnumerable<ClientRegulationModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAvailableByClientId(string clientId)
         {
@@ -106,6 +141,13 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok(model);
         }
 
+        /// <summary>
+        /// Adds the client regulation.
+        /// </summary>
+        /// <param name="model">The model what describe a client regulation.</param>
+        /// <returns></returns>
+        /// <response code="204">Client regulation successfully added.</response>
+        /// <response code="400">Invalid model what describe a client regulation.</response>
         [HttpPost]
         [Route("add")]
         [SwaggerOperation("AddClientRegulation")]
@@ -127,6 +169,47 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Adds default regulations to client associated with country.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="country">The country name.</param>
+        /// <returns></returns>
+        /// <response code="204">Default regulations successfully added to client.</response>
+        /// <response code="400">Client already have regulations or no default regulations for specified country.</response>
+        [HttpPost]
+        [Route("default/{clientId}/{country}")]
+        [SwaggerOperation("SetDefaultClientRegulations")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> SetDefault(string clientId, string country)
+        {
+            try
+            {
+                await _clientRegulationService.SetDefaultAsync(clientId, country);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(SetDefault),
+                    $"{exception.Message} ClientId: {clientId}. Country: {country}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+
+            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(SetDefault),
+                $"Default regulations was assigned for client. ClientId: {clientId}. Country: {country}. IP: {HttpContext.GetIp()}");
+
+            return Ok();
+        }
+
+        /// <summary>
+        /// Sets the client regulation KYC status to <c>true</c>.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <response code="204">Client regulation KYC status successfully updated.</response>
+        /// <response code="400">Client regulation not found.</response>
         [HttpPost]
         [Route("kyc/{clientId}/{regulationId}")]
         [SwaggerOperation("SetClientRegulationKyc")]
@@ -152,6 +235,14 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Sets the client regulation active status to <c>true</c>.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <response code="204">Client regulation active status successfully updated.</response>
+        /// <response code="400">Client regulation not found.</response>
         [HttpPost]
         [Route("activate/{clientId}/{regulationId}")]
         [SwaggerOperation("ActivateClientRegulation")]
@@ -177,9 +268,17 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Sets the client regulation active status to <c>false</c>.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <response code="204">Client regulation active status successfully updated.</response>
+        /// <response code="400">Client regulation not found.</response>
         [HttpPost]
         [Route("deactivate/{clientId}/{regulationId}")]
-        [SwaggerOperation("ActivateClientRegulation")]
+        [SwaggerOperation("DeactivateClientRegulation")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Deactivate(string clientId, string regulationId)
@@ -202,6 +301,14 @@ namespace Lykke.Service.Regulation.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Deletes the regulation associated with client by specified id.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The id of regulation to delete.</param>
+        /// <returns></returns>
+        /// <response code="204">Client regulation successfully deleted.</response>
+        /// <response code="400">Can not delete KYC or active client regulation.</response>
         [HttpDelete]
         [Route("{clientId}/{regulationId}")]
         [SwaggerOperation("DeleteClientRegulation")]
