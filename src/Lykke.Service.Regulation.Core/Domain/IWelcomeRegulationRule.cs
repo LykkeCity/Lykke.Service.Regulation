@@ -5,5 +5,6 @@
         string Id { get; }
         string Country { get; }
         string RegulationId { get; }
+        bool Active { get; }
     }
 }

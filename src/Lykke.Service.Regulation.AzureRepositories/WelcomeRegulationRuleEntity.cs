@@ -12,6 +12,8 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public string RegulationId { get; set; }
 
+        public bool Active { get; set; }
+
         internal static string GeneratePartitionKey()
         {
             return "WelcomeRegulationRule";
@@ -22,14 +24,15 @@ namespace Lykke.Service.Regulation.AzureRepositories
             return Guid.NewGuid().ToString("D");
         }
 
-        internal static WelcomeRegulationRuleEntity Create(string country, string regulationId)
+        internal static WelcomeRegulationRuleEntity Create(IWelcomeRegulationRule welcomeRegulationRule)
         {
             return new WelcomeRegulationRuleEntity
             {
                 RowKey = GenerateRowKey(),
                 PartitionKey = GeneratePartitionKey(),
-                Country = country,
-                RegulationId = regulationId
+                Country = welcomeRegulationRule.Country,
+                RegulationId = welcomeRegulationRule.RegulationId,
+                Active = welcomeRegulationRule.Active
             };
         }
     }

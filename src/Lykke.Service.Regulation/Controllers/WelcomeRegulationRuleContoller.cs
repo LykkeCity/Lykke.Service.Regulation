@@ -127,6 +127,38 @@ namespace Lykke.Service.Regulation.Controllers
         }
 
         /// <summary>
+        /// Updates active state of welcome regulation rule.
+        /// </summary>
+        /// <param name="regulationRuleId">The welcome regulation rule id.</param>
+        /// <param name="active">The welcome regulation rule active state.</param>
+        /// <response code="204">Welcome regulation rule active state successfully updated.</response>
+        /// <response code="400">Regulation rule not found.</response>
+        [HttpPut]
+        [Route("{regulationRuleId}/{active}")]
+        [SwaggerOperation("UpdateWelcomeRegulationRuleActive")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> UpdateActive(string regulationRuleId, bool active)
+        {
+            try
+            {
+                await _welcomeRegulationRuleService.UpdateActiveAsync(regulationRuleId, active);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(UpdateActive),
+                    $"{exception.Message} RegulationRuleId: {regulationRuleId}. Active: {active}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+
+            await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(UpdateActive),
+                $"Welcome regulation rule active state updated. RegulationRuleId: {regulationRuleId}. Active: {active}. IP: {HttpContext.GetIp()}");
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Deletes the welcome regulation rule by specified regulation id.
         /// </summary>
         /// <param name="regulationId">The regulation id associated with welcome regulation rule.</param>

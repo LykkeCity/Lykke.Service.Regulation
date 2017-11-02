@@ -56,6 +56,24 @@ namespace Lykke.Service.Regulation.Services
             await _welcomeRegulationRuleRepository.AddAsync(welcomeRegulationRule);
         }
 
+        public async Task UpdateActiveAsync(string id, bool active)
+        {
+            IWelcomeRegulationRule regulationRule = await _welcomeRegulationRuleRepository.GetAsync(id);
+
+            if (regulationRule == null)
+            {
+                throw new ServiceException("Regulation rule not found.");
+            }
+
+            await _welcomeRegulationRuleRepository.UpdateAsync(new WelcomeRegulationRule
+            {
+                Id = regulationRule.Id,
+                RegulationId = regulationRule.RegulationId,
+                Country = regulationRule.Country,
+                Active = active
+            });
+        }
+
         public Task DeleteAsync(string regulationId)
         {
             return _welcomeRegulationRuleRepository.DeleteAsync(regulationId);
