@@ -91,7 +91,7 @@ namespace Lykke.Service.Regulation.Services
             await _clientRegulationRepository.AddAsync(defaultClientRegulations);
         }
 
-        public async Task SetKycAsync(string clientId, string regulationId)
+        public async Task UpdateKycAsync(string clientId, string regulationId, bool active)
         {
             IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
 
@@ -100,12 +100,12 @@ namespace Lykke.Service.Regulation.Services
                 throw new ServiceException("Client regulation not found.");
             }
 
-            clientRegulation.Kyc = true;
+            clientRegulation.Kyc = active;
 
             await _clientRegulationRepository.UpdateAsync(clientRegulation);
         }
 
-        public async Task SetActiveAsync(string clientId, string regulationId, bool state)
+        public async Task UpdateActiveAsync(string clientId, string regulationId, bool state)
         {
             IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
 

@@ -203,34 +203,35 @@ namespace Lykke.Service.Regulation.Controllers
         }
 
         /// <summary>
-        /// Sets the client regulation KYC status to <c>true</c>.
+        /// Updates the client regulation KYC status.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="regulationId">The regulation id.</param>
+        /// <param name="active">The client regulation KYC status.</param>
         /// <returns></returns>
         /// <response code="204">Client regulation KYC status successfully updated.</response>
         /// <response code="400">Client regulation not found.</response>
         [HttpPost]
-        [Route("kyc/{clientId}/{regulationId}")]
-        [SwaggerOperation("SetClientRegulationKyc")]
+        [Route("kyc/{clientId}/{regulationId}/{active}")]
+        [SwaggerOperation("UpdateClientRegulationKyc")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> SetKyc(string clientId, string regulationId)
+        public async Task<IActionResult> UpdateKyc(string clientId, string regulationId, bool active)
         {
             try
             {
-                await _clientRegulationService.SetKycAsync(clientId, regulationId);
+                await _clientRegulationService.UpdateKycAsync(clientId, regulationId, active);
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(SetKyc),
-                    $"{exception.Message} ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(UpdateKyc),
+                    $"{exception.Message} ClientId: {clientId}. RegulationId: {regulationId}. Active: {active}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(SetKyc),
-                $"Client regulation KYC updated. ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(UpdateKyc),
+                $"Client regulation KYC updated. ClientId: {clientId}. RegulationId: {regulationId}. Active: {active}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
         }
@@ -252,7 +253,7 @@ namespace Lykke.Service.Regulation.Controllers
         {
             try
             {
-                await _clientRegulationService.SetActiveAsync(clientId, regulationId, true);
+                await _clientRegulationService.UpdateActiveAsync(clientId, regulationId, true);
             }
             catch (ServiceException exception)
             {
@@ -285,7 +286,7 @@ namespace Lykke.Service.Regulation.Controllers
         {
             try
             {
-                await _clientRegulationService.SetActiveAsync(clientId, regulationId, false);
+                await _clientRegulationService.UpdateActiveAsync(clientId, regulationId, false);
             }
             catch (ServiceException exception)
             {

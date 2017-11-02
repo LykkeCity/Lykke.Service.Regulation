@@ -93,7 +93,7 @@ namespace Lykke.Service.Regulation.Tests
                 .Returns(Task.FromResult<IClientRegulation>(null));
 
             // act
-            Task task = _service.SetKycAsync(clientId, regulationId);
+            Task task = _service.UpdateKycAsync(clientId, regulationId, true);
 
             // assert
             ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
@@ -123,7 +123,7 @@ namespace Lykke.Service.Regulation.Tests
                 .Returns(Task.CompletedTask);
 
             // act
-            await _service.SetKycAsync(clientId, regulationId);
+            await _service.UpdateKycAsync(clientId, regulationId, true);
 
             // assert
             Assert.True(clientRegulation.Kyc);
@@ -140,7 +140,7 @@ namespace Lykke.Service.Regulation.Tests
                 .Returns(Task.FromResult<IClientRegulation>(null));
 
             // act
-            Task task = _service.SetActiveAsync(clientId, regulationId, true);
+            Task task = _service.UpdateActiveAsync(clientId, regulationId, true);
 
             // assert
             ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
@@ -170,7 +170,7 @@ namespace Lykke.Service.Regulation.Tests
                 .Returns(Task.CompletedTask);
 
             // act
-            await _service.SetActiveAsync(clientId, regulationId, true);
+            await _service.UpdateActiveAsync(clientId, regulationId, true);
 
             // assert
             Assert.True(clientRegulation.Active);
