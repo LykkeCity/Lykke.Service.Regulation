@@ -31,6 +31,41 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
+        public async void GetAsync_Throw_Exception_If_Does_Not_Exist()
+        {
+            // arrange
+            const string regulationId = "ID";
+            const string clientId = "me";
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.FromResult<IClientRegulation>(null));
+
+            // act
+            Task task = _service.GetAsync(clientId, regulationId);
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Client regulation not found.", exception.Message);
+        }
+
+        [Fact]
+        public async void GetByRegulationIdAsync_Throw_Exception_If_Regulation_Does_Not_Exist()
+        {
+            // arrange
+            const string regulationId = "ID";
+
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult<IRegulation>(null));
+
+            // act
+            Task task = _service.GetByRegulationIdAsync(regulationId);
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Regulation not found.", exception.Message);
+        }
+
+        [Fact]
         public async void AddAsync_Ok()
         {
             // arrange
@@ -61,7 +96,7 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void AddAsync_Can_Not_Add_Regulation_To_Client_If_It_Does_Not_Exist()
+        public async void AddAsync_Throw_Exception_If_Regulation_Does_Not_Exist()
         {
             // arrange
             const string regulationId = "ID";
@@ -83,7 +118,7 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void SetKycAsync_Can_Not_Set_KYC_If_Client_Regulation_Does_Not_Exist()
+        public async void UpdateKycAsync_Throw_Exception_If_Client_Regulation_Does_Not_Exist()
         {
             // arrange
             const string regulationId = "ID";
@@ -101,7 +136,7 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void SetKycAsync_OK()
+        public async void UpdateKycAsync_OK()
         {
             // arrange
             const string regulationId = "ID";
@@ -130,7 +165,7 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void SetActiveAsync_Can_Not_Set_Active_If_Client_Regulation_Does_Not_Exist()
+        public async void UpdateActiveAsync_Throw_Exception_If_Client_Regulation_Does_Not_Exist()
         {
             // arrange
             const string regulationId = "ID";
@@ -148,7 +183,7 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void SetActiveAsync_OK()
+        public async void UpdateActiveAsync_OK()
         {
             // arrange
             const string regulationId = "ID";
@@ -177,7 +212,25 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void DeleteAsync_Can_Not_Delete_KYC_Regulation()
+        public async void DeleteAsync_Throw_Exception_If_Does_Not_Exist()
+        {
+            // arrange
+            const string regulationId = "ID";
+            const string clientId = "me";
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.FromResult<IClientRegulation>(null));
+
+            // act
+            Task task = _service.DeleteAsync(clientId, regulationId);
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Client regulation not found.", exception.Message);
+        }
+
+        [Fact]
+        public async void DeleteAsync_Throw_Exception_If_KYC_True()
         {
             // arrange
             const string regulationId = "ID";
@@ -202,7 +255,7 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void DeleteAsync_Can_Not_Delete_Active_Regulation()
+        public async void DeleteAsync_Throw_Exception_If_Active_True()
         {
             // arrange
             const string regulationId = "ID";
@@ -227,7 +280,7 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void SetDefaultAsync_Can_Not_Set_Default_Regulations_If_Client_Have_Regulations()
+        public async void SetDefaultAsync_Throw_Exception_If_Client_Alredy_Have_Regulations()
         {
             // arrange
             const string regulationId = "ID";
@@ -256,7 +309,7 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void SetDefaultAsync_Can_Not_Set_Default_Regulations_If_No_Default_Regulations_For_Country()
+        public async void SetDefaultAsync_Throw_Exception_If_No_Default_Regulations_For_Country()
         {
             // arrange
             const string clientId = "me";

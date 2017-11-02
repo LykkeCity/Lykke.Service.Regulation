@@ -27,6 +27,23 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
+        public async void GetByRegulationIdAsync_Can_Not_Return_Results_If_Regulation_Does_Not_Exist()
+        {
+            // arrange
+            const string regulationId = "ID";
+
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult<IRegulation>(null));
+
+            // act
+            Task task = _service.GetByRegulationIdAsync(regulationId);
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Regulation not found.", exception.Message);
+        }
+
+        [Fact]
         public async void AddAsync_Can_Not_Add_If_Regulation_Does_Not_Exist()
         {
             // arrange
@@ -94,6 +111,23 @@ namespace Lykke.Service.Regulation.Tests
 
             // act
             Task task = _service.UpdateActiveAsync(regulationRuleId, true);
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Regulation rule not found.", exception.Message);
+        }
+
+        [Fact]
+        public async void DeleteAsync_Can_Not_Delete_If_Rule_Does_Not_Exist()
+        {
+            // arrange
+            const string regulationRuleId = "ID";
+
+            _welcomeRegulationRuleRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult<IWelcomeRegulationRule>(null));
+
+            // act
+            Task task = _service.DeleteAsync(regulationRuleId);
 
             // assert
             ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);

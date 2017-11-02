@@ -87,7 +87,7 @@ namespace Lykke.Service.Regulation.Controllers
         [SwaggerOperation("AddRegulation")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Add([FromBody] RegulationModel model)
+        public async Task<IActionResult> Add([FromBody] NewRegulationModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -104,14 +104,13 @@ namespace Lykke.Service.Regulation.Controllers
             return NoContent();
         }
 
-
         /// <summary>
         /// Deletes the regulation by specified id.
         /// </summary>
         /// <param name="regulationId">The id of regulation to delete.</param>
         /// <returns></returns>
         /// <response code="204">Regulation successfully deleted.</response>
-        /// <response code="400">Can not delete regulation associated with client or welcome regulation rule.</response>
+        /// <response code="400">Can not delete regulation associated with client or welcome regulation rule or regulation not found.</response>
         [HttpDelete]
         [Route("{regulationId}")]
         [SwaggerOperation("DeleteRegulation")]

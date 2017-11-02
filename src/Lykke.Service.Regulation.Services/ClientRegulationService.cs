@@ -24,9 +24,16 @@ namespace Lykke.Service.Regulation.Services
             _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
         }
 
-        public Task<IClientRegulation> GetAsync(string clientId, string regulationId)
+        public async Task<IClientRegulation> GetAsync(string clientId, string regulationId)
         {
-            return _clientRegulationRepository.GetAsync(clientId, regulationId);
+            IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
+
+            if (clientRegulation == null)
+            {
+                throw new ServiceException("Client regulation not found.");
+            }
+
+            return clientRegulation;
         }
 
         public Task<IEnumerable<IClientRegulation>> GetByClientIdAsync(string clientId)
@@ -44,9 +51,16 @@ namespace Lykke.Service.Regulation.Services
             return _clientRegulationRepository.GetAvailableByClientIdAsync(clientId);
         }
 
-        public Task<IEnumerable<IClientRegulation>> GetByRegulationIdAsync(string regulationId)
+        public async Task<IEnumerable<IClientRegulation>> GetByRegulationIdAsync(string regulationId)
         {
-            return _clientRegulationRepository.GetByRegulationIdAsync(regulationId);
+            IRegulation result = await _regulationRepository.GetAsync(regulationId);
+
+            if (result == null)
+            {
+                throw new ServiceException("Regulation not found.");
+            }
+
+            return await _clientRegulationRepository.GetByRegulationIdAsync(regulationId);
         }
 
         public async Task AddAsync(IClientRegulation clientRegulation)
@@ -84,7 +98,7 @@ namespace Lykke.Service.Regulation.Services
                 {
                     ClientId = clientId,
                     RegulationId = o.RegulationId,
-                    Active = false,
+                    Active = o.Active,
                     Kyc = false
                 });
 
@@ -124,7 +138,9 @@ namespace Lykke.Service.Regulation.Services
             IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
 
             if (clientRegulation == null)
-                return;
+            {
+                throw new ServiceException("Client regulation not found.");
+            }
 
             if (clientRegulation.Kyc)
             {

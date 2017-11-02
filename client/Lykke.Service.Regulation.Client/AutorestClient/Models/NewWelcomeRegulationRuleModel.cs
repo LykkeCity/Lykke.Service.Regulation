@@ -9,22 +9,23 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
     using Newtonsoft.Json;
     using System.Linq;
 
-    public partial class WelcomeRegulationRuleModel
+    public partial class NewWelcomeRegulationRuleModel
     {
         /// <summary>
-        /// Initializes a new instance of the WelcomeRegulationRuleModel class.
+        /// Initializes a new instance of the NewWelcomeRegulationRuleModel
+        /// class.
         /// </summary>
-        public WelcomeRegulationRuleModel()
+        public NewWelcomeRegulationRuleModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the WelcomeRegulationRuleModel class.
+        /// Initializes a new instance of the NewWelcomeRegulationRuleModel
+        /// class.
         /// </summary>
-        public WelcomeRegulationRuleModel(bool active, string id = default(string), string country = default(string), string regulationId = default(string))
+        public NewWelcomeRegulationRuleModel(bool active, string country = default(string), string regulationId = default(string))
         {
-            Id = id;
             Country = country;
             RegulationId = regulationId;
             Active = active;
@@ -35,11 +36,6 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// An initialization method that performs custom operations like setting defaults
         /// </summary>
         partial void CustomInit();
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "Id")]
-        public string Id { get; set; }
 
         /// <summary>
         /// </summary>

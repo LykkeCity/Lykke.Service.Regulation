@@ -70,7 +70,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         Task<HttpOperationResponse<ErrorResponse>> DeleteClientRegulationWithHttpMessagesAsync(string clientId, string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Returns a client regulations associated with client.
+        /// Returns a regulations associated with client.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
@@ -95,10 +95,10 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<IList<ClientRegulationModel>>> GetClientRegulationsByRegulationIdWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<object>> GetClientRegulationsByRegulationIdWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Returns an active client regulations associated with client.
+        /// Returns an active regulations associated with client.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
@@ -112,8 +112,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         Task<HttpOperationResponse<IList<ClientRegulationModel>>> GetActiveClientRegulationsByClientIdWithHttpMessagesAsync(string clientId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Returns an active and KYC client regulations associated with
-        /// client.
+        /// Returns an active and KYC regulations associated with client.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
@@ -138,10 +137,10 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<ErrorResponse>> AddClientRegulationWithHttpMessagesAsync(ClientRegulationModel model = default(ClientRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<ErrorResponse>> AddClientRegulationWithHttpMessagesAsync(NewClientRegulationModel model = default(NewClientRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Adds default regulations to client associated with country.
+        /// Initializes client regulations using rules associated with country.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
@@ -158,7 +157,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         Task<HttpOperationResponse<ErrorResponse>> SetDefaultClientRegulationsWithHttpMessagesAsync(string clientId, string country, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Sets the client regulation KYC status to {true}.
+        /// Updates the client regulation KYC status.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
@@ -166,13 +165,16 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='regulationId'>
         /// The regulation id.
         /// </param>
+        /// <param name='active'>
+        /// The client regulation KYC status.
+        /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<ErrorResponse>> SetClientRegulationKycWithHttpMessagesAsync(string clientId, string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<ErrorResponse>> UpdateClientRegulationKycWithHttpMessagesAsync(string clientId, string regulationId, bool active, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Sets the client regulation active status to {true}.
@@ -270,7 +272,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<ErrorResponse>> AddRegulationWithHttpMessagesAsync(RegulationModel model = default(RegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<ErrorResponse>> AddRegulationWithHttpMessagesAsync(NewRegulationModel model = default(NewRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Returns all welcome regulation rules.
@@ -295,7 +297,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<ErrorResponse>> AddWelcomeRegulationRuleWithHttpMessagesAsync(WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<ErrorResponse>> AddWelcomeRegulationRuleWithHttpMessagesAsync(NewWelcomeRegulationRuleModel model = default(NewWelcomeRegulationRuleModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Returns all welcome regulation rules associated with specified
@@ -325,13 +327,16 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<IList<WelcomeRegulationRuleModel>>> GetWelcomeRegulationRulesByRegulationIdWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<object>> GetWelcomeRegulationRulesByRegulationIdWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Deletes the welcome regulation rule by specified regulation id.
+        /// Updates active state of welcome regulation rule.
         /// </summary>
-        /// <param name='regulationId'>
-        /// The regulation id associated with welcome regulation rule.
+        /// <param name='regulationRuleId'>
+        /// The welcome regulation rule id.
+        /// </param>
+        /// <param name='active'>
+        /// The welcome regulation rule active state.
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -339,7 +344,21 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse> DeleteWelcomeRegulationRuleWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<ErrorResponse>> UpdateWelcomeRegulationRuleActiveWithHttpMessagesAsync(string regulationRuleId, bool active, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Deletes the welcome regulation rule by specified regulation id.
+        /// </summary>
+        /// <param name='regulationRuleId'>
+        /// The welcome regulation rule id.
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<ErrorResponse>> DeleteWelcomeRegulationRuleWithHttpMessagesAsync(string regulationRuleId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
     }
 }

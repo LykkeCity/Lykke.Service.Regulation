@@ -30,7 +30,8 @@ namespace Lykke.Service.Regulation.Client
             {
                 Id = model.Id,
                 RegulationId = model.RegulationId,
-                Country = model.Country
+                Country = model.Country,
+                Active = model.Active
             };
         }
     }

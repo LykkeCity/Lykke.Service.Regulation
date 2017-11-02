@@ -234,7 +234,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             HttpStatusCode _statusCode = _httpResponse.StatusCode;
             cancellationToken.ThrowIfCancellationRequested();
             string _responseContent = null;
-            if ((int)_statusCode != 200 && (int)_statusCode != 404)
+            if ((int)_statusCode != 200 && (int)_statusCode != 400)
             {
                 var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
                 if (_httpResponse.Content != null) {
@@ -279,7 +279,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
                 }
             }
             // Deserialize Response
-            if ((int)_statusCode == 404)
+            if ((int)_statusCode == 400)
             {
                 _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
                 try
@@ -448,7 +448,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         }
 
         /// <summary>
-        /// Returns a client regulations associated with client.
+        /// Returns a regulations associated with client.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
@@ -609,7 +609,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<IList<ClientRegulationModel>>> GetClientRegulationsByRegulationIdWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<object>> GetClientRegulationsByRegulationIdWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (regulationId == null)
             {
@@ -666,7 +666,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             HttpStatusCode _statusCode = _httpResponse.StatusCode;
             cancellationToken.ThrowIfCancellationRequested();
             string _responseContent = null;
-            if ((int)_statusCode != 200)
+            if ((int)_statusCode != 200 && (int)_statusCode != 400)
             {
                 var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
                 if (_httpResponse.Content != null) {
@@ -689,7 +689,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
                 throw ex;
             }
             // Create Result
-            var _result = new HttpOperationResponse<IList<ClientRegulationModel>>();
+            var _result = new HttpOperationResponse<object>();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
             // Deserialize Response
@@ -710,6 +710,24 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
                     throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
                 }
             }
+            // Deserialize Response
+            if ((int)_statusCode == 400)
+            {
+                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                try
+                {
+                    _result.Body = SafeJsonConvert.DeserializeObject<ErrorResponse>(_responseContent, DeserializationSettings);
+                }
+                catch (JsonException ex)
+                {
+                    _httpRequest.Dispose();
+                    if (_httpResponse != null)
+                    {
+                        _httpResponse.Dispose();
+                    }
+                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
+                }
+            }
             if (_shouldTrace)
             {
                 ServiceClientTracing.Exit(_invocationId, _result);
@@ -718,7 +736,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         }
 
         /// <summary>
-        /// Returns an active client regulations associated with client.
+        /// Returns an active regulations associated with client.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
@@ -853,7 +871,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         }
 
         /// <summary>
-        /// Returns an active and KYC client regulations associated with client.
+        /// Returns an active and KYC regulations associated with client.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
@@ -1008,7 +1026,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<ErrorResponse>> AddClientRegulationWithHttpMessagesAsync(ClientRegulationModel model = default(ClientRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<ErrorResponse>> AddClientRegulationWithHttpMessagesAsync(NewClientRegulationModel model = default(NewClientRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (model != null)
             {
@@ -1122,7 +1140,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         }
 
         /// <summary>
-        /// Adds default regulations to client associated with country.
+        /// Initializes client regulations using rules associated with country.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
@@ -1266,13 +1284,16 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         }
 
         /// <summary>
-        /// Sets the client regulation KYC status to {true}.
+        /// Updates the client regulation KYC status.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.
         /// </param>
         /// <param name='regulationId'>
         /// The regulation id.
+        /// </param>
+        /// <param name='active'>
+        /// The client regulation KYC status.
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -1295,7 +1316,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<ErrorResponse>> SetClientRegulationKycWithHttpMessagesAsync(string clientId, string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<ErrorResponse>> UpdateClientRegulationKycWithHttpMessagesAsync(string clientId, string regulationId, bool active, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (clientId == null)
             {
@@ -1314,14 +1335,16 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("clientId", clientId);
                 tracingParameters.Add("regulationId", regulationId);
+                tracingParameters.Add("active", active);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "SetClientRegulationKyc", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "UpdateClientRegulationKyc", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/ClientRegulation/kyc/{clientId}/{regulationId}").ToString();
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/ClientRegulation/kyc/{clientId}/{regulationId}/{active}").ToString();
             _url = _url.Replace("{clientId}", System.Uri.EscapeDataString(clientId));
             _url = _url.Replace("{regulationId}", System.Uri.EscapeDataString(regulationId));
+            _url = _url.Replace("{active}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(active, SerializationSettings).Trim('"')));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
@@ -2264,7 +2287,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<ErrorResponse>> AddRegulationWithHttpMessagesAsync(RegulationModel model = default(RegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<ErrorResponse>> AddRegulationWithHttpMessagesAsync(NewRegulationModel model = default(NewRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -2514,8 +2537,12 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<ErrorResponse>> AddWelcomeRegulationRuleWithHttpMessagesAsync(WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<ErrorResponse>> AddWelcomeRegulationRuleWithHttpMessagesAsync(NewWelcomeRegulationRuleModel model = default(NewWelcomeRegulationRuleModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (model != null)
+            {
+                model.Validate();
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;
@@ -2785,7 +2812,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<IList<WelcomeRegulationRuleModel>>> GetWelcomeRegulationRulesByRegulationIdWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<object>> GetWelcomeRegulationRulesByRegulationIdWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (regulationId == null)
             {
@@ -2842,7 +2869,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             HttpStatusCode _statusCode = _httpResponse.StatusCode;
             cancellationToken.ThrowIfCancellationRequested();
             string _responseContent = null;
-            if ((int)_statusCode != 200)
+            if ((int)_statusCode != 200 && (int)_statusCode != 400)
             {
                 var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
                 if (_httpResponse.Content != null) {
@@ -2865,7 +2892,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
                 throw ex;
             }
             // Create Result
-            var _result = new HttpOperationResponse<IList<WelcomeRegulationRuleModel>>();
+            var _result = new HttpOperationResponse<object>();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
             // Deserialize Response
@@ -2875,6 +2902,164 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
                 try
                 {
                     _result.Body = SafeJsonConvert.DeserializeObject<IList<WelcomeRegulationRuleModel>>(_responseContent, DeserializationSettings);
+                }
+                catch (JsonException ex)
+                {
+                    _httpRequest.Dispose();
+                    if (_httpResponse != null)
+                    {
+                        _httpResponse.Dispose();
+                    }
+                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
+                }
+            }
+            // Deserialize Response
+            if ((int)_statusCode == 400)
+            {
+                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                try
+                {
+                    _result.Body = SafeJsonConvert.DeserializeObject<ErrorResponse>(_responseContent, DeserializationSettings);
+                }
+                catch (JsonException ex)
+                {
+                    _httpRequest.Dispose();
+                    if (_httpResponse != null)
+                    {
+                        _httpResponse.Dispose();
+                    }
+                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
+                }
+            }
+            if (_shouldTrace)
+            {
+                ServiceClientTracing.Exit(_invocationId, _result);
+            }
+            return _result;
+        }
+
+        /// <summary>
+        /// Updates active state of welcome regulation rule.
+        /// </summary>
+        /// <param name='regulationRuleId'>
+        /// The welcome regulation rule id.
+        /// </param>
+        /// <param name='active'>
+        /// The welcome regulation rule active state.
+        /// </param>
+        /// <param name='customHeaders'>
+        /// Headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        /// <exception cref="HttpOperationException">
+        /// Thrown when the operation returned an invalid status code
+        /// </exception>
+        /// <exception cref="SerializationException">
+        /// Thrown when unable to deserialize the response
+        /// </exception>
+        /// <exception cref="ValidationException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when a required parameter is null
+        /// </exception>
+        /// <return>
+        /// A response object containing the response body and response headers.
+        /// </return>
+        public async Task<HttpOperationResponse<ErrorResponse>> UpdateWelcomeRegulationRuleActiveWithHttpMessagesAsync(string regulationRuleId, bool active, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (regulationRuleId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "regulationRuleId");
+            }
+            // Tracing
+            bool _shouldTrace = ServiceClientTracing.IsEnabled;
+            string _invocationId = null;
+            if (_shouldTrace)
+            {
+                _invocationId = ServiceClientTracing.NextInvocationId.ToString();
+                Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
+                tracingParameters.Add("regulationRuleId", regulationRuleId);
+                tracingParameters.Add("active", active);
+                tracingParameters.Add("cancellationToken", cancellationToken);
+                ServiceClientTracing.Enter(_invocationId, this, "UpdateWelcomeRegulationRuleActive", tracingParameters);
+            }
+            // Construct URL
+            var _baseUrl = BaseUri.AbsoluteUri;
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/WelcomeRegulationRuleContoller/{regulationRuleId}/{active}").ToString();
+            _url = _url.Replace("{regulationRuleId}", System.Uri.EscapeDataString(regulationRuleId));
+            _url = _url.Replace("{active}", System.Uri.EscapeDataString(SafeJsonConvert.SerializeObject(active, SerializationSettings).Trim('"')));
+            // Create HTTP transport objects
+            var _httpRequest = new HttpRequestMessage();
+            HttpResponseMessage _httpResponse = null;
+            _httpRequest.Method = new HttpMethod("PUT");
+            _httpRequest.RequestUri = new System.Uri(_url);
+            // Set Headers
+
+
+            if (customHeaders != null)
+            {
+                foreach(var _header in customHeaders)
+                {
+                    if (_httpRequest.Headers.Contains(_header.Key))
+                    {
+                        _httpRequest.Headers.Remove(_header.Key);
+                    }
+                    _httpRequest.Headers.TryAddWithoutValidation(_header.Key, _header.Value);
+                }
+            }
+
+            // Serialize Request
+            string _requestContent = null;
+            // Send Request
+            if (_shouldTrace)
+            {
+                ServiceClientTracing.SendRequest(_invocationId, _httpRequest);
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            _httpResponse = await HttpClient.SendAsync(_httpRequest, cancellationToken).ConfigureAwait(false);
+            if (_shouldTrace)
+            {
+                ServiceClientTracing.ReceiveResponse(_invocationId, _httpResponse);
+            }
+            HttpStatusCode _statusCode = _httpResponse.StatusCode;
+            cancellationToken.ThrowIfCancellationRequested();
+            string _responseContent = null;
+            if ((int)_statusCode != 204 && (int)_statusCode != 400)
+            {
+                var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
+                if (_httpResponse.Content != null) {
+                    _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                }
+                else {
+                    _responseContent = string.Empty;
+                }
+                ex.Request = new HttpRequestMessageWrapper(_httpRequest, _requestContent);
+                ex.Response = new HttpResponseMessageWrapper(_httpResponse, _responseContent);
+                if (_shouldTrace)
+                {
+                    ServiceClientTracing.Error(_invocationId, ex);
+                }
+                _httpRequest.Dispose();
+                if (_httpResponse != null)
+                {
+                    _httpResponse.Dispose();
+                }
+                throw ex;
+            }
+            // Create Result
+            var _result = new HttpOperationResponse<ErrorResponse>();
+            _result.Request = _httpRequest;
+            _result.Response = _httpResponse;
+            // Deserialize Response
+            if ((int)_statusCode == 400)
+            {
+                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                try
+                {
+                    _result.Body = SafeJsonConvert.DeserializeObject<ErrorResponse>(_responseContent, DeserializationSettings);
                 }
                 catch (JsonException ex)
                 {
@@ -2896,8 +3081,8 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <summary>
         /// Deletes the welcome regulation rule by specified regulation id.
         /// </summary>
-        /// <param name='regulationId'>
-        /// The regulation id associated with welcome regulation rule.
+        /// <param name='regulationRuleId'>
+        /// The welcome regulation rule id.
         /// </param>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -2908,6 +3093,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <exception cref="HttpOperationException">
         /// Thrown when the operation returned an invalid status code
         /// </exception>
+        /// <exception cref="SerializationException">
+        /// Thrown when unable to deserialize the response
+        /// </exception>
         /// <exception cref="ValidationException">
         /// Thrown when a required parameter is null
         /// </exception>
@@ -2917,11 +3105,11 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse> DeleteWelcomeRegulationRuleWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<ErrorResponse>> DeleteWelcomeRegulationRuleWithHttpMessagesAsync(string regulationRuleId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (regulationId == null)
+            if (regulationRuleId == null)
             {
-                throw new ValidationException(ValidationRules.CannotBeNull, "regulationId");
+                throw new ValidationException(ValidationRules.CannotBeNull, "regulationRuleId");
             }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
@@ -2930,14 +3118,14 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             {
                 _invocationId = ServiceClientTracing.NextInvocationId.ToString();
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
-                tracingParameters.Add("regulationId", regulationId);
+                tracingParameters.Add("regulationRuleId", regulationRuleId);
                 tracingParameters.Add("cancellationToken", cancellationToken);
                 ServiceClientTracing.Enter(_invocationId, this, "DeleteWelcomeRegulationRule", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;
-            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/WelcomeRegulationRuleContoller/{regulationId}").ToString();
-            _url = _url.Replace("{regulationId}", System.Uri.EscapeDataString(regulationId));
+            var _url = new System.Uri(new System.Uri(_baseUrl + (_baseUrl.EndsWith("/") ? "" : "/")), "api/WelcomeRegulationRuleContoller/{regulationRuleId}").ToString();
+            _url = _url.Replace("{regulationRuleId}", System.Uri.EscapeDataString(regulationRuleId));
             // Create HTTP transport objects
             var _httpRequest = new HttpRequestMessage();
             HttpResponseMessage _httpResponse = null;
@@ -2974,7 +3162,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             HttpStatusCode _statusCode = _httpResponse.StatusCode;
             cancellationToken.ThrowIfCancellationRequested();
             string _responseContent = null;
-            if ((int)_statusCode != 204)
+            if ((int)_statusCode != 204 && (int)_statusCode != 400)
             {
                 var ex = new HttpOperationException(string.Format("Operation returned an invalid status code '{0}'", _statusCode));
                 if (_httpResponse.Content != null) {
@@ -2997,9 +3185,27 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
                 throw ex;
             }
             // Create Result
-            var _result = new HttpOperationResponse();
+            var _result = new HttpOperationResponse<ErrorResponse>();
             _result.Request = _httpRequest;
             _result.Response = _httpResponse;
+            // Deserialize Response
+            if ((int)_statusCode == 400)
+            {
+                _responseContent = await _httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                try
+                {
+                    _result.Body = SafeJsonConvert.DeserializeObject<ErrorResponse>(_responseContent, DeserializationSettings);
+                }
+                catch (JsonException ex)
+                {
+                    _httpRequest.Dispose();
+                    if (_httpResponse != null)
+                    {
+                        _httpResponse.Dispose();
+                    }
+                    throw new SerializationException("Unable to deserialize the response.", _responseContent, ex);
+                }
+            }
             if (_shouldTrace)
             {
                 ServiceClientTracing.Exit(_invocationId, _result);

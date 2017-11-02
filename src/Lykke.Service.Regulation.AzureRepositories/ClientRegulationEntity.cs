@@ -1,5 +1,4 @@
-﻿using System;
-using Lykke.Service.Regulation.Core.Domain;
+﻿using Lykke.Service.Regulation.Core.Domain;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Lykke.Service.Regulation.AzureRepositories
@@ -26,16 +25,16 @@ namespace Lykke.Service.Regulation.AzureRepositories
             return $"{clientId}_{regulationId}";
         }
 
-        internal static ClientRegulationEntity Create(string clientId, string regulationId)
+        internal static ClientRegulationEntity Create(IClientRegulation clientRegulation)
         {
             return new ClientRegulationEntity
             {
-                RowKey = GenerateRowKey(clientId, regulationId),
+                RowKey = GenerateRowKey(clientRegulation.ClientId, clientRegulation.RegulationId),
                 PartitionKey = GeneratePartitionKey(),
-                ClientId = clientId,
-                RegulationId = regulationId,
+                ClientId = clientRegulation.ClientId,
+                RegulationId = clientRegulation.RegulationId,
                 Kyc = false,
-                Active = false
+                Active = clientRegulation.Active
             };
         }
     }

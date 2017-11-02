@@ -31,9 +31,16 @@ namespace Lykke.Service.Regulation.Services
             return _welcomeRegulationRuleRepository.GetByCountryAsync(country);
         }
 
-        public Task<IEnumerable<IWelcomeRegulationRule>> GetByRegulationIdAsync(string regulationId)
+        public async Task<IEnumerable<IWelcomeRegulationRule>> GetByRegulationIdAsync(string regulationId)
         {
-            return _welcomeRegulationRuleRepository.GetByRegulationIdAsync(regulationId);
+            IRegulation result = await _regulationRepository.GetAsync(regulationId);
+
+            if (result == null)
+            {
+                throw new ServiceException("Regulation not found.");
+            }
+
+            return await _welcomeRegulationRuleRepository.GetByRegulationIdAsync(regulationId);
         }
 
         public async Task AddAsync(IWelcomeRegulationRule welcomeRegulationRule)
@@ -56,9 +63,9 @@ namespace Lykke.Service.Regulation.Services
             await _welcomeRegulationRuleRepository.AddAsync(welcomeRegulationRule);
         }
 
-        public async Task UpdateActiveAsync(string id, bool active)
+        public async Task UpdateActiveAsync(string regulationRuleId, bool active)
         {
-            IWelcomeRegulationRule regulationRule = await _welcomeRegulationRuleRepository.GetAsync(id);
+            IWelcomeRegulationRule regulationRule = await _welcomeRegulationRuleRepository.GetAsync(regulationRuleId);
 
             if (regulationRule == null)
             {
@@ -74,9 +81,16 @@ namespace Lykke.Service.Regulation.Services
             });
         }
 
-        public Task DeleteAsync(string regulationId)
+        public async Task DeleteAsync(string regulationRuleId)
         {
-            return _welcomeRegulationRuleRepository.DeleteAsync(regulationId);
+            IWelcomeRegulationRule regulationRule = await _welcomeRegulationRuleRepository.GetAsync(regulationRuleId);
+
+            if (regulationRule == null)
+            {
+                throw new ServiceException("Regulation rule not found.");
+            }
+
+            await _welcomeRegulationRuleRepository.DeleteAsync(regulationRuleId);
         }
     }
 }

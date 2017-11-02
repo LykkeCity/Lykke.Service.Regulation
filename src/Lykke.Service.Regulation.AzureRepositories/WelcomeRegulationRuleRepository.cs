@@ -16,11 +16,11 @@ namespace Lykke.Service.Regulation.AzureRepositories
             _tableStorage = tableStorage;
         }
 
-        public async Task<IWelcomeRegulationRule> GetAsync(string id)
+        public async Task<IWelcomeRegulationRule> GetAsync(string regulationRuleId)
         {
             var partitionKey = WelcomeRegulationRuleEntity.GeneratePartitionKey();
 
-            return await _tableStorage.GetDataAsync(partitionKey, id);
+            return await _tableStorage.GetDataAsync(partitionKey, regulationRuleId);
         }
 
         public async Task<IEnumerable<IWelcomeRegulationRule>> GetAllAsync()
@@ -80,11 +80,11 @@ namespace Lykke.Service.Regulation.AzureRepositories
             });
         }
 
-        public async Task DeleteAsync(string regulationId)
+        public async Task DeleteAsync(string regulationRuleId)
         {
             var partitionKey = WelcomeRegulationRuleEntity.GeneratePartitionKey();
             
-            await _tableStorage.DeleteAsync(partitionKey, regulationId);
+            await _tableStorage.DeleteAsync(partitionKey, regulationRuleId);
         }
     }
 }

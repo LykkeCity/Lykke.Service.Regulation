@@ -39,10 +39,10 @@ namespace Lykke.Service.Regulation.Controllers
         [ProducesResponseType(typeof(IEnumerable<WelcomeRegulationRuleModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAll()
         {
-            IEnumerable<IWelcomeRegulationRule> regulations = await _welcomeRegulationRuleService.GetAllAsync();
+            IEnumerable<IWelcomeRegulationRule> regulationRules = await _welcomeRegulationRuleService.GetAllAsync();
 
             IEnumerable<WelcomeRegulationRuleModel> model =
-                Mapper.Map<IEnumerable<IWelcomeRegulationRule>, IEnumerable<WelcomeRegulationRuleModel>>(regulations);
+                Mapper.Map<IEnumerable<IWelcomeRegulationRule>, IEnumerable<WelcomeRegulationRuleModel>>(regulationRules);
 
             return Ok(model);
         }
@@ -59,11 +59,11 @@ namespace Lykke.Service.Regulation.Controllers
         [ProducesResponseType(typeof(IEnumerable<WelcomeRegulationRuleModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByCountry(string country)
         {
-            IEnumerable<IWelcomeRegulationRule> regulations =
+            IEnumerable<IWelcomeRegulationRule> regulationRules =
                 await _welcomeRegulationRuleService.GetByCountryAsync(country);
 
             IEnumerable<WelcomeRegulationRuleModel> model =
-                Mapper.Map<IEnumerable<IWelcomeRegulationRule>, IEnumerable<WelcomeRegulationRuleModel>>(regulations);
+                Mapper.Map<IEnumerable<IWelcomeRegulationRule>, IEnumerable<WelcomeRegulationRuleModel>>(regulationRules);
 
             return Ok(model);
         }
@@ -74,17 +74,30 @@ namespace Lykke.Service.Regulation.Controllers
         /// <param name="regulationId">The regulation id.</param>
         /// <returns>The list of welcome regulation rules.</returns>
         /// <response code="200">The list of welcome regulation rules.</response>
+        /// <response code="400">Regulation with specified id not found.</response>
         [HttpGet]
         [Route("regulation/{regulationId}")]
         [SwaggerOperation("GetWelcomeRegulationRulesByRegulationId")]
         [ProducesResponseType(typeof(IEnumerable<WelcomeRegulationRuleModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetByRegulationId(string regulationId)
         {
-            IEnumerable<IWelcomeRegulationRule> regulations =
-                await _welcomeRegulationRuleService.GetByRegulationIdAsync(regulationId);
+            IEnumerable<IWelcomeRegulationRule> regulationRules;
+
+            try
+            {
+                regulationRules = await _welcomeRegulationRuleService.GetByRegulationIdAsync(regulationId);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(GetByRegulationId),
+                    $"{exception.Message} RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
 
             IEnumerable<WelcomeRegulationRuleModel> model =
-                Mapper.Map<IEnumerable<IWelcomeRegulationRule>, IEnumerable<WelcomeRegulationRuleModel>>(regulations);
+                Mapper.Map<IEnumerable<IWelcomeRegulationRule>, IEnumerable<WelcomeRegulationRuleModel>>(regulationRules);
 
             return Ok(model);
         }
@@ -99,7 +112,7 @@ namespace Lykke.Service.Regulation.Controllers
         [SwaggerOperation("AddWelcomeRegulationRule")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Add([FromBody] WelcomeRegulationRuleModel model)
+        public async Task<IActionResult> Add([FromBody] NewWelcomeRegulationRuleModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -107,7 +120,7 @@ namespace Lykke.Service.Regulation.Controllers
             }
 
             var regulation = Mapper.Map<WelcomeRegulationRule>(model);
-            
+
             try
             {
                 await _welcomeRegulationRuleService.AddAsync(regulation);
@@ -123,7 +136,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Add),
                 $"Welcome regulation rule added. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -161,20 +174,31 @@ namespace Lykke.Service.Regulation.Controllers
         /// <summary>
         /// Deletes the welcome regulation rule by specified regulation id.
         /// </summary>
-        /// <param name="regulationId">The regulation id associated with welcome regulation rule.</param>
+        /// <param name="regulationRuleId">The welcome regulation rule id.</param>
         /// <response code="204">Welcome regulation rule successfully deleted.</response>
+        /// <response code="400">Regulation rule not found.</response>
         [HttpDelete]
-        [Route("{regulationId}")]
+        [Route("{regulationRuleId}")]
         [SwaggerOperation("DeleteWelcomeRegulationRule")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        public async Task<IActionResult> Delete(string regulationId)
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Delete(string regulationRuleId)
         {
-            await _welcomeRegulationRuleService.DeleteAsync(regulationId);
+            try
+            {
+                await _welcomeRegulationRuleService.DeleteAsync(regulationRuleId);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(Delete),
+                    $"{exception.Message} RegulationRuleId: {regulationRuleId}. IP: {HttpContext.GetIp()}");
 
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
             await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Delete),
-                $"Welcome regulation rule deleted. Id: {regulationId}. IP: {HttpContext.GetIp()}");
+                $"Welcome regulation rule deleted. Id: {regulationRuleId}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
     }
 }

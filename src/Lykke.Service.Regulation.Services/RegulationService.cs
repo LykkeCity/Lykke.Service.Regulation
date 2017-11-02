@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
@@ -41,6 +42,13 @@ namespace Lykke.Service.Regulation.Services
 
         public async Task DeleteAsync(string regulationId)
         {
+            IRegulation regulation = await _regulationRepository.GetAsync(regulationId);
+
+            if (regulation == null)
+            {
+                throw new ServiceException("Regulation not found.");
+            }
+
             IEnumerable<IClientRegulation> clientAvailableRegulations =
                 await _clientRegulationRepository.GetByRegulationIdAsync(regulationId);
 

@@ -23,9 +23,7 @@ namespace Lykke.Service.Regulation.Controllers
         private readonly IClientRegulationService _clientRegulationService;
         private readonly ILog _log;
 
-        public ClientRegulationController(
-            IClientRegulationService clientRegulationService,
-            ILog log)
+        public ClientRegulationController(IClientRegulationService clientRegulationService, ILog log)
         {
             _clientRegulationService = clientRegulationService;
             _log = log;
@@ -38,31 +36,35 @@ namespace Lykke.Service.Regulation.Controllers
         /// <param name="regulationId">The regulation id.</param>
         /// <returns>The client regulation.</returns>
         /// <response code="200">The client regulation.</response>
-        /// <response code="404">Client regulation not found.</response>
+        /// <response code="400">Client regulation not found.</response>
         [HttpGet]
         [Route("{clientId}/{regulationId}")]
         [SwaggerOperation("GetClientRegulation")]
         [ProducesResponseType(typeof(ClientRegulationModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Get(string clientId, string regulationId)
         {
-            IClientRegulation clientRegulation =
-                await _clientRegulationService.GetAsync(clientId, regulationId);
+            IClientRegulation clientRegulation;
 
-            if (clientRegulation == null)
+            try
+            {
+                clientRegulation = await _clientRegulationService.GetAsync(clientId, regulationId);
+            }
+            catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Get),
-                    $"Client '{clientId}' have not regulation. IP: {HttpContext.GetIp()}");
-                return NotFound(ErrorResponse.Create("Client regulation not found."));
-            }
+                    $"{exception.Message} ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+            
             var model = Mapper.Map<ClientRegulationModel>(clientRegulation);
 
             return Ok(model);
         }
 
         /// <summary>
-        /// Returns a client regulations associated with client.
+        /// Returns a regulations associated with client.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <returns>The list of client regulations.</returns>
@@ -87,14 +89,27 @@ namespace Lykke.Service.Regulation.Controllers
         /// <param name="regulationId">The regulation id.</param>
         /// <returns>The list of client regulations.</returns>
         /// <response code="200">The list of client regulations.</response>
+        /// <response code="400">Regulation not found.</response>
         [HttpGet]
         [Route("regulation/{regulationId}")]
         [SwaggerOperation("GetClientRegulationsByRegulationId")]
         [ProducesResponseType(typeof(IEnumerable<ClientRegulationModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetByRegulationId(string regulationId)
         {
-            IEnumerable<IClientRegulation> clientRegulations =
-                await _clientRegulationService.GetByRegulationIdAsync(regulationId);
+            IEnumerable<IClientRegulation> clientRegulations;
+
+            try
+            {
+                clientRegulations  = await _clientRegulationService.GetByRegulationIdAsync(regulationId);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(GetByRegulationId),
+                    $"{exception.Message} RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
 
             var model = Mapper.Map<IEnumerable<ClientRegulationModel>>(clientRegulations);
 
@@ -102,7 +117,7 @@ namespace Lykke.Service.Regulation.Controllers
         }
 
         /// <summary>
-        /// Returns an active client regulations associated with client.
+        /// Returns an active regulations associated with client.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <returns>The list of client regulations.</returns>
@@ -122,7 +137,7 @@ namespace Lykke.Service.Regulation.Controllers
         }
 
         /// <summary>
-        /// Returns an active and KYC client regulations associated with client.
+        /// Returns an active and KYC regulations associated with client.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <returns>The list of client regulations.</returns>
@@ -147,13 +162,13 @@ namespace Lykke.Service.Regulation.Controllers
         /// <param name="model">The model what describe a client regulation.</param>
         /// <returns></returns>
         /// <response code="204">Client regulation successfully added.</response>
-        /// <response code="400">Invalid model what describe a client regulation.</response>
+        /// <response code="400">Invalid model what describe a client regulation or regulation not found.</response>
         [HttpPost]
         [Route("add")]
         [SwaggerOperation("AddClientRegulation")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Add([FromBody] ClientRegulationModel model)
+        public async Task<IActionResult> Add([FromBody] NewClientRegulationModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -161,8 +176,19 @@ namespace Lykke.Service.Regulation.Controllers
             }
 
             var clientRegulation = Mapper.Map<ClientRegulation>(model);
-            await _clientRegulationService.AddAsync(clientRegulation);
             
+            try
+            {
+                await _clientRegulationService.AddAsync(clientRegulation);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Add),
+                    $"{exception.Message} Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Add),
                 $"Client regulation added. Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
@@ -170,7 +196,7 @@ namespace Lykke.Service.Regulation.Controllers
         }
 
         /// <summary>
-        /// Adds default regulations to client associated with country.
+        /// Initializes client regulations using rules associated with country.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="country">The country name.</param>

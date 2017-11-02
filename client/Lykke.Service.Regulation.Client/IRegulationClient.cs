@@ -8,8 +8,10 @@ namespace Lykke.Service.Regulation.Client
 {
     public interface IRegulationClient
     {
+        void Dispose();
+
         /// <summary>
-        /// Returns regulation.
+        /// Returns regulation details by specified id.
         /// </summary>
         /// <param name="regulationId">The regulation id.</param>
         /// <returns>The <see cref="RegulationModel"/>.</returns>
@@ -24,7 +26,7 @@ namespace Lykke.Service.Regulation.Client
         Task<IEnumerable<RegulationModel>> GetRegulationsAsync();
 
         /// <summary>
-        /// Adds regulations.
+        /// Adds the regulation.
         /// </summary>
         /// <param name="model">The model what describe a regulation.</param>
         /// <returns></returns>
@@ -32,9 +34,9 @@ namespace Lykke.Service.Regulation.Client
         Task AddRegulationAsync(RegulationModel model);
 
         /// <summary>
-        /// Removes regulation.
+        /// Deletes the regulation by specified id.
         /// </summary>
-        /// <param name="regulationId">The regulation id for remove.</param>
+        /// <param name="regulationId">The id of regulation to delete.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         Task DeleteRegulationAsync(string regulationId);
@@ -46,21 +48,21 @@ namespace Lykke.Service.Regulation.Client
         Task<IEnumerable<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesAsync();
 
         /// <summary>
-        /// Returns all welcome regulation rules by country.
+        /// Returns all welcome regulation rules associated with specified country.
         /// </summary>
         /// <param name="country">The country name.</param>
         /// <returns>The list of welcome regulation rules.</returns>
         Task<IEnumerable<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesByCountryAsync(string country);
 
         /// <summary>
-        /// Returns all welcome regulation rules by regulation.
+        /// Returns all welcome regulation rules associated with specified regulation.
         /// </summary>
         /// <param name="regulationId">The regulation id.</param>
         /// <returns>The list of welcome regulation rules.</returns>
         Task<IEnumerable<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesByRegulationIdAsync(string regulationId);
 
         /// <summary>
-        /// Adds welcome regulation rule.
+        /// Adds the welcome regulation rule.
         /// </summary>
         /// <param name="model">The model what describe a welcome regulation rule.</param>
         /// <returns></returns>
@@ -68,53 +70,61 @@ namespace Lykke.Service.Regulation.Client
         Task AddWelcomeRegulationRuleAsync(WelcomeRegulationRuleModel model);
 
         /// <summary>
-        /// Removes welcome regulation rule.
+        /// Updates active state of welcome regulation rule.
         /// </summary>
-        /// <param name="regulationId">The regulation id for remove.</param>
+        /// <param name="regulationRuleId">The welcome regulation rule id.</param>
+        /// <param name="active">The welcome regulation rule active state.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
-        Task DeleteWelcomeRegulationRuleAsync(string regulationId);
+        Task UpdateWelcomeRegulationRuleActiveAsync(string regulationRuleId, bool active);
 
         /// <summary>
-        /// Returns client regulation.
+        /// Deletes the welcome regulation rule by specified regulation id.
+        /// </summary>
+        /// <param name="regulationRuleId">The welcome regulation rule id.</param>
+        /// <returns></returns>
+        Task DeleteWelcomeRegulationRuleAsync(string regulationRuleId);
+
+        /// <summary>
+        /// Returns a client regulation by specified client id and regulation id.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="regulationId">The regulation id.</param>
         /// <returns>Client regulation.</returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
-        Task<string> GetClientRegulationAsync(string clientId, string regulationId);
+        Task<ClientRegulationModel> GetClientRegulationAsync(string clientId, string regulationId);
 
         /// <summary>
-        /// Returns all client regulations.
+        /// Returns a regulations associated with client.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <returns>The list of client regulations.</returns>
         Task<IEnumerable<ClientRegulationModel>> GetClientRegulationsByClientIdAsync(string clientId);
 
         /// <summary>
-        /// Returns client regulations by regulation.
+        /// Returns a regulations associated with regulation.
         /// </summary>
         /// <param name="regulationId">The regulation id.</param>
         /// <returns>The list of client regulations.</returns>
         Task<IEnumerable<ClientRegulationModel>> GetClientRegulationsByRegulationIdAsync(string regulationId);
 
         /// <summary>
-        /// Returns client active regulations.
+        /// Returns an active client regulations associated with client.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <returns>The list of client regulations.</returns>
         Task<IEnumerable<ClientRegulationModel>> GetActiveClientRegulationsByClientIdAsync(string clientId);
 
         /// <summary>
-        /// Returns client available regulations.
+        /// Returns an active and KYC client regulations associated with client.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <returns>The list of client regulations.</returns>
         Task<IEnumerable<ClientRegulationModel>> GetAvailableClientRegulationsByClientIdAsync(string clientId);
 
         /// <summary>
-        /// Adds client regulation.
+        /// Adds the client regulation.
         /// </summary>
         /// <param name="model">The model what describe a client regulation.</param>
         /// <returns></returns>
@@ -122,25 +132,26 @@ namespace Lykke.Service.Regulation.Client
         Task AddClientRegulationAsync(ClientRegulationModel model);
 
         /// <summary>
-        /// Sets default client regulations.
+        /// Adds default regulations to client associated with country.
         /// </summary>
         /// <param name="clientId">The client id.</param>
-        /// <param name="country">The country assosiated with client.</param>
+        /// <param name="country">The country name.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         Task SetDefaultClientRegulationsAsync(string clientId, string country);
 
         /// <summary>
-        /// Sets client regulation KYC to <c>true</c>.
+        /// Sets the client regulation KYC status to <c>true</c>.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="regulationId">The regulation id.</param>
+        /// <param name="active">The client regulation KYC status.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
-        Task SetClientRegulationKycAsync(string clientId, string regulationId);
+        Task UpdateClientRegulationKycAsync(string clientId, string regulationId, bool active);
 
         /// <summary>
-        /// Sets client regulation active state to <c>true</c>.
+        /// Sets the client regulation active status to <c>true</c>.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="regulationId">The regulation id.</param>
@@ -149,7 +160,7 @@ namespace Lykke.Service.Regulation.Client
         Task ActivateClientRegulationAsync(string clientId, string regulationId);
 
         /// <summary>
-        /// Sets client regulation active state to <c>false</c>.
+        /// Sets the client regulation active status to <c>false</c>.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="regulationId">The regulation id.</param>
@@ -158,7 +169,7 @@ namespace Lykke.Service.Regulation.Client
         Task DeactivateClientRegulationAsync(string clientId, string regulationId);
 
         /// <summary>
-        /// Removes client regulation.
+        /// Deletes the regulation associated with client by specified id.
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <param name="regulationId">The regulation id.</param>

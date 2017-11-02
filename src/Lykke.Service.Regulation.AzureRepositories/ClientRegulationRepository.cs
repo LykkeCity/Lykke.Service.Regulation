@@ -107,16 +107,14 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public Task AddAsync(IClientRegulation clientRegulation)
         {
-            ClientRegulationEntity entity =
-                ClientRegulationEntity.Create(clientRegulation.ClientId, clientRegulation.RegulationId);
+            ClientRegulationEntity entity = ClientRegulationEntity.Create(clientRegulation);
 
             return _tableStorage.InsertOrReplaceAsync(entity);
         }
 
         public Task AddAsync(IEnumerable<IClientRegulation> clientRegulations)
         {
-            IEnumerable<ClientRegulationEntity> entities =
-                clientRegulations.Select(o => ClientRegulationEntity.Create(o.ClientId, o.RegulationId));
+            IEnumerable<ClientRegulationEntity> entities = clientRegulations.Select(ClientRegulationEntity.Create);
 
             return _tableStorage.InsertOrReplaceBatchAsync(entities);
         }
