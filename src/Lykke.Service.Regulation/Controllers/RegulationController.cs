@@ -101,7 +101,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _log.WriteInfoAsync(nameof(RegulationController), nameof(Add),
                 $"Regulation added. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
 
 
@@ -134,7 +134,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _log.WriteInfoAsync(nameof(RegulationController), nameof(Delete),
                 $"Regulation deleted. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
     }
 }

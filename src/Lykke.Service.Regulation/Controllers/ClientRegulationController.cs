@@ -166,7 +166,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Add),
                 $"Client regulation added. Model {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(SetDefault),
                 $"Default regulations was assigned for client. ClientId: {clientId}. Country: {country}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(SetKyc),
                 $"Client regulation KYC updated. ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Activate),
                 $"Client regulation activated. ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Deactivate),
                 $"Client regulation deactivated. ClientId: {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace Lykke.Service.Regulation.Controllers
             await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Delete),
                 $"Client current regulation deleted. ClientId {clientId}. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
-            return Ok();
+            return NoContent();
         }
     }
 }
