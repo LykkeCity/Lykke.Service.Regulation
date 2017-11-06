@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
 using Lykke.Service.Regulation.Core.Domain;
@@ -32,18 +34,10 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public async Task<IEnumerable<IWelcomeRegulationRule>> GetByCountryAsync(string country)
         {
-            var partitionKey = WelcomeRegulationRuleEntity.GeneratePartitionKey();
+            IEnumerable<IWelcomeRegulationRule> entities = await GetAllAsync();
 
-            string partitionKeyFilter = TableQuery
-                .GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey);
-
-            string countryFilter = TableQuery
-                .GenerateFilterCondition("Country", QueryComparisons.Equal, country);
-
-            var query = new TableQuery<WelcomeRegulationRuleEntity>()
-                .Where(TableQuery.CombineFilters(partitionKeyFilter, TableOperators.And, countryFilter));
-
-            return await _tableStorage.WhereAsync(query);
+            return entities
+                .Where(o => o.Countries.Any(p => p.Equals(country, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         public async Task<IEnumerable<IWelcomeRegulationRule>> GetByRegulationIdAsync(string regulationId)
@@ -75,7 +69,7 @@ namespace Lykke.Service.Regulation.AzureRepositories
             
             return _tableStorage.MergeAsync(partitionKey, welcomeRegulationRule.Id, entity =>
             {
-                entity.Active = welcomeRegulationRule.Active;
+                entity.Update(welcomeRegulationRule);
                 return entity;
             });
         }

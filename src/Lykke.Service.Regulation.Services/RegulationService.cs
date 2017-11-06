@@ -25,9 +25,16 @@ namespace Lykke.Service.Regulation.Services
             _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
         }
         
-        public Task<IRegulation> GetAsync(string regulationId)
+        public async Task<IRegulation> GetAsync(string regulationId)
         {
-            return _regulationRepository.GetAsync(regulationId);
+            IRegulation regulation = await _regulationRepository.GetAsync(regulationId);
+
+            if (regulation == null)
+            {
+                throw new ServiceException("Regulation not found.");
+            }
+
+            return regulation;
         }
 
         public Task<IEnumerable<IRegulation>> GetAllAsync()

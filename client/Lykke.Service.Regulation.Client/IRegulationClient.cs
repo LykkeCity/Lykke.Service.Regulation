@@ -70,13 +70,12 @@ namespace Lykke.Service.Regulation.Client
         Task AddWelcomeRegulationRuleAsync(WelcomeRegulationRuleModel model);
 
         /// <summary>
-        /// Updates active state of welcome regulation rule.
+        /// Updates welcome regulation rule.
         /// </summary>
-        /// <param name="regulationRuleId">The welcome regulation rule id.</param>
-        /// <param name="active">The welcome regulation rule active state.</param>
+        /// <param name="model">The model what describe a welcome regulation rule.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
-        Task UpdateWelcomeRegulationRuleActiveAsync(string regulationRuleId, bool active);
+        Task UpdateWelcomeRegulationRuleAsync(WelcomeRegulationRuleModel model);
 
         /// <summary>
         /// Deletes the welcome regulation rule by specified regulation id.

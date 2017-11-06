@@ -35,22 +35,26 @@ namespace Lykke.Service.Regulation.Controllers
         /// <param name="regulationId">The regulation id.</param>
         /// <returns>The regulation if exists, otherwise <see cref="ErrorResponse"/>.</returns>
         /// <response code="200">The regulation.</response>
-        /// <response code="404">Regulation not found.</response>
+        /// <response code="400">Regulation not found.</response>
         [HttpGet]
         [Route("{regulationId}")]
         [SwaggerOperation("GetRegulation")]
         [ProducesResponseType(typeof(RegulationModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Get(string regulationId)
         {
-            IRegulation regulation = await _regulationService.GetAsync(regulationId);
+            IRegulation regulation;
 
-            if (regulation == null)
+            try
+            {
+                regulation =  await _regulationService.GetAsync(regulationId);
+            }
+            catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(RegulationController), nameof(Get),
-                    $"Regulation not found. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+                    $"{exception.Message} RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
 
-                return NotFound(ErrorResponse.Create("Regulation not found."));
+                return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
             var model = Mapper.Map<RegulationModel>(regulation);

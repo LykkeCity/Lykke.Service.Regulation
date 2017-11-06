@@ -597,6 +597,38 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
+            /// <param name='welcomeRegulationRuleId'>
+            /// </param>
+            public static object GetWelcomeRegulationRulesById(this IRegulationAPI operations, string welcomeRegulationRuleId)
+            {
+                return operations.GetWelcomeRegulationRulesByIdAsync(welcomeRegulationRuleId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Returns all welcome regulation rules.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='welcomeRegulationRuleId'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<object> GetWelcomeRegulationRulesByIdAsync(this IRegulationAPI operations, string welcomeRegulationRuleId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetWelcomeRegulationRulesByIdWithHttpMessagesAsync(welcomeRegulationRuleId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Returns all welcome regulation rules.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
             public static IList<WelcomeRegulationRuleModel> GetWelcomeRegulationRules(this IRegulationAPI operations)
             {
                 return operations.GetWelcomeRegulationRulesAsync().GetAwaiter().GetResult();
@@ -722,40 +754,34 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             }
 
             /// <summary>
-            /// Updates active state of welcome regulation rule.
+            /// Updates welcome regulation rule.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='regulationRuleId'>
-            /// The welcome regulation rule id.
+            /// <param name='model'>
+            /// The model what describe a welcome regulation rule.
             /// </param>
-            /// <param name='active'>
-            /// The welcome regulation rule active state.
-            /// </param>
-            public static ErrorResponse UpdateWelcomeRegulationRuleActive(this IRegulationAPI operations, string regulationRuleId, bool active)
+            public static ErrorResponse UpdateWelcomeRegulationRule(this IRegulationAPI operations, WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel))
             {
-                return operations.UpdateWelcomeRegulationRuleActiveAsync(regulationRuleId, active).GetAwaiter().GetResult();
+                return operations.UpdateWelcomeRegulationRuleAsync(model).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Updates active state of welcome regulation rule.
+            /// Updates welcome regulation rule.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            /// <param name='regulationRuleId'>
-            /// The welcome regulation rule id.
-            /// </param>
-            /// <param name='active'>
-            /// The welcome regulation rule active state.
+            /// <param name='model'>
+            /// The model what describe a welcome regulation rule.
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> UpdateWelcomeRegulationRuleActiveAsync(this IRegulationAPI operations, string regulationRuleId, bool active, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> UpdateWelcomeRegulationRuleAsync(this IRegulationAPI operations, WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.UpdateWelcomeRegulationRuleActiveWithHttpMessagesAsync(regulationRuleId, active, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.UpdateWelcomeRegulationRuleWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

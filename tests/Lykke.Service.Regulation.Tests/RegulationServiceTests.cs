@@ -30,6 +30,23 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
+        public async void GetAsync_Throw_Exception_If_Regulation_Does_Not_Exist()
+        {
+            // arrange
+            const string regulationId = "ID";
+
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult<IRegulation>(null));
+
+            // act
+            Task task = _service.GetAsync(regulationId);
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Regulation not found.", exception.Message);
+        }
+
+        [Fact]
         public async void DeleteAsync_Can_Not_Delete_If_Regulation_Does_Not_Exist()
         {
             // arrange

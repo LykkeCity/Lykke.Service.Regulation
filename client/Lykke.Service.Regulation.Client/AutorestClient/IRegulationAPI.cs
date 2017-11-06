@@ -277,6 +277,19 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <summary>
         /// Returns all welcome regulation rules.
         /// </summary>
+        /// <param name='welcomeRegulationRuleId'>
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<object>> GetWelcomeRegulationRulesByIdWithHttpMessagesAsync(string welcomeRegulationRuleId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Returns all welcome regulation rules.
+        /// </summary>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
         /// </param>
@@ -330,13 +343,10 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         Task<HttpOperationResponse<object>> GetWelcomeRegulationRulesByRegulationIdWithHttpMessagesAsync(string regulationId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Updates active state of welcome regulation rule.
+        /// Updates welcome regulation rule.
         /// </summary>
-        /// <param name='regulationRuleId'>
-        /// The welcome regulation rule id.
-        /// </param>
-        /// <param name='active'>
-        /// The welcome regulation rule active state.
+        /// <param name='model'>
+        /// The model what describe a welcome regulation rule.
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -344,7 +354,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<ErrorResponse>> UpdateWelcomeRegulationRuleActiveWithHttpMessagesAsync(string regulationRuleId, bool active, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<ErrorResponse>> UpdateWelcomeRegulationRuleWithHttpMessagesAsync(WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Deletes the welcome regulation rule by specified regulation id.

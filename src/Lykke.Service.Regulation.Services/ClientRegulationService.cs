@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
@@ -86,23 +87,36 @@ namespace Lykke.Service.Regulation.Services
             }
 
             List<IWelcomeRegulationRule> welcomeRegulationRules =
-                (await _welcomeRegulationRuleRepository.GetByCountryAsync(country)).ToList();
+                (await _welcomeRegulationRuleRepository.GetAllAsync()).ToList();
 
-            if (!welcomeRegulationRules.Any())
+            IWelcomeRegulationRule welcomeRegulationRule = welcomeRegulationRules
+                .Where(o => o.Countries.Any(p => p.Equals(country, StringComparison.CurrentCultureIgnoreCase)))
+                .OrderByDescending(o => o.Priority)
+                .FirstOrDefault();
+
+            if (welcomeRegulationRule == null)
+            {
+                welcomeRegulationRule = welcomeRegulationRules
+                    .Where(o => !o.Countries.Any())
+                    .OrderByDescending(o => o.Priority)
+                    .FirstOrDefault();
+            }
+
+            if (welcomeRegulationRule == null)
             {
                 throw new ServiceException("No default regulations for country.");
             }
 
-            IEnumerable<ClientRegulation> defaultClientRegulations =
-                welcomeRegulationRules.Select(o => new ClientRegulation
+            ClientRegulation defaultClientRegulation =
+                new ClientRegulation
                 {
                     ClientId = clientId,
-                    RegulationId = o.RegulationId,
-                    Active = o.Active,
+                    RegulationId = welcomeRegulationRule.RegulationId,
+                    Active = welcomeRegulationRule.Active,
                     Kyc = false
-                });
+                };
 
-            await _clientRegulationRepository.AddAsync(defaultClientRegulations);
+            await _clientRegulationRepository.AddAsync(defaultClientRegulation);
         }
 
         public async Task UpdateKycAsync(string clientId, string regulationId, bool active)

@@ -29,9 +29,11 @@ namespace Lykke.Service.Regulation.Client
             return new WelcomeRegulationRuleModel
             {
                 Id = model.Id,
+                Name = model.Name,
                 RegulationId = model.RegulationId,
-                Country = model.Country,
-                Active = model.Active
+                Countries = model.Countries,
+                Active = model.Active,
+                Priority = model.Priority
             };
         }
     }

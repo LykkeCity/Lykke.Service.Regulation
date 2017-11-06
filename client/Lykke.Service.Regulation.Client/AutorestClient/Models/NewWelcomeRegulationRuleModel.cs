@@ -7,6 +7,8 @@
 namespace Lykke.Service.Regulation.Client.AutorestClient.Models
 {
     using Newtonsoft.Json;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Linq;
 
     public partial class NewWelcomeRegulationRuleModel
@@ -24,11 +26,13 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// Initializes a new instance of the NewWelcomeRegulationRuleModel
         /// class.
         /// </summary>
-        public NewWelcomeRegulationRuleModel(bool active, string country = default(string), string regulationId = default(string))
+        public NewWelcomeRegulationRuleModel(bool active, int priority, string name = default(string), IList<string> countries = default(IList<string>), string regulationId = default(string))
         {
-            Country = country;
+            Name = name;
+            Countries = countries;
             RegulationId = regulationId;
             Active = active;
+            Priority = priority;
             CustomInit();
         }
 
@@ -39,8 +43,13 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "Country")]
-        public string Country { get; set; }
+        [JsonProperty(PropertyName = "Name")]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "Countries")]
+        public IList<string> Countries { get; set; }
 
         /// <summary>
         /// </summary>
@@ -53,6 +62,11 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         public bool Active { get; set; }
 
         /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "Priority")]
+        public int Priority { get; set; }
+
+        /// <summary>
         /// Validate the object.
         /// </summary>
         /// <exception cref="Microsoft.Rest.ValidationException">
@@ -60,7 +74,6 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// </exception>
         public virtual void Validate()
         {
-            //Nothing to validate
         }
     }
 }

@@ -96,6 +96,26 @@ namespace Lykke.Service.Regulation.Client
         }
 
         /// <summary>
+        /// Returns welcome regulation rule by specified id.
+        /// </summary>
+        /// <param name="welcomeRegulationRuleId">The regulation rule id.</param>
+        /// <returns>The <see cref="WelcomeRegulationRuleModel"/>.</returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
+        public async Task<WelcomeRegulationRuleModel> GetWelcomeRegulationRulesByIdAsync(string welcomeRegulationRuleId)
+        {
+            object result = await _service.GetWelcomeRegulationRulesByIdAsync(welcomeRegulationRuleId);
+
+            if (result is AutorestClient.Models.WelcomeRegulationRuleModel regulationModel)
+                return regulationModel.ToModel();
+
+            if (result is ErrorResponse errorResponse)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+
+            throw new InvalidOperationException($"Unexpected response type: {result?.GetType()}");
+        }
+
+        /// <summary>
         /// Returns all welcome regulation rules.
         /// </summary>
         /// <returns>The list of welcome regulation rules.</returns>
@@ -150,9 +170,11 @@ namespace Lykke.Service.Regulation.Client
                 await _service.AddWelcomeRegulationRuleAsync(
                     new NewWelcomeRegulationRuleModel
                     {
+                        Name = model.Name,
                         RegulationId = model.RegulationId,
-                        Country = model.Country,
-                        Active = model.Active
+                        Countries = model.Countries,
+                        Active = model.Active,
+                        Priority = model.Priority
                     });
 
             if (errorResponse != null)
@@ -160,16 +182,23 @@ namespace Lykke.Service.Regulation.Client
         }
 
         /// <summary>
-        /// Updates active state of welcome regulation rule.
+        /// Updates welcome regulation rule.
         /// </summary>
-        /// <param name="regulationRuleId">The welcome regulation rule id.</param>
-        /// <param name="active">The welcome regulation rule active state.</param>
+        /// <param name="model">The model what describe a welcome regulation rule.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
-        public async Task UpdateWelcomeRegulationRuleActiveAsync(string regulationRuleId, bool active)
+        public async Task UpdateWelcomeRegulationRuleAsync(WelcomeRegulationRuleModel model)
         {
             ErrorResponse errorResponse =
-                await _service.UpdateWelcomeRegulationRuleActiveAsync(regulationRuleId, active);
+                await _service.UpdateWelcomeRegulationRuleAsync(new AutorestClient.Models.WelcomeRegulationRuleModel
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    RegulationId = model.RegulationId,
+                    Countries = model.Countries,
+                    Active = model.Active,
+                    Priority = model.Priority
+                });
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);

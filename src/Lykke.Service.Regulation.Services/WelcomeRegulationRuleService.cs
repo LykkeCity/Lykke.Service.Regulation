@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
@@ -19,6 +18,18 @@ namespace Lykke.Service.Regulation.Services
         {
             _regulationRepository = regulationRepository;
             _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
+        }
+
+        public async Task<IWelcomeRegulationRule> GetAsync(string regulationRuleId)
+        {
+            IWelcomeRegulationRule regulationRule = await _welcomeRegulationRuleRepository.GetAsync(regulationRuleId);
+
+            if (regulationRule == null)
+            {
+                throw new ServiceException("Regulation rule not found.");
+            }
+
+            return regulationRule;
         }
 
         public Task<IEnumerable<IWelcomeRegulationRule>> GetAllAsync()
@@ -52,33 +63,26 @@ namespace Lykke.Service.Regulation.Services
                 throw new ServiceException("Regulation not found.");
             }
 
-            IEnumerable<IWelcomeRegulationRule> regulationRules =
-                await _welcomeRegulationRuleRepository.GetByCountryAsync(welcomeRegulationRule.Country);
-
-            if (regulationRules.Any(o => o.RegulationId == welcomeRegulationRule.RegulationId))
-            {
-                throw new ServiceException("Rule already exist.");
-            }
-            
             await _welcomeRegulationRuleRepository.AddAsync(welcomeRegulationRule);
         }
 
-        public async Task UpdateActiveAsync(string regulationRuleId, bool active)
+        public async Task UpdateAsync(IWelcomeRegulationRule welcomeRegulationRule)
         {
-            IWelcomeRegulationRule regulationRule = await _welcomeRegulationRuleRepository.GetAsync(regulationRuleId);
+            IRegulation result = await _regulationRepository.GetAsync(welcomeRegulationRule.RegulationId);
+
+            if (result == null)
+            {
+                throw new ServiceException("Regulation not found.");
+            }
+
+            IWelcomeRegulationRule regulationRule = await _welcomeRegulationRuleRepository.GetAsync(welcomeRegulationRule.Id);
 
             if (regulationRule == null)
             {
                 throw new ServiceException("Regulation rule not found.");
             }
 
-            await _welcomeRegulationRuleRepository.UpdateAsync(new WelcomeRegulationRule
-            {
-                Id = regulationRule.Id,
-                RegulationId = regulationRule.RegulationId,
-                Country = regulationRule.Country,
-                Active = active
-            });
+            await _welcomeRegulationRuleRepository.UpdateAsync(welcomeRegulationRule);
         }
 
         public async Task DeleteAsync(string regulationRuleId)

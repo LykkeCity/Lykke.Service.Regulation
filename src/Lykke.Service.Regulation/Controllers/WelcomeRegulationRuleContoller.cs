@@ -30,6 +30,39 @@ namespace Lykke.Service.Regulation.Controllers
         }
 
         /// <summary>
+        /// Returns welcome regulation rule by specified id.
+        /// </summary>
+        /// <returns>The welcome regulation rule.</returns>
+        /// <response code="200">The welcome regulation rule.</response>
+        /// <response code="400">Regulation rule with specified id not found.</response>
+        [HttpGet]
+        [Route("{welcomeRegulationRuleId}")]
+        [SwaggerOperation("GetWelcomeRegulationRulesById")]
+        [ProducesResponseType(typeof(WelcomeRegulationRuleModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Get(string welcomeRegulationRuleId)
+        {
+            IWelcomeRegulationRule regulationRule;
+
+            try
+            {
+                regulationRule = await _welcomeRegulationRuleService.GetAsync(welcomeRegulationRuleId);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(Get),
+                    $"{exception.Message} Id: {welcomeRegulationRuleId}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+
+            WelcomeRegulationRuleModel model =
+                Mapper.Map<IWelcomeRegulationRule, WelcomeRegulationRuleModel>(regulationRule);
+
+            return Ok(model);
+        }
+
+        /// <summary>
         /// Returns all welcome regulation rules.
         /// </summary>
         /// <returns>The list of welcome regulation rules.</returns>
@@ -119,11 +152,11 @@ namespace Lykke.Service.Regulation.Controllers
                 return BadRequest(ErrorResponse.Create("Invalid model.", ModelState));
             }
 
-            var regulation = Mapper.Map<WelcomeRegulationRule>(model);
+            var regulationRule = Mapper.Map<WelcomeRegulationRule>(model);
 
             try
             {
-                await _welcomeRegulationRuleService.AddAsync(regulation);
+                await _welcomeRegulationRuleService.AddAsync(regulationRule);
             }
             catch (ServiceException exception)
             {
@@ -140,33 +173,39 @@ namespace Lykke.Service.Regulation.Controllers
         }
 
         /// <summary>
-        /// Updates active state of welcome regulation rule.
+        /// Updates welcome regulation rule.
         /// </summary>
-        /// <param name="regulationRuleId">The welcome regulation rule id.</param>
-        /// <param name="active">The welcome regulation rule active state.</param>
+        /// <param name="model">The model what describe a welcome regulation rule.</param>
         /// <response code="204">Welcome regulation rule active state successfully updated.</response>
-        /// <response code="400">Regulation rule not found.</response>
+        /// <response code="400">Invalid model what describe a welcome regulation rule or regulation rule not found or specified regulation not found.</response>
         [HttpPut]
-        [Route("{regulationRuleId}/{active}")]
-        [SwaggerOperation("UpdateWelcomeRegulationRuleActive")]
+        [Route("update")]
+        [SwaggerOperation("UpdateWelcomeRegulationRule")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> UpdateActive(string regulationRuleId, bool active)
+        public async Task<IActionResult> Update([FromBody] WelcomeRegulationRuleModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ErrorResponse.Create("Invalid model.", ModelState));
+            }
+
+            var regulationRule = Mapper.Map<WelcomeRegulationRule>(model);
+
             try
             {
-                await _welcomeRegulationRuleService.UpdateActiveAsync(regulationRuleId, active);
+                await _welcomeRegulationRuleService.UpdateAsync(regulationRule);
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(UpdateActive),
-                    $"{exception.Message} RegulationRuleId: {regulationRuleId}. Active: {active}. IP: {HttpContext.GetIp()}");
+                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(Update),
+                    $"{exception.Message} Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(UpdateActive),
-                $"Welcome regulation rule active state updated. RegulationRuleId: {regulationRuleId}. Active: {active}. IP: {HttpContext.GetIp()}");
+            await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Update),
+                $"Welcome regulation rule updated. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
         }

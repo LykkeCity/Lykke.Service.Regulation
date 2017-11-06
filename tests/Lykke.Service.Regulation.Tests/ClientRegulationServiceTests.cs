@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
@@ -330,34 +329,29 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
-        public async void SetDefaultAsync_OK()
+        public async void SetDefaultAsync_Choose_Regulation_Rule_With_Most_Priority()
         {
             // arrange
             const string clientId = "me";
             const string country = "uk";
 
-            IEnumerable<IClientRegulation> result = null;
+            WelcomeRegulationRule rule1 = Create("1", "reg_1", country, true, 10);
+            WelcomeRegulationRule rule2 = Create("2", "reg_2", country, true, 100);
+
+            IClientRegulation result = null;
 
             _clientRegulationRepositoryMock.Setup(o => o.GetByClientIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(new List<ClientRegulation>());
 
-            _clientRegulationRepositoryMock.Setup(o => o.AddAsync(It.IsAny<IEnumerable<IClientRegulation>>()))
+            _clientRegulationRepositoryMock.Setup(o => o.AddAsync(It.IsAny<IClientRegulation>()))
                 .Returns(Task.CompletedTask)
-                .Callback((IEnumerable<IClientRegulation> o) => { result = o; });
+                .Callback((IClientRegulation o) => result = o);
 
-            _welcomeRegulationRuleRepositoryMock.Setup(o => o.GetByCountryAsync(It.Is<string>(c => c == country)))
+            _welcomeRegulationRuleRepositoryMock.Setup(o => o.GetAllAsync())
                 .ReturnsAsync(new List<WelcomeRegulationRule>
                 {
-                    new WelcomeRegulationRule
-                    {
-                        RegulationId = "ru",
-                        Country = country
-                    },
-                    new WelcomeRegulationRule
-                    {
-                        RegulationId = "en",
-                        Country = country
-                    }
+                    rule1,
+                    rule2
                 });
 
             // act
@@ -365,7 +359,65 @@ namespace Lykke.Service.Regulation.Tests
 
             // assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Count());
+            Assert.Equal(result.RegulationId, rule2.RegulationId);
+            Assert.Equal(result.Active, rule2.Active);
+        }
+
+        [Fact]
+        public async void SetDefaultAsync_Choose_Default_Regulation_Rule_With_Most_Priority()
+        {
+            // arrange
+            const string clientId = "me";
+            const string country = "uk";
+
+            WelcomeRegulationRule rule1 = Create("1", "reg_1", "tmp0", true, 100);
+            WelcomeRegulationRule rule2 = Create("2", "reg_2", null, false, 100);
+            WelcomeRegulationRule rule3 = Create("3", "reg_3", null, true, 10);
+
+            IClientRegulation result = null;
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetByClientIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new List<ClientRegulation>());
+
+            _clientRegulationRepositoryMock.Setup(o => o.AddAsync(It.IsAny<IClientRegulation>()))
+                .Returns(Task.CompletedTask)
+                .Callback((IClientRegulation o) => result = o);
+
+            _welcomeRegulationRuleRepositoryMock.Setup(o => o.GetAllAsync())
+                .ReturnsAsync(new List<WelcomeRegulationRule>
+                {
+                    rule1,
+                    rule2,
+                    rule3
+                });
+
+            // act
+            await _service.SetDefaultAsync(clientId, country);
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Equal(result.RegulationId, rule2.RegulationId);
+            Assert.Equal(result.Active, rule2.Active);
+        }
+        
+        private WelcomeRegulationRule Create(string id, string regulation, string country, bool active, int priority)
+        {
+            return new WelcomeRegulationRule
+            {
+                Id = id,
+                Name = $"Rule {id}",
+                RegulationId = regulation,
+                Countries = country == null
+                    ? new List<string>()
+                    : new List<string>
+                    {
+                        "tmp",
+                        country,
+                        "tmp1"
+                    },
+                Active = active,
+                Priority = priority
+            };
         }
     }
 }

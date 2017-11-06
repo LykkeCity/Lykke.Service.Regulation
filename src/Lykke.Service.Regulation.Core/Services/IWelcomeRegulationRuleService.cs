@@ -6,6 +6,8 @@ namespace Lykke.Service.Regulation.Core.Services
 {
     public interface IWelcomeRegulationRuleService
     {
+        Task<IWelcomeRegulationRule> GetAsync(string regulationRuleId);
+
         Task<IEnumerable<IWelcomeRegulationRule>> GetAllAsync();
 
         Task<IEnumerable<IWelcomeRegulationRule>> GetByCountryAsync(string country);
@@ -14,7 +16,7 @@ namespace Lykke.Service.Regulation.Core.Services
 
         Task AddAsync(IWelcomeRegulationRule welcomeRegulationRule);
 
-        Task UpdateActiveAsync(string regulationRuleId, bool active);
+        Task UpdateAsync(IWelcomeRegulationRule welcomeRegulationRule);
 
         Task DeleteAsync(string regulationRuleId);
     }
