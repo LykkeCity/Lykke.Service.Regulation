@@ -592,20 +592,20 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             }
 
             /// <summary>
-            /// Returns all welcome regulation rules.
+            /// Returns welcome regulation rule by specified id.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='welcomeRegulationRuleId'>
             /// </param>
-            public static object GetWelcomeRegulationRulesById(this IRegulationAPI operations, string welcomeRegulationRuleId)
+            public static object GetWelcomeRegulationRuleById(this IRegulationAPI operations, string welcomeRegulationRuleId)
             {
-                return operations.GetWelcomeRegulationRulesByIdAsync(welcomeRegulationRuleId).GetAwaiter().GetResult();
+                return operations.GetWelcomeRegulationRuleByIdAsync(welcomeRegulationRuleId).GetAwaiter().GetResult();
             }
 
             /// <summary>
-            /// Returns all welcome regulation rules.
+            /// Returns welcome regulation rule by specified id.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -615,9 +615,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetWelcomeRegulationRulesByIdAsync(this IRegulationAPI operations, string welcomeRegulationRuleId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> GetWelcomeRegulationRuleByIdAsync(this IRegulationAPI operations, string welcomeRegulationRuleId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetWelcomeRegulationRulesByIdWithHttpMessagesAsync(welcomeRegulationRuleId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.GetWelcomeRegulationRuleByIdWithHttpMessagesAsync(welcomeRegulationRuleId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

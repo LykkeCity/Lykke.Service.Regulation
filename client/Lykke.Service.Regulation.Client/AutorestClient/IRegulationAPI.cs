@@ -275,7 +275,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         Task<HttpOperationResponse<ErrorResponse>> AddRegulationWithHttpMessagesAsync(NewRegulationModel model = default(NewRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Returns all welcome regulation rules.
+        /// Returns welcome regulation rule by specified id.
         /// </summary>
         /// <param name='welcomeRegulationRuleId'>
         /// </param>
@@ -285,7 +285,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<object>> GetWelcomeRegulationRulesByIdWithHttpMessagesAsync(string welcomeRegulationRuleId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<object>> GetWelcomeRegulationRuleByIdWithHttpMessagesAsync(string welcomeRegulationRuleId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Returns all welcome regulation rules.

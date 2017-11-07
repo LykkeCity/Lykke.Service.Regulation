@@ -37,7 +37,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="400">Regulation rule with specified id not found.</response>
         [HttpGet]
         [Route("{welcomeRegulationRuleId}")]
-        [SwaggerOperation("GetWelcomeRegulationRulesById")]
+        [SwaggerOperation("GetWelcomeRegulationRuleById")]
         [ProducesResponseType(typeof(WelcomeRegulationRuleModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Get(string welcomeRegulationRuleId)

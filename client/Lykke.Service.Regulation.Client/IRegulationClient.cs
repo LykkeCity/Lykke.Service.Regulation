@@ -42,6 +42,13 @@ namespace Lykke.Service.Regulation.Client
         Task DeleteRegulationAsync(string regulationId);
 
         /// <summary>
+        /// Returns welcome regulation rule by specified id.
+        /// </summary>
+        /// <param name="welcomeRegulationRuleId">The regulation rule id.</param>
+        /// <returns>The <see cref="WelcomeRegulationRuleModel"/>.</returns>
+        Task<WelcomeRegulationRuleModel> GetWelcomeRegulationRuleByIdAsync(string welcomeRegulationRuleId);
+
+        /// <summary>
         /// Returns all welcome regulation rules.
         /// </summary>
         /// <returns>The list of welcome regulation rules.</returns>

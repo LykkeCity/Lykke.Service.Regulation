@@ -2397,7 +2397,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         }
 
         /// <summary>
-        /// Returns all welcome regulation rules.
+        /// Returns welcome regulation rule by specified id.
         /// </summary>
         /// <param name='welcomeRegulationRuleId'>
         /// </param>
@@ -2422,7 +2422,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <return>
         /// A response object containing the response body and response headers.
         /// </return>
-        public async Task<HttpOperationResponse<object>> GetWelcomeRegulationRulesByIdWithHttpMessagesAsync(string welcomeRegulationRuleId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HttpOperationResponse<object>> GetWelcomeRegulationRuleByIdWithHttpMessagesAsync(string welcomeRegulationRuleId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (welcomeRegulationRuleId == null)
             {
@@ -2437,7 +2437,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
                 Dictionary<string, object> tracingParameters = new Dictionary<string, object>();
                 tracingParameters.Add("welcomeRegulationRuleId", welcomeRegulationRuleId);
                 tracingParameters.Add("cancellationToken", cancellationToken);
-                ServiceClientTracing.Enter(_invocationId, this, "GetWelcomeRegulationRulesById", tracingParameters);
+                ServiceClientTracing.Enter(_invocationId, this, "GetWelcomeRegulationRuleById", tracingParameters);
             }
             // Construct URL
             var _baseUrl = BaseUri.AbsoluteUri;

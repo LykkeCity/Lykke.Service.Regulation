@@ -102,9 +102,9 @@ namespace Lykke.Service.Regulation.Client
         /// <returns>The <see cref="WelcomeRegulationRuleModel"/>.</returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
-        public async Task<WelcomeRegulationRuleModel> GetWelcomeRegulationRulesByIdAsync(string welcomeRegulationRuleId)
+        public async Task<WelcomeRegulationRuleModel> GetWelcomeRegulationRuleByIdAsync(string welcomeRegulationRuleId)
         {
-            object result = await _service.GetWelcomeRegulationRulesByIdAsync(welcomeRegulationRuleId);
+            object result = await _service.GetWelcomeRegulationRuleByIdAsync(welcomeRegulationRuleId);
 
             if (result is AutorestClient.Models.WelcomeRegulationRuleModel regulationModel)
                 return regulationModel.ToModel();
