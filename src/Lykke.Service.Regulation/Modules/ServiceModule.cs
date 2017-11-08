@@ -1,11 +1,13 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
+using Common;
 using Common.Log;
 using Lykke.Service.Regulation.AzureRepositories;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Core.Settings.ServiceSettings;
+using Lykke.Service.Regulation.RabbitSubscribers;
 using Lykke.Service.Regulation.Services;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,6 +53,7 @@ namespace Lykke.Service.Regulation.Modules
 
             RegisterRepositories(builder);
             RegisterServices(builder);
+            RegisterRabbitMqSubscribers(builder);
 
             builder.Populate(_services);
         }
@@ -85,6 +88,17 @@ namespace Lykke.Service.Regulation.Modules
 
             builder.RegisterType<RegulationService>()
                 .As<IRegulationService>();
+        }
+
+        private void RegisterRabbitMqSubscribers(ContainerBuilder builder)
+        {
+            builder.RegisterType<ClientRegisteredSubscriber>()
+                .AsSelf()
+                .As<IStartable>()
+                .As<IStopable>()
+                .AutoActivate()
+                .SingleInstance()
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.RabbitMq));
         }
     }
 }

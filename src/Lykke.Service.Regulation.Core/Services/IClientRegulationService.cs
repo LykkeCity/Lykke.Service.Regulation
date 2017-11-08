@@ -20,6 +20,8 @@ namespace Lykke.Service.Regulation.Core.Services
 
         Task SetDefaultAsync(string clientId, string country);
 
+        Task SetDefaultByPhoneNumberAsync(string clientId, string phoneNumber);
+
         Task UpdateKycAsync(string clientId, string regulationId, bool active);
 
         Task UpdateActiveAsync(string clientId, string regulationId, bool state);

@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common;
+using Common.Log;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
+using Lykke.Service.Regulation.Core.Utils;
 using Lykke.Service.Regulation.Services.Exceptions;
 
 namespace Lykke.Service.Regulation.Services
@@ -14,15 +17,18 @@ namespace Lykke.Service.Regulation.Services
         private readonly IRegulationRepository _regulationRepository;
         private readonly IClientRegulationRepository _clientRegulationRepository;
         private readonly IWelcomeRegulationRuleRepository _welcomeRegulationRuleRepository;
+        private readonly ILog _log;
 
         public ClientRegulationService(
             IRegulationRepository regulationRepository,
             IClientRegulationRepository clientRegulationRepository,
-            IWelcomeRegulationRuleRepository welcomeRegulationRuleRepository)
+            IWelcomeRegulationRuleRepository welcomeRegulationRuleRepository,
+            ILog log)
         {
             _regulationRepository = regulationRepository;
             _clientRegulationRepository = clientRegulationRepository;
             _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
+            _log = log;
         }
 
         public async Task<IClientRegulation> GetAsync(string clientId, string regulationId)
@@ -117,6 +123,22 @@ namespace Lykke.Service.Regulation.Services
                 };
 
             await _clientRegulationRepository.AddAsync(defaultClientRegulation);
+        }
+
+        public async Task SetDefaultByPhoneNumberAsync(string clientId, string phoneNumber)
+        {
+            // TODO: Only for development! The country should be added to registration contract.
+            string countryCode = CountryCodeUtil.GetCountryCodeByPhoneNumber(phoneNumber);
+
+            if (string.IsNullOrEmpty(countryCode))
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegulationService), nameof(SetDefaultByPhoneNumberAsync),
+                    $"Can not find country code by phone number. {nameof(clientId)}: {clientId}. {nameof(phoneNumber)}: {phoneNumber}");
+
+                countryCode = "n/a";
+            }
+            
+            await SetDefaultAsync(clientId, CountryManager.Iso2ToIso3(countryCode));
         }
 
         public async Task UpdateKycAsync(string clientId, string regulationId, bool active)
