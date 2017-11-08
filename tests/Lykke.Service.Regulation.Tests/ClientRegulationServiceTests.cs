@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Common.Log;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Services;
@@ -11,6 +12,7 @@ namespace Lykke.Service.Regulation.Tests
 {
     public class ClientRegulationServiceTests
     {
+        private readonly Mock<ILog> _logMock;
         private readonly Mock<IRegulationRepository> _regulationRepositoryMock;
         private readonly Mock<IClientRegulationRepository> _clientRegulationRepositoryMock;
         private readonly Mock<IWelcomeRegulationRuleRepository> _welcomeRegulationRuleRepositoryMock;
@@ -19,6 +21,7 @@ namespace Lykke.Service.Regulation.Tests
 
         public ClientRegulationServiceTests()
         {
+            _logMock = new Mock<ILog>();
             _regulationRepositoryMock = new Mock<IRegulationRepository>();
             _clientRegulationRepositoryMock = new Mock<IClientRegulationRepository>();
             _welcomeRegulationRuleRepositoryMock = new Mock<IWelcomeRegulationRuleRepository>();
@@ -26,7 +29,8 @@ namespace Lykke.Service.Regulation.Tests
             _service = new ClientRegulationService(
                 _regulationRepositoryMock.Object,
                 _clientRegulationRepositoryMock.Object,
-                _welcomeRegulationRuleRepositoryMock.Object);
+                _welcomeRegulationRuleRepositoryMock.Object,
+                _logMock.Object);
         }
 
         [Fact]
