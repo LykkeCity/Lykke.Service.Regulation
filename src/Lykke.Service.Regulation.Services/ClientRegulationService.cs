@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Common.Log;
+using Lykke.Service.Regulation.Core.Contracts;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Core.Utils;
 using Lykke.Service.Regulation.Services.Exceptions;
+using ClientRegulation = Lykke.Service.Regulation.Core.Domain.ClientRegulation;
 
 namespace Lykke.Service.Regulation.Services
 {
@@ -17,17 +19,20 @@ namespace Lykke.Service.Regulation.Services
         private readonly IRegulationRepository _regulationRepository;
         private readonly IClientRegulationRepository _clientRegulationRepository;
         private readonly IWelcomeRegulationRuleRepository _welcomeRegulationRuleRepository;
+        private readonly IClientRegulationPublisher _clientRegulationPublisher;
         private readonly ILog _log;
 
         public ClientRegulationService(
             IRegulationRepository regulationRepository,
             IClientRegulationRepository clientRegulationRepository,
             IWelcomeRegulationRuleRepository welcomeRegulationRuleRepository,
+            IClientRegulationPublisher clientRegulationPublisher,
             ILog log)
         {
             _regulationRepository = regulationRepository;
             _clientRegulationRepository = clientRegulationRepository;
             _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
+            _clientRegulationPublisher = clientRegulationPublisher;
             _log = log;
         }
 
@@ -80,6 +85,8 @@ namespace Lykke.Service.Regulation.Services
             }
 
             await _clientRegulationRepository.AddAsync(clientRegulation);
+
+            await PublishOnChanged(clientRegulation.ClientId);
         }
 
         public async Task SetDefaultAsync(string clientId, string country)
@@ -123,6 +130,8 @@ namespace Lykke.Service.Regulation.Services
                 };
 
             await _clientRegulationRepository.AddAsync(defaultClientRegulation);
+
+            await PublishOnChanged(clientId);
         }
 
         public async Task SetDefaultByPhoneNumberAsync(string clientId, string phoneNumber)
@@ -153,6 +162,8 @@ namespace Lykke.Service.Regulation.Services
             clientRegulation.Kyc = active;
 
             await _clientRegulationRepository.UpdateAsync(clientRegulation);
+
+            await PublishOnChanged(clientId);
         }
 
         public async Task UpdateActiveAsync(string clientId, string regulationId, bool state)
@@ -167,6 +178,8 @@ namespace Lykke.Service.Regulation.Services
             clientRegulation.Active = state;
 
             await _clientRegulationRepository.UpdateAsync(clientRegulation);
+
+            await PublishOnChanged(clientId);
         }
 
         public async Task DeleteAsync(string clientId, string regulationId)
@@ -189,6 +202,27 @@ namespace Lykke.Service.Regulation.Services
             }
 
             await _clientRegulationRepository.DeleteAsync(clientId, regulationId);
+
+            await PublishOnChanged(clientId);
+        }
+
+        private async Task PublishOnChanged(string clientId)
+        {
+            IEnumerable<IClientRegulation> clientRegulations =
+                await _clientRegulationRepository.GetByClientIdAsync(clientId);
+
+            var message = new ClientRegulationsMessage
+            {
+                ClientId = clientId,
+                Regulations = clientRegulations.Select(o => new Core.Contracts.ClientRegulation
+                {
+                    RegulationId = o.RegulationId,
+                    Kyc = o.Kyc,
+                    Active = o.Active
+                }).ToList()
+            };
+
+            await _clientRegulationPublisher.PublishAsync(message);
         }
     }
 }

@@ -14,10 +14,10 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
     {
         private readonly ILog _log;
         private readonly IClientRegulationService _clientRegulationService;
-        private readonly RabbitMqSettings _settings;
+        private readonly RegistrationQueue _settings;
         private RabbitMqSubscriber<ClientRegisteredMessage> _subscriber;
 
-        public ClientRegisteredSubscriber(ILog log, IClientRegulationService clientRegulationService,  RabbitMqSettings settings)
+        public ClientRegisteredSubscriber(ILog log, IClientRegulationService clientRegulationService, RegistrationQueue settings)
         {
             _log = log;
             _clientRegulationService = clientRegulationService;
@@ -27,8 +27,7 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
         public void Start()
         {
             var settings = RabbitMqSubscriptionSettings
-                .CreateForSubscriber(_settings.RegistrationQueue.ConnectionString, _settings.RegistrationQueue.Exchange,
-                    "regulation")
+                .CreateForSubscriber(_settings.ConnectionString, _settings.Exchange, "regulation")
                 .MakeDurable();
 
             settings.DeadLetterExchangeName = null;

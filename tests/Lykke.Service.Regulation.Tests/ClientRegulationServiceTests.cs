@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Log;
+using Lykke.Service.Regulation.Core.Contracts;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
+using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Services;
 using Lykke.Service.Regulation.Services.Exceptions;
 using Moq;
 using Xunit;
+using ClientRegulation = Lykke.Service.Regulation.Core.Domain.ClientRegulation;
 
 namespace Lykke.Service.Regulation.Tests
 {
@@ -16,6 +19,7 @@ namespace Lykke.Service.Regulation.Tests
         private readonly Mock<IRegulationRepository> _regulationRepositoryMock;
         private readonly Mock<IClientRegulationRepository> _clientRegulationRepositoryMock;
         private readonly Mock<IWelcomeRegulationRuleRepository> _welcomeRegulationRuleRepositoryMock;
+        private readonly Mock<IClientRegulationPublisher> _clientRegulationPublisherMock;
 
         private readonly ClientRegulationService _service;
 
@@ -25,11 +29,13 @@ namespace Lykke.Service.Regulation.Tests
             _regulationRepositoryMock = new Mock<IRegulationRepository>();
             _clientRegulationRepositoryMock = new Mock<IClientRegulationRepository>();
             _welcomeRegulationRuleRepositoryMock = new Mock<IWelcomeRegulationRuleRepository>();
-
+            _clientRegulationPublisherMock = new Mock<IClientRegulationPublisher>();
+            
             _service = new ClientRegulationService(
                 _regulationRepositoryMock.Object,
                 _clientRegulationRepositoryMock.Object,
                 _welcomeRegulationRuleRepositoryMock.Object,
+                _clientRegulationPublisherMock.Object,
                 _logMock.Object);
         }
 
@@ -96,6 +102,145 @@ namespace Lykke.Service.Regulation.Tests
 
             // assert
             Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async void AddAsync_Publish_Ok()
+        {
+            // arrange
+            const string regulationId = "ID";
+            const string clientId = "me";
+
+            bool published = false;
+
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new Core.Domain.Regulation
+                {
+                    Id = regulationId
+                });
+
+            _clientRegulationPublisherMock.Setup(o => o.PublishAsync(It.IsAny<ClientRegulationsMessage>()))
+                .Returns(Task.CompletedTask)
+                .Callback(() => published = true);
+
+            // act
+            await _service.AddAsync(new ClientRegulation
+            {
+                ClientId = clientId,
+                RegulationId = regulationId
+            });
+
+            // assert
+            Assert.True(published);
+        }
+
+        [Fact]
+        public async void SetDefaultAsync_Publish_Ok()
+        {
+            // arrange
+            const string clientId = "me";
+            const string country = "uk";
+
+            bool published = false;
+
+            WelcomeRegulationRule rule1 = Create("1", "reg_1", null, true, 100);
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetByClientIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new List<ClientRegulation>());
+
+            _welcomeRegulationRuleRepositoryMock.Setup(o => o.GetAllAsync())
+                .ReturnsAsync(new List<WelcomeRegulationRule>
+                {
+                    rule1
+                });
+
+            _clientRegulationPublisherMock.Setup(o => o.PublishAsync(It.IsAny<ClientRegulationsMessage>()))
+                .Returns(Task.CompletedTask)
+                .Callback(() => published = true);
+
+            // act
+            await _service.SetDefaultAsync(clientId, country);
+
+            // assert
+            Assert.True(published);
+        }
+
+        [Fact]
+        public async void UpdateKycAsync_Publish_Ok()
+        {
+            // arrange
+            const string regulationId = "ID";
+            const string clientId = "me";
+
+            bool published = false;
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new ClientRegulation());
+
+            _clientRegulationRepositoryMock.Setup(o => o.UpdateAsync(It.IsAny<IClientRegulation>()))
+                .Returns(Task.CompletedTask);
+
+            _clientRegulationPublisherMock.Setup(o => o.PublishAsync(It.IsAny<ClientRegulationsMessage>()))
+                .Returns(Task.CompletedTask)
+                .Callback(() => published = true);
+
+            // act
+            await _service.UpdateKycAsync(clientId, regulationId, true);
+
+            // assert
+            Assert.True(published);
+        }
+
+        [Fact]
+        public async void UpdateActiveAsync_Publish_Ok()
+        {
+            // arrange
+            const string regulationId = "ID";
+            const string clientId = "me";
+
+            bool published = false;
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new ClientRegulation());
+
+            _clientRegulationRepositoryMock.Setup(o => o.UpdateAsync(It.IsAny<IClientRegulation>()))
+                .Returns(Task.CompletedTask);
+
+            _clientRegulationPublisherMock.Setup(o => o.PublishAsync(It.IsAny<ClientRegulationsMessage>()))
+                .Returns(Task.CompletedTask)
+                .Callback(() => published = true);
+
+            // act
+            await _service.UpdateActiveAsync(clientId, regulationId, true);
+
+            // assert
+            Assert.True(published);
+        }
+
+        [Fact]
+        public async void DeleteAsync_Publish_Ok()
+        {
+            // arrange
+            const string regulationId = "ID";
+            const string clientId = "me";
+
+            bool published = false;
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(new ClientRegulation());
+
+            _clientRegulationRepositoryMock.Setup(o => o.DeleteAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.CompletedTask);
+
+            _clientRegulationPublisherMock.Setup(o => o.PublishAsync(It.IsAny<ClientRegulationsMessage>()))
+                .Returns(Task.CompletedTask)
+                .Callback(() => published = true);
+
+            // act
+            await _service.UpdateActiveAsync(clientId, regulationId, true);
+
+            // assert
+            Assert.True(published);
         }
 
         [Fact]
