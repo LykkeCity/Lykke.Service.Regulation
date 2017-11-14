@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureStorage;
+using Lykke.Service.Regulation.AzureRepositories.Extensions;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 
@@ -34,7 +35,7 @@ namespace Lykke.Service.Regulation.AzureRepositories
         {
             RegulationEntity entity = RegulationEntity.Create(regulation.Id);
 
-            return _tableStorage.InsertOrReplaceAsync(entity);
+            return _tableStorage.InsertNoConflict(entity);
         }
 
         public async Task DeleteAsync(string regulationId)

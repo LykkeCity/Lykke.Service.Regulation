@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
@@ -42,9 +41,14 @@ namespace Lykke.Service.Regulation.Services
             return _regulationRepository.GetAllAsync();
         }
 
-        public Task AddAsync(IRegulation regulation)
+        public async Task AddAsync(IRegulation regulation)
         {
-            return _regulationRepository.AddAsync(regulation);
+            if (await _regulationRepository.GetAsync(regulation.Id) != null)
+            {
+                throw new ServiceException("Regulation already exists.");
+            }
+
+            await _regulationRepository.AddAsync(regulation);
         }
 
         public async Task DeleteAsync(string regulationId)

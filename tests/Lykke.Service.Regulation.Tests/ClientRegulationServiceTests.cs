@@ -15,7 +15,6 @@ namespace Lykke.Service.Regulation.Tests
 {
     public class ClientRegulationServiceTests
     {
-        private readonly Mock<ILog> _logMock;
         private readonly Mock<IRegulationRepository> _regulationRepositoryMock;
         private readonly Mock<IClientRegulationRepository> _clientRegulationRepositoryMock;
         private readonly Mock<IWelcomeRegulationRuleRepository> _welcomeRegulationRuleRepositoryMock;
@@ -25,7 +24,7 @@ namespace Lykke.Service.Regulation.Tests
 
         public ClientRegulationServiceTests()
         {
-            _logMock = new Mock<ILog>();
+            var logMock = new Mock<ILog>();
             _regulationRepositoryMock = new Mock<IRegulationRepository>();
             _clientRegulationRepositoryMock = new Mock<IClientRegulationRepository>();
             _welcomeRegulationRuleRepositoryMock = new Mock<IWelcomeRegulationRuleRepository>();
@@ -36,7 +35,7 @@ namespace Lykke.Service.Regulation.Tests
                 _clientRegulationRepositoryMock.Object,
                 _welcomeRegulationRuleRepositoryMock.Object,
                 _clientRegulationPublisherMock.Object,
-                _logMock.Object);
+                logMock.Object);
         }
 
         [Fact]
@@ -263,6 +262,38 @@ namespace Lykke.Service.Regulation.Tests
             // assert
             ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
             Assert.Equal("Regulation not found.", exception.Message);
+        }
+
+        [Fact]
+        public async void AddAsync_Throw_Exception_If_Client_Regulation_Already_Exists()
+        {
+            // arrange
+            const string regulationId = "ID";
+            const string clientId = "me";
+
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult<IRegulation>(new Core.Domain.Regulation
+                {
+                    Id = regulationId
+                }));
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(Task.FromResult<IClientRegulation>(new ClientRegulation
+                {
+                    ClientId = clientId,
+                    RegulationId = regulationId
+                }));
+
+            // act
+            Task task = _service.AddAsync(new ClientRegulation
+            {
+                ClientId = clientId,
+                RegulationId = regulationId
+            });
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Client regulation already exists.", exception.Message);
         }
 
         [Fact]

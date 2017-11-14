@@ -124,7 +124,7 @@ namespace Lykke.Service.Regulation.Controllers
             catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(GetByRegulationId),
-                    $"{exception.Message} RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+                    $"{exception.Message} {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
@@ -161,13 +161,13 @@ namespace Lykke.Service.Regulation.Controllers
             catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(Add),
-                    $"{exception.Message} Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+                    $"{exception.Message} {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
             await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Add),
-                $"Welcome regulation rule added. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+                $"Welcome regulation rule added. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
         }
@@ -199,13 +199,13 @@ namespace Lykke.Service.Regulation.Controllers
             catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(Update),
-                    $"{exception.Message} Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+                    $"{exception.Message} {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
             await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Update),
-                $"Welcome regulation rule updated. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+                $"Welcome regulation rule updated. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
         }

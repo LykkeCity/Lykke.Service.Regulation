@@ -52,7 +52,7 @@ namespace Lykke.Service.Regulation.Controllers
             catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(RegulationController), nameof(Get),
-                    $"{exception.Message} RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+                    $"{exception.Message} {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
@@ -100,10 +100,20 @@ namespace Lykke.Service.Regulation.Controllers
 
             var regulation = Mapper.Map<Core.Domain.Regulation>(model);
 
-            await _regulationService.AddAsync(regulation);
+            try
+            {
+                await _regulationService.AddAsync(regulation);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Add),
+                    $"{exception.Message} {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+            
             await _log.WriteInfoAsync(nameof(RegulationController), nameof(Add),
-                $"Regulation added. Model: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+                $"Regulation added. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
         }
@@ -129,13 +139,13 @@ namespace Lykke.Service.Regulation.Controllers
             catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(RegulationController), nameof(Delete),
-                    $"{exception.Message} RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+                    $"{exception.Message} {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
             await _log.WriteInfoAsync(nameof(RegulationController), nameof(Delete),
-                $"Regulation deleted. RegulationId: {regulationId}. IP: {HttpContext.GetIp()}");
+                $"Regulation deleted. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
         }

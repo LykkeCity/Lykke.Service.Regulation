@@ -84,6 +84,11 @@ namespace Lykke.Service.Regulation.Services
                 throw new ServiceException("Regulation not found.");
             }
 
+            if (await _clientRegulationRepository.GetAsync(clientRegulation.ClientId, clientRegulation.RegulationId) != null)
+            {
+                throw new ServiceException("Client regulation already exists.");
+            }
+
             await _clientRegulationRepository.AddAsync(clientRegulation);
 
             await PublishOnChanged(clientRegulation.ClientId);

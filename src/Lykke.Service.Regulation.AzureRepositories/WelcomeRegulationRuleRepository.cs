@@ -60,7 +60,7 @@ namespace Lykke.Service.Regulation.AzureRepositories
         {
             WelcomeRegulationRuleEntity entity = WelcomeRegulationRuleEntity.Create(welcomeRegulationRule);
 
-            return _tableStorage.InsertOrReplaceAsync(entity);
+            return _tableStorage.InsertAsync(entity);
         }
 
         public Task UpdateAsync(IWelcomeRegulationRule welcomeRegulationRule)

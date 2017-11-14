@@ -30,6 +30,29 @@ namespace Lykke.Service.Regulation.Tests
         }
 
         [Fact]
+        public async void AddAsync_Throw_Exception_If_Regulation_Already_Exists()
+        {
+            // arrange
+            const string regulationId = "ID";
+
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult<IRegulation>(new Core.Domain.Regulation
+                {
+                    Id = regulationId
+                }));
+
+            // act
+            Task task = _service.AddAsync(new Core.Domain.Regulation
+            {
+                Id = regulationId
+            });
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Regulation already exists.", exception.Message);
+        }
+
+        [Fact]
         public async void GetAsync_Throw_Exception_If_Regulation_Does_Not_Exist()
         {
             // arrange
