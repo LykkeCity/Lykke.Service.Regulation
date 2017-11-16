@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Extensions;
-using Lykke.Service.Regulation.Services.Exceptions;
+using Lykke.Service.Regulation.Core.Exceptions;
 
 namespace Lykke.Service.Regulation.Controllers
 {

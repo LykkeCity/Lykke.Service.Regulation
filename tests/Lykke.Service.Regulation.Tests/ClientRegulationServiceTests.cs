@@ -6,7 +6,7 @@ using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Services;
-using Lykke.Service.Regulation.Services.Exceptions;
+using Lykke.Service.Regulation.Core.Exceptions;
 using Moq;
 using Xunit;
 using ClientRegulation = Lykke.Service.Regulation.Core.Domain.ClientRegulation;
@@ -456,6 +456,72 @@ namespace Lykke.Service.Regulation.Tests
             // assert
             ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
             Assert.Equal("Can not delete active client regulation.", exception.Message);
+        }
+
+        [Fact]
+        public async void SetDefaultByPhoneNumberAsync_Default_Regulations_For_Empty_Phone()
+        {
+            // arrange
+            const string clientId = "me";
+            const string phone = "";
+
+            WelcomeRegulationRule rule1 = Create("1", "reg_1", "tmp0", true, 100);
+            WelcomeRegulationRule rule2 = Create("2", "reg_2", null, false, 100);
+
+            IClientRegulation result = null;
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetByClientIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new List<ClientRegulation>());
+
+            _clientRegulationRepositoryMock.Setup(o => o.AddAsync(It.IsAny<IClientRegulation>()))
+                .Returns(Task.CompletedTask)
+                .Callback((IClientRegulation o) => result = o);
+
+            _welcomeRegulationRuleRepositoryMock.Setup(o => o.GetAllAsync())
+                .ReturnsAsync(new List<WelcomeRegulationRule>
+                {
+                    rule1,
+                    rule2
+                });
+
+            // act
+            await _service.SetDefaultByPhoneNumberAsync(clientId, phone);
+
+            // assert
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async void SetDefaultByPhoneNumberAsync_Default_Regulations_For_Null_Phone()
+        {
+            // arrange
+            const string clientId = "me";
+            const string phone = null;
+
+            WelcomeRegulationRule rule1 = Create("1", "reg_1", "tmp0", true, 100);
+            WelcomeRegulationRule rule2 = Create("2", "reg_2", null, false, 100);
+
+            IClientRegulation result = null;
+
+            _clientRegulationRepositoryMock.Setup(o => o.GetByClientIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new List<ClientRegulation>());
+
+            _clientRegulationRepositoryMock.Setup(o => o.AddAsync(It.IsAny<IClientRegulation>()))
+                .Returns(Task.CompletedTask)
+                .Callback((IClientRegulation o) => result = o);
+
+            _welcomeRegulationRuleRepositoryMock.Setup(o => o.GetAllAsync())
+                .ReturnsAsync(new List<WelcomeRegulationRule>
+                {
+                    rule1,
+                    rule2
+                });
+
+            // act
+            await _service.SetDefaultByPhoneNumberAsync(clientId, phone);
+
+            // assert
+            Assert.NotNull(result);
         }
 
         [Fact]

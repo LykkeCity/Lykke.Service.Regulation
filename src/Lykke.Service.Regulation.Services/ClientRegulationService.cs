@@ -6,10 +6,10 @@ using Common;
 using Common.Log;
 using Lykke.Service.Regulation.Core.Contracts;
 using Lykke.Service.Regulation.Core.Domain;
+using Lykke.Service.Regulation.Core.Exceptions;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Core.Utils;
-using Lykke.Service.Regulation.Services.Exceptions;
 using ClientRegulation = Lykke.Service.Regulation.Core.Domain.ClientRegulation;
 
 namespace Lykke.Service.Regulation.Services

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Services;
-using Lykke.Service.Regulation.Services.Exceptions;
+using Lykke.Service.Regulation.Core.Exceptions;
 using Moq;
 using Xunit;
 

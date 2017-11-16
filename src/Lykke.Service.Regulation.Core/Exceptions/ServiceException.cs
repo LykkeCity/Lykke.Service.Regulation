@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Lykke.Service.Regulation.Services.Exceptions
+namespace Lykke.Service.Regulation.Core.Exceptions
 {
     /// <summary>
     /// Represents errors that occur during call services.

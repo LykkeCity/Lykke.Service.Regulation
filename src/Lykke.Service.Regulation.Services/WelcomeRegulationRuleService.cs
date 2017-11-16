@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
-using Lykke.Service.Regulation.Services.Exceptions;
+using Lykke.Service.Regulation.Core.Exceptions;
 
 namespace Lykke.Service.Regulation.Services
 {

@@ -253,6 +253,9 @@ namespace Lykke.Service.Regulation.Core.Utils
 
         public static string GetCountryCodeByPhoneNumber(string phoneNumber)
         {
+            if (string.IsNullOrEmpty(phoneNumber))
+                return null;
+
             foreach (KeyValuePair<string, string> pair in Map)
             {
                 if (phoneNumber.StartsWith(pair.Value))

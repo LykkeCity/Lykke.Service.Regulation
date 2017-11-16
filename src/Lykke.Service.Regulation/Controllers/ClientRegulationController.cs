@@ -8,7 +8,7 @@ using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Extensions;
 using Lykke.Service.Regulation.Models;
-using Lykke.Service.Regulation.Services.Exceptions;
+using Lykke.Service.Regulation.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.SwaggerGen.Annotations;
 

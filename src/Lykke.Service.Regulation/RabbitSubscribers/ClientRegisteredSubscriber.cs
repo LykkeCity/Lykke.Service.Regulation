@@ -5,6 +5,7 @@ using Common;
 using Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
+using Lykke.Service.Regulation.Core.Exceptions;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Core.Settings.ServiceSettings;
 
@@ -56,7 +57,15 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
 
         private async Task ProcessMessageAsync(ClientRegisteredMessage message)
         {
-            await _clientRegulationService.SetDefaultByPhoneNumberAsync(message.ClientId, message.Phone);
+            try
+            {
+                await _clientRegulationService.SetDefaultByPhoneNumberAsync(message.ClientId, message.Phone);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
+                    $"{exception.Message} {nameof(message)}: {message.ToJson()}.");
+            }
         }
     }
 }
