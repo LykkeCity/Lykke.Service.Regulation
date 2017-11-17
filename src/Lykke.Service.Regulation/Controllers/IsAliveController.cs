@@ -4,7 +4,7 @@ using System.Net;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Models;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.SwaggerGen.Annotations;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Lykke.Service.Regulation.Controllers
 {
