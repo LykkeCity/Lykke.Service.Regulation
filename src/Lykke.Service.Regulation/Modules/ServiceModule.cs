@@ -62,21 +62,22 @@ namespace Lykke.Service.Regulation.Modules
 
         private void RegisterRepositories(ContainerBuilder builder)
         {
-            const string tableName = "Regulations";
+            const string regulationsTableName = "Regulations";
+            const string clientRegulationsTableName = "ClientRegulations";
 
             builder.Register(c => new RegulationRepository(
                     AzureTableStorage<RegulationEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
-                        tableName, _log)))
+                        regulationsTableName, _log)))
                 .As<IRegulationRepository>();
 
             builder.Register(c => new ClientRegulationRepository(
                     AzureTableStorage<ClientRegulationEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
-                        tableName, _log)))
+                        clientRegulationsTableName, _log)))
                 .As<IClientRegulationRepository>();
 
             builder.Register(c => new WelcomeRegulationRuleRepository(
                     AzureTableStorage<WelcomeRegulationRuleEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
-                        tableName, _log)))
+                        regulationsTableName, _log)))
                 .As<IWelcomeRegulationRuleRepository>();
         }
 

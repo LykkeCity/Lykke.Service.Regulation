@@ -18,32 +18,37 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public async Task<IRegulation> GetAsync(string regulationId)
         {
-            var partitionKey = RegulationEntity.GeneratePartitionKey();
-            var rowKey = RegulationEntity.GenerateRowKey(regulationId);
-
-            return await _tableStorage.GetDataAsync(partitionKey, rowKey);
+            return await _tableStorage.GetDataAsync(GetPartitionKey(), GetRowKey(regulationId));
         }
 
         public async Task<IEnumerable<IRegulation>> GetAllAsync()
         {
-            var partitionKey = RegulationEntity.GeneratePartitionKey();
-
-            return await _tableStorage.GetDataAsync(partitionKey);
+            return await _tableStorage.GetDataAsync(GetPartitionKey());
         }
 
         public Task AddAsync(IRegulation regulation)
         {
-            RegulationEntity entity = RegulationEntity.Create(regulation.Id);
-
-            return _tableStorage.InsertNoConflict(entity);
+            return _tableStorage.InsertThrowConflict(Create(regulation.Id));
         }
 
         public async Task DeleteAsync(string regulationId)
         {
-            var partitionKey = RegulationEntity.GeneratePartitionKey();
-            var rowKey = RegulationEntity.GenerateRowKey(regulationId);
+            await _tableStorage.DeleteAsync(GetPartitionKey(), GetRowKey(regulationId));
+        }
 
-            await _tableStorage.DeleteAsync(partitionKey, rowKey);
+        private static string GetPartitionKey()
+            => "Regulation";
+
+        private static string GetRowKey(string regulationId)
+            => regulationId.ToLower();
+
+        private static RegulationEntity Create(string regulationId)
+        {
+            return new RegulationEntity
+            {
+                PartitionKey = GetPartitionKey(),
+                RowKey = GetRowKey(regulationId)
+            };
         }
     }
 }

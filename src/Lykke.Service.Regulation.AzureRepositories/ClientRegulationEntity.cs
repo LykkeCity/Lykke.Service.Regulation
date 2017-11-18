@@ -14,28 +14,5 @@ namespace Lykke.Service.Regulation.AzureRepositories
         public bool Kyc { get; set; }
 
         public bool Active { get; set; }
-
-        internal static string GeneratePartitionKey()
-        {
-            return "ClientRegulation";
-        }
-
-        internal static string GenerateRowKey(string regulationId, string clientId)
-        {
-            return $"{clientId}_{regulationId}";
-        }
-
-        internal static ClientRegulationEntity Create(IClientRegulation clientRegulation)
-        {
-            return new ClientRegulationEntity
-            {
-                RowKey = GenerateRowKey(clientRegulation.ClientId, clientRegulation.RegulationId),
-                PartitionKey = GeneratePartitionKey(),
-                ClientId = clientRegulation.ClientId,
-                RegulationId = clientRegulation.RegulationId,
-                Kyc = false,
-                Active = clientRegulation.Active
-            };
-        }
     }
 }

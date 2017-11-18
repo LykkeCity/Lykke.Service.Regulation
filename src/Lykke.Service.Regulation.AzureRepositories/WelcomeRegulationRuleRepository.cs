@@ -20,16 +20,12 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public async Task<IWelcomeRegulationRule> GetAsync(string regulationRuleId)
         {
-            var partitionKey = WelcomeRegulationRuleEntity.GeneratePartitionKey();
-
-            return await _tableStorage.GetDataAsync(partitionKey, regulationRuleId);
+            return await _tableStorage.GetDataAsync(GetPartitionKey(), regulationRuleId);
         }
 
         public async Task<IEnumerable<IWelcomeRegulationRule>> GetAllAsync()
         {
-            var partitionKey = WelcomeRegulationRuleEntity.GeneratePartitionKey();
-
-            return await _tableStorage.GetDataAsync(partitionKey);
+            return await _tableStorage.GetDataAsync(GetPartitionKey());
         }
 
         public async Task<IEnumerable<IWelcomeRegulationRule>> GetByCountryAsync(string country)
@@ -42,10 +38,8 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public async Task<IEnumerable<IWelcomeRegulationRule>> GetByRegulationIdAsync(string regulationId)
         {
-            var partitionKey = WelcomeRegulationRuleEntity.GeneratePartitionKey();
-
             string partitionKeyFilter = TableQuery
-                .GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey);
+                .GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, GetPartitionKey());
 
             string regulationIdFilter = TableQuery
                 .GenerateFilterCondition("RegulationId", QueryComparisons.Equal, regulationId);
@@ -58,27 +52,43 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public Task AddAsync(IWelcomeRegulationRule welcomeRegulationRule)
         {
-            WelcomeRegulationRuleEntity entity = WelcomeRegulationRuleEntity.Create(welcomeRegulationRule);
-
-            return _tableStorage.InsertAsync(entity);
+            return _tableStorage.InsertAsync(Create(welcomeRegulationRule));
         }
 
         public Task UpdateAsync(IWelcomeRegulationRule welcomeRegulationRule)
         {
-            var partitionKey = WelcomeRegulationRuleEntity.GeneratePartitionKey();
-            
-            return _tableStorage.MergeAsync(partitionKey, welcomeRegulationRule.Id, entity =>
+            return _tableStorage.MergeAsync(GetPartitionKey(), welcomeRegulationRule.Id, entity =>
             {
-                entity.Update(welcomeRegulationRule);
+                entity.Name = welcomeRegulationRule.Name;
+                entity.Countries = welcomeRegulationRule.Countries;
+                entity.RegulationId = welcomeRegulationRule.RegulationId;
+                entity.Active = welcomeRegulationRule.Active;
+                entity.Priority = welcomeRegulationRule.Priority;
                 return entity;
             });
         }
 
         public async Task DeleteAsync(string regulationRuleId)
         {
-            var partitionKey = WelcomeRegulationRuleEntity.GeneratePartitionKey();
-            
-            await _tableStorage.DeleteAsync(partitionKey, regulationRuleId);
+            await _tableStorage.DeleteAsync(GetPartitionKey(), regulationRuleId);
         }
+
+        private static string GetPartitionKey()
+            => "WelcomeRegulationRule";
+
+        private static string GetRowKey()
+            => Guid.NewGuid().ToString("D");
+
+        private static WelcomeRegulationRuleEntity Create(IWelcomeRegulationRule welcomeRegulationRule)
+            => new WelcomeRegulationRuleEntity
+            {
+                RowKey = GetRowKey(),
+                PartitionKey = GetPartitionKey(),
+                Name = welcomeRegulationRule.Name,
+                Countries = welcomeRegulationRule.Countries,
+                RegulationId = welcomeRegulationRule.RegulationId,
+                Active = welcomeRegulationRule.Active,
+                Priority = welcomeRegulationRule.Priority
+            };
     }
 }

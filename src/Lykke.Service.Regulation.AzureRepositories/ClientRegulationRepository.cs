@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
+using Common;
 using Lykke.Service.Regulation.AzureRepositories.Extensions;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
@@ -20,61 +21,35 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public async Task<IClientRegulation> GetAsync(string clientId, string regulationId)
         {
-            var partitionKey = ClientRegulationEntity.GeneratePartitionKey();
-            var rowKey = ClientRegulationEntity.GenerateRowKey(clientId, regulationId);
-
-            return await _tableStorage.GetDataAsync(partitionKey, rowKey);
+            return await _tableStorage.GetDataAsync(GetPartitionKey(clientId), GetRowKey(regulationId));
         }
 
         public async Task<IEnumerable<IClientRegulation>> GetByClientIdAsync(string clientId)
         {
-            var partitionKey = ClientRegulationEntity.GeneratePartitionKey();
-
-            string partitionKeyFilter = TableQuery
-                .GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey);
-
-            string clientIdFilter = TableQuery
-                .GenerateFilterCondition("ClientId", QueryComparisons.Equal, clientId);
-
-            string filter = TableQuery.CombineFilters(partitionKeyFilter, TableOperators.And, clientIdFilter);
-
-            var query = new TableQuery<ClientRegulationEntity>().Where(filter);
-
-            return await _tableStorage.WhereAsync(query);
+            return await _tableStorage.GetDataAsync(GetPartitionKey(clientId));
         }
 
         public async Task<IEnumerable<IClientRegulation>> GetByRegulationIdAsync(string regulationId)
         {
-            var partitionKey = ClientRegulationEntity.GeneratePartitionKey();
-
-            string partitionKeyFilter = TableQuery
-                .GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey);
-
-            string regulationIdFilter = TableQuery
-                .GenerateFilterCondition("RegulationId", QueryComparisons.Equal, regulationId);
-
-            string filter = TableQuery.CombineFilters(partitionKeyFilter, TableOperators.And, regulationIdFilter);
-
-            var query = new TableQuery<ClientRegulationEntity>().Where(filter);
+            string rowKeyFilter = TableQuery
+                .GenerateFilterCondition(nameof(ClientRegulationEntity.RowKey), QueryComparisons.Equal,
+                    GetRowKey(regulationId));
+            
+            var query = new TableQuery<ClientRegulationEntity>().Where(rowKeyFilter);
 
             return await _tableStorage.WhereAsync(query);
         }
 
         public async Task<IEnumerable<IClientRegulation>> GetActiveByClientIdAsync(string clientId)
         {
-            var partitionKey = ClientRegulationEntity.GeneratePartitionKey();
-
             string partitionKeyFilter = TableQuery
-                .GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey);
-
-            string clientIdFilter = TableQuery
-                .GenerateFilterCondition("ClientId", QueryComparisons.Equal, clientId);
-
+                .GenerateFilterCondition(nameof(ClientRegulationEntity.PartitionKey), QueryComparisons.Equal,
+                    GetPartitionKey(clientId));
+            
             string activeFilter = TableQuery
-                .GenerateFilterConditionForBool("Active", QueryComparisons.Equal, true);
+                .GenerateFilterConditionForBool(nameof(ClientRegulationEntity.Active), QueryComparisons.Equal, true);
 
-            string filter = TableQuery.CombineFilters(partitionKeyFilter, TableOperators.And, clientIdFilter);
-            filter = TableQuery.CombineFilters(filter, TableOperators.And, activeFilter);
+            string filter = TableQuery.CombineFilters(partitionKeyFilter, TableOperators.And, activeFilter);
 
             var query = new TableQuery<ClientRegulationEntity>().Where(filter);
 
@@ -83,22 +58,17 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public async Task<IEnumerable<IClientRegulation>> GetAvailableByClientIdAsync(string clientId)
         {
-            var partitionKey = ClientRegulationEntity.GeneratePartitionKey();
-
             string partitionKeyFilter = TableQuery
-                .GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey);
-
-            string clientIdFilter = TableQuery
-                .GenerateFilterCondition("ClientId", QueryComparisons.Equal, clientId);
+                .GenerateFilterCondition(nameof(ClientRegulationEntity.PartitionKey), QueryComparisons.Equal,
+                    GetPartitionKey(clientId));
 
             string activeFilter = TableQuery
-                .GenerateFilterConditionForBool("Active", QueryComparisons.Equal, true);
+                .GenerateFilterConditionForBool(nameof(ClientRegulationEntity.Active), QueryComparisons.Equal, true);
 
             string kycFilter = TableQuery
-                .GenerateFilterConditionForBool("Kyc", QueryComparisons.Equal, true);
+                .GenerateFilterConditionForBool(nameof(ClientRegulationEntity.Kyc), QueryComparisons.Equal, true);
 
-            string filter = TableQuery.CombineFilters(partitionKeyFilter, TableOperators.And, clientIdFilter);
-            filter = TableQuery.CombineFilters(filter, TableOperators.And, activeFilter);
+            string filter = TableQuery.CombineFilters(partitionKeyFilter, TableOperators.And, activeFilter);
             filter = TableQuery.CombineFilters(filter, TableOperators.And, kycFilter);
 
             var query = new TableQuery<ClientRegulationEntity>().Where(filter);
@@ -108,22 +78,20 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public Task AddAsync(IClientRegulation clientRegulation)
         {
-            ClientRegulationEntity entity = ClientRegulationEntity.Create(clientRegulation);
-
-            return _tableStorage.InsertNoConflict(entity);
+            return _tableStorage.InsertThrowConflict(Create(clientRegulation));
         }
 
         public Task AddAsync(IEnumerable<IClientRegulation> clientRegulations)
         {
-            IEnumerable<ClientRegulationEntity> entities = clientRegulations.Select(ClientRegulationEntity.Create);
+            IEnumerable<ClientRegulationEntity> entities = clientRegulations.Select(Create);
 
             return _tableStorage.InsertOrReplaceBatchAsync(entities);
         }
 
         public Task UpdateAsync(IClientRegulation clientRegulation)
         {
-            var partitionKey = ClientRegulationEntity.GeneratePartitionKey();
-            var rowKey = ClientRegulationEntity.GenerateRowKey(clientRegulation.ClientId, clientRegulation.RegulationId);
+            string partitionKey = GetPartitionKey(clientRegulation.ClientId);
+            string rowKey = GetRowKey(clientRegulation.RegulationId);
 
             return _tableStorage.MergeAsync(partitionKey, rowKey, entity =>
             {
@@ -135,10 +103,26 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public async Task DeleteAsync(string clientId, string regulationId)
         {
-            var partitionKey = ClientRegulationEntity.GeneratePartitionKey();
-            var rowKey = ClientRegulationEntity.GenerateRowKey(clientId, regulationId);
-            
-            await _tableStorage.DeleteAsync(partitionKey, rowKey);
+            await _tableStorage.DeleteAsync(GetPartitionKey(clientId), GetRowKey(regulationId));
+        }
+
+        private static string GetPartitionKey(string clientId)
+            => clientId.ToLower();
+
+        private static string GetRowKey(string regulationId)
+            => $"regulation_{regulationId}".ToLowCase();
+
+        private static ClientRegulationEntity Create(IClientRegulation clientRegulation)
+        {
+            return new ClientRegulationEntity
+            {
+                RowKey = GetRowKey(clientRegulation.RegulationId),
+                PartitionKey = GetPartitionKey(clientRegulation.ClientId),
+                ClientId = clientRegulation.ClientId,
+                RegulationId = clientRegulation.RegulationId,
+                Kyc = false,
+                Active = clientRegulation.Active
+            };
         }
     }
 }

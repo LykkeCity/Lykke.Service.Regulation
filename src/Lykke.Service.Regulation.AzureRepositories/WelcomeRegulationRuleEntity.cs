@@ -37,38 +37,5 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
             return base.WriteEntity(operationContext);
         }
-
-        internal static string GeneratePartitionKey()
-        {
-            return "WelcomeRegulationRule";
-        }
-
-        internal static string GenerateRowKey()
-        {
-            return Guid.NewGuid().ToString("D");
-        }
-
-        internal void Update(IWelcomeRegulationRule welcomeRegulationRule)
-        {
-            Name = welcomeRegulationRule.Name;
-            Countries = welcomeRegulationRule.Countries;
-            RegulationId = welcomeRegulationRule.RegulationId;
-            Active = welcomeRegulationRule.Active;
-            Priority = welcomeRegulationRule.Priority;
-        }
-
-        internal static WelcomeRegulationRuleEntity Create(IWelcomeRegulationRule welcomeRegulationRule)
-        {
-            return new WelcomeRegulationRuleEntity
-            {
-                RowKey = GenerateRowKey(),
-                PartitionKey = GeneratePartitionKey(),
-                Name =welcomeRegulationRule.Name,
-                Countries = welcomeRegulationRule.Countries,
-                RegulationId = welcomeRegulationRule.RegulationId,
-                Active = welcomeRegulationRule.Active,
-                Priority = welcomeRegulationRule.Priority
-            };
-        }
     }
 }
