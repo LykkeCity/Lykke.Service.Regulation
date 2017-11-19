@@ -54,7 +54,7 @@ namespace Lykke.Service.Regulation
                 });
 
                 Mapper.Initialize(x => x.AddProfiles(GetType().Assembly));
-                //Mapper.Configuration.AssertConfigurationIsValid();
+                Mapper.Configuration.AssertConfigurationIsValid();
 
                 var builder = new ContainerBuilder();
                 var appSettings = Configuration.LoadSettings<AppSettings>();
