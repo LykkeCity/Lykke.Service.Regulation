@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AzureStorage;
-using Common;
 using Lykke.Service.Regulation.AzureRepositories.Extensions;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
@@ -110,7 +109,7 @@ namespace Lykke.Service.Regulation.AzureRepositories
             => clientId.ToLower();
 
         private static string GetRowKey(string regulationId)
-            => $"regulation_{regulationId}".ToLowCase();
+            => $"regulation_{regulationId}".ToLower();
 
         private static ClientRegulationEntity Create(IClientRegulation clientRegulation)
         {
