@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Services;
+using Lykke.Service.Regulation.Core.Exceptions;
 using Moq;
 using Xunit;
 
@@ -12,98 +12,130 @@ namespace Lykke.Service.Regulation.Tests
     public class RegulationServiceTests
     {
         private readonly Mock<IRegulationRepository> _regulationRepositoryMock;
-        private readonly Mock<IClientAvailableRegulationRepository> _clientAvailableRegulationRepositoryMock;
+        private readonly Mock<IClientRegulationRepository> _clientRegulationRepositoryMock;
+        private readonly Mock<IWelcomeRegulationRuleRepository> _welcomeRegulationRuleRepositoryMock;
 
         private readonly RegulationService _service;
 
         public RegulationServiceTests()
         {
             _regulationRepositoryMock = new Mock<IRegulationRepository>();
-            _clientAvailableRegulationRepositoryMock = new Mock<IClientAvailableRegulationRepository>();
+            _clientRegulationRepositoryMock = new Mock<IClientRegulationRepository>();
+            _welcomeRegulationRuleRepositoryMock = new Mock<IWelcomeRegulationRuleRepository>();
 
-            _service = new RegulationService(_regulationRepositoryMock.Object,
-                _clientAvailableRegulationRepositoryMock.Object);
+            _service = new RegulationService(
+                _regulationRepositoryMock.Object,
+                _clientRegulationRepositoryMock.Object,
+                _welcomeRegulationRuleRepositoryMock.Object);
         }
 
         [Fact]
-        public async void GetAsync_Returs_Regulations_By_Id()
+        public async void AddAsync_Throw_Exception_If_Regulation_Already_Exists()
         {
             // arrange
             const string regulationId = "ID";
 
-            _regulationRepositoryMock.Setup(o => o.GetAsync(It.Is<string>(i => i == regulationId)))
-                .ReturnsAsync(new Core.Domain.Regulation
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult<IRegulation>(new Core.Domain.Regulation
                 {
-                    Id = regulationId,
-                    RequiresKYC = true
+                    Id = regulationId
+                }));
+
+            // act
+            Task task = _service.AddAsync(new Core.Domain.Regulation
+            {
+                Id = regulationId
+            });
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Regulation already exists.", exception.Message);
+        }
+
+        [Fact]
+        public async void GetAsync_Throw_Exception_If_Regulation_Does_Not_Exist()
+        {
+            // arrange
+            const string regulationId = "ID";
+
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult<IRegulation>(null));
+
+            // act
+            Task task = _service.GetAsync(regulationId);
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Regulation not found.", exception.Message);
+        }
+
+        [Fact]
+        public async void DeleteAsync_Can_Not_Delete_If_Regulation_Does_Not_Exist()
+        {
+            // arrange
+            const string regulationId = "ID";
+
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .Returns(Task.FromResult<IRegulation>(null));
+
+            // act
+            Task task = _service.DeleteAsync(regulationId);
+
+            // assert
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Regulation not found.", exception.Message);
+        }
+
+        [Fact]
+        public async void DeleteAsync_Can_Not_Delete_If_Regulation_Assigned_With_Client()
+        {
+            // arrange
+            const string regulationId = "ID";
+
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new Core.Domain.Regulation());
+
+            _clientRegulationRepositoryMock
+                .Setup(o => o.GetByRegulationIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new List<ClientRegulation>
+                {
+                    new ClientRegulation()
                 });
 
             // act
-            IRegulation regulation = await _service.GetAsync(regulationId);
+            Task task = _service.DeleteAsync(regulationId);
 
             // assert
-            Assert.NotNull(regulation);
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Can not delete regulation associated with one or more clients.", exception.Message);
         }
 
         [Fact]
-        public async void GetAsync_Not_Returs_Regulations_By_Id()
+        public async void DeleteAsync_Can_Not_Delete_If_Regulation_Assigned_With_Welcome_Rule()
         {
             // arrange
             const string regulationId = "ID";
 
-            _regulationRepositoryMock.Setup(o => o.GetAsync(It.Is<string>(i => i == "nothing")))
-                .ReturnsAsync(new Core.Domain.Regulation
+            _regulationRepositoryMock.Setup(o => o.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new Core.Domain.Regulation());
+
+            _clientRegulationRepositoryMock
+                .Setup(o => o.GetByRegulationIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new List<ClientRegulation>());
+
+            _welcomeRegulationRuleRepositoryMock
+                .Setup(o => o.GetByRegulationIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(new List<WelcomeRegulationRule>
                 {
-                    Id = regulationId,
-                    RequiresKYC = true
+                    new WelcomeRegulationRule()
                 });
 
             // act
-            IRegulation regulation = await _service.GetAsync(regulationId);
+            Task task = _service.DeleteAsync(regulationId);
 
             // assert
-            Assert.Null(regulation);
-        }
-
-        [Fact]
-        public async void RemoveAsync_Can_Not_Remove_If_Regulation_Assigned_With_Client()
-        {
-            // arrange
-            const string regulationId = "ID";
-
-            _clientAvailableRegulationRepositoryMock
-                .Setup(o => o.GetByRegulationIdAsync(It.Is<string>(i => i == regulationId)))
-                .ReturnsAsync(new List<ClientAvailableRegulation>
-                {
-                    new ClientAvailableRegulation
-                    {
-                        ClientId = regulationId,
-                        RegulationId = regulationId,
-                    }
-                });
-
-            // act
-            Task task = _service.RemoveAsync(regulationId);
-
-            // assert
-            await Assert.ThrowsAsync<Exception>(async () => await task);
-        }
-
-        [Fact]
-        public async void RemoveAsync_Remove_If_Regulation_Not_Assigned_With_Client()
-        {
-            // arrange
-            const string regulationId = "ID";
-
-            _clientAvailableRegulationRepositoryMock
-                .Setup(o => o.GetByRegulationIdAsync(It.Is<string>(i => i == regulationId)))
-                .ReturnsAsync(new List<ClientAvailableRegulation>());
-
-            // act
-            Task task = _service.RemoveAsync(regulationId);
-
-            // assert
-            await task;
+            ServiceException exception = await Assert.ThrowsAsync<ServiceException>(async () => await task);
+            Assert.Equal("Can not delete regulation associated with one or more welcome rules.", exception.Message);
         }
     }
 }

@@ -9,9 +9,17 @@ namespace Lykke.Service.Regulation.Assets.AutoMapperProfiles
         public DefaultProfile()
         {
             CreateMap<RegulationModel, Core.Domain.Regulation>();
+            CreateMap<NewRegulationModel, Core.Domain.Regulation>();
             CreateMap<IRegulation, RegulationModel>();
             CreateMap<ClientRegulationModel, ClientRegulation>();
-            CreateMap<ClientAvailableRegulationModel, ClientAvailableRegulation>();
+            CreateMap<IWelcomeRegulationRule, WelcomeRegulationRuleModel>();
+            CreateMap<WelcomeRegulationRuleModel, WelcomeRegulationRule>();
+            CreateMap<NewWelcomeRegulationRuleModel, WelcomeRegulationRule>()
+                .ForMember(model => model.Id, option => option.Ignore());
+            CreateMap<IClientRegulation, ClientRegulationModel>();
+            CreateMap<NewClientRegulationModel, ClientRegulation>()
+                .ForMember(model => model.Id, option => option.Ignore())
+                .ForMember(model => model.Kyc, option => option.Ignore());
         }
 
         public override string ProfileName => "Default profile";

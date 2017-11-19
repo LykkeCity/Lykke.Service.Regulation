@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzureStorage;
+using Lykke.Service.Regulation.AzureRepositories.Extensions;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
 
@@ -17,44 +18,37 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public async Task<IRegulation> GetAsync(string regulationId)
         {
-            var partitionKey = RegulationEntity.GeneratePartitionKey();
-            var rowKey = RegulationEntity.GenerateRowKey(regulationId);
-
-            return await _tableStorage.GetDataAsync(partitionKey, rowKey);
+            return await _tableStorage.GetDataAsync(GetPartitionKey(), GetRowKey(regulationId));
         }
 
         public async Task<IEnumerable<IRegulation>> GetAllAsync()
         {
-            var partitionKey = RegulationEntity.GeneratePartitionKey();
-
-            return await _tableStorage.GetDataAsync(partitionKey);
+            return await _tableStorage.GetDataAsync(GetPartitionKey());
         }
 
         public Task AddAsync(IRegulation regulation)
         {
-            RegulationEntity entity = RegulationEntity.Create(regulation.Id, regulation.RequiresKYC);
-
-            return _tableStorage.InsertOrReplaceAsync(entity);
+            return _tableStorage.InsertThrowConflict(Create(regulation.Id));
         }
 
-        public async Task RemoveAsync(string regulationId)
+        public async Task DeleteAsync(string regulationId)
         {
-            var partitionKey = RegulationEntity.GeneratePartitionKey();
-            var rowKey = RegulationEntity.GenerateRowKey(regulationId);
-
-            await _tableStorage.DeleteAsync(partitionKey, rowKey);
+            await _tableStorage.DeleteAsync(GetPartitionKey(), GetRowKey(regulationId));
         }
 
-        public async Task UpdateAsync(IRegulation regulation)
-        {
-            var partitionKey = RegulationEntity.GeneratePartitionKey();
-            var rowKey = RegulationEntity.GenerateRowKey(regulation.Id);
+        private static string GetPartitionKey()
+            => "Regulation";
 
-            await _tableStorage.MergeAsync(partitionKey, rowKey, item =>
+        private static string GetRowKey(string regulationId)
+            => regulationId.ToLower();
+
+        private static RegulationEntity Create(string regulationId)
+        {
+            return new RegulationEntity
             {
-                item.RequiresKYC = regulation.RequiresKYC;
-                return item;
-            });
+                PartitionKey = GetPartitionKey(),
+                RowKey = GetRowKey(regulationId)
+            };
         }
     }
 }

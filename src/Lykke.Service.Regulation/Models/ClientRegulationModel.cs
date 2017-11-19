@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-
-namespace Lykke.Service.Regulation.Models
+﻿namespace Lykke.Service.Regulation.Models
 {
     public class ClientRegulationModel
     {
-        [Required]
+        public string Id { get; set; }
+
         public string ClientId { get; set; }
 
-        [Required]
         public string RegulationId { get; set; }
+
+        public bool Kyc { get; set; }
+
+        public bool Active { get; set; }
     }
 }

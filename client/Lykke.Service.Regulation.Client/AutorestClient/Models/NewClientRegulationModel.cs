@@ -9,25 +9,24 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
     using Newtonsoft.Json;
     using System.Linq;
 
-    public partial class ClientAvailableRegulationModel
+    public partial class NewClientRegulationModel
     {
         /// <summary>
-        /// Initializes a new instance of the ClientAvailableRegulationModel
-        /// class.
+        /// Initializes a new instance of the NewClientRegulationModel class.
         /// </summary>
-        public ClientAvailableRegulationModel()
+        public NewClientRegulationModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the ClientAvailableRegulationModel
-        /// class.
+        /// Initializes a new instance of the NewClientRegulationModel class.
         /// </summary>
-        public ClientAvailableRegulationModel(string clientId = default(string), string regulationId = default(string))
+        public NewClientRegulationModel(bool active, string clientId = default(string), string regulationId = default(string))
         {
             ClientId = clientId;
             RegulationId = regulationId;
+            Active = active;
             CustomInit();
         }
 
@@ -46,5 +45,20 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         [JsonProperty(PropertyName = "RegulationId")]
         public string RegulationId { get; set; }
 
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "Active")]
+        public bool Active { get; set; }
+
+        /// <summary>
+        /// Validate the object.
+        /// </summary>
+        /// <exception cref="Microsoft.Rest.ValidationException">
+        /// Thrown if validation fails
+        /// </exception>
+        public virtual void Validate()
+        {
+            //Nothing to validate
+        }
     }
 }

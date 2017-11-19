@@ -6,11 +6,26 @@ namespace Lykke.Service.Regulation.Core.Services
 {
     public interface IClientRegulationService
     {
-        Task<string> GetAsync(string clientId);
-        Task<IEnumerable<string>> GetAvailableAsync(string clientId);
-        Task AddAsync(IClientAvailableRegulation regulation);
-        Task SetAsync(IClientRegulation regulation);
-        Task RemoveAsync(string clientId);
-        Task RemoveAvailableAsync(string clientId, string regulationId);
+        Task<IClientRegulation> GetAsync(string clientId, string regulationId);
+
+        Task<IEnumerable<IClientRegulation>> GetByClientIdAsync(string clientId);
+
+        Task<IEnumerable<IClientRegulation>> GetByRegulationIdAsync(string regulationId);
+
+        Task<IEnumerable<IClientRegulation>> GetActiveByClientIdAsync(string clientId);
+
+        Task<IEnumerable<IClientRegulation>> GetAvailableByClientIdAsync(string clientId);
+
+        Task AddAsync(IClientRegulation clientRegulation);
+
+        Task SetDefaultAsync(string clientId, string country);
+
+        Task SetDefaultByPhoneNumberAsync(string clientId, string phoneNumber);
+
+        Task UpdateKycAsync(string clientId, string regulationId, bool active);
+
+        Task UpdateActiveAsync(string clientId, string regulationId, bool state);
+
+        Task DeleteAsync(string clientId, string regulationId);
     }
 }

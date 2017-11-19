@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Common;
+using Common.Log;
+using Lykke.Service.Regulation.Core.Contracts;
 using Lykke.Service.Regulation.Core.Domain;
+using Lykke.Service.Regulation.Core.Exceptions;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
-using Lykke.Service.Regulation.Services.Exceptions;
+using Lykke.Service.Regulation.Core.Utils;
+using ClientRegulation = Lykke.Service.Regulation.Core.Domain.ClientRegulation;
 
 namespace Lykke.Service.Regulation.Services
 {
@@ -12,77 +18,216 @@ namespace Lykke.Service.Regulation.Services
     {
         private readonly IRegulationRepository _regulationRepository;
         private readonly IClientRegulationRepository _clientRegulationRepository;
-        private readonly IClientAvailableRegulationRepository _clientAvailableRegulationRepository;
+        private readonly IWelcomeRegulationRuleRepository _welcomeRegulationRuleRepository;
+        private readonly IClientRegulationPublisher _clientRegulationPublisher;
+        private readonly ILog _log;
 
         public ClientRegulationService(
             IRegulationRepository regulationRepository,
-            IClientRegulationRepository clientRegulationRepository, 
-            IClientAvailableRegulationRepository clientAvailableRegulationRepository)
+            IClientRegulationRepository clientRegulationRepository,
+            IWelcomeRegulationRuleRepository welcomeRegulationRuleRepository,
+            IClientRegulationPublisher clientRegulationPublisher,
+            ILog log)
         {
             _regulationRepository = regulationRepository;
             _clientRegulationRepository = clientRegulationRepository;
-            _clientAvailableRegulationRepository = clientAvailableRegulationRepository;
+            _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
+            _clientRegulationPublisher = clientRegulationPublisher;
+            _log = log;
         }
 
-        public async Task<string> GetAsync(string clientId)
+        public async Task<IClientRegulation> GetAsync(string clientId, string regulationId)
         {
-            IClientRegulation regulation = await _clientRegulationRepository.GetAsync(clientId);
+            IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
 
-            return regulation?.RegulationId;
+            if (clientRegulation == null)
+            {
+                throw new ServiceException("Client regulation not found.");
+            }
+
+            return clientRegulation;
         }
 
-        public async Task<IEnumerable<string>> GetAvailableAsync(string clientId)
+        public Task<IEnumerable<IClientRegulation>> GetByClientIdAsync(string clientId)
         {
-            IEnumerable<IClientAvailableRegulation> regulations = await _clientAvailableRegulationRepository.GetByClientIdAsync(clientId);
-
-            return regulations.Select(o => o.RegulationId);
+            return _clientRegulationRepository.GetByClientIdAsync(clientId);
         }
 
-        public async Task AddAsync(IClientAvailableRegulation availableRegulation)
+        public Task<IEnumerable<IClientRegulation>> GetActiveByClientIdAsync(string clientId)
         {
-            IRegulation result = await _regulationRepository.GetAsync(availableRegulation.RegulationId);
+            return _clientRegulationRepository.GetActiveByClientIdAsync(clientId);
+        }
+
+        public Task<IEnumerable<IClientRegulation>> GetAvailableByClientIdAsync(string clientId)
+        {
+            return _clientRegulationRepository.GetAvailableByClientIdAsync(clientId);
+        }
+
+        public async Task<IEnumerable<IClientRegulation>> GetByRegulationIdAsync(string regulationId)
+        {
+            IRegulation result = await _regulationRepository.GetAsync(regulationId);
 
             if (result == null)
             {
-                throw new ServiceException($"Regulation '{availableRegulation.RegulationId}' not found'.");
+                throw new ServiceException("Regulation not found.");
             }
 
-            if (!result.RequiresKYC)
-            {
-                throw new ServiceException($"Regulation '{availableRegulation.RegulationId}' is not KYC'.");
-            }
-
-            await _clientAvailableRegulationRepository.AddAsync(availableRegulation);
+            return await _clientRegulationRepository.GetByRegulationIdAsync(regulationId);
         }
 
-        public async Task SetAsync(IClientRegulation clientRegulation)
+        public async Task AddAsync(IClientRegulation clientRegulation)
         {
-            IEnumerable<IClientAvailableRegulation> availableRegulations =
-                await _clientAvailableRegulationRepository.GetByClientIdAsync(clientRegulation.ClientId);
+            IRegulation result = await _regulationRepository.GetAsync(clientRegulation.RegulationId);
 
-            if (availableRegulations.All(o => o.RegulationId != clientRegulation.RegulationId))
+            if (result == null)
             {
-                throw new ServiceException($"Regulation '{clientRegulation.RegulationId}' is not available for client '{clientRegulation.ClientId}'.");
+                throw new ServiceException("Regulation not found.");
+            }
+
+            if (await _clientRegulationRepository.GetAsync(clientRegulation.ClientId, clientRegulation.RegulationId) != null)
+            {
+                throw new ServiceException("Client regulation already exists.");
             }
 
             await _clientRegulationRepository.AddAsync(clientRegulation);
+
+            await PublishOnChanged(clientRegulation.ClientId);
         }
 
-        public async Task RemoveAsync(string clientId)
+        public async Task SetDefaultAsync(string clientId, string country)
         {
-            await _clientRegulationRepository.RemoveAsync(clientId);
-        }
+            IEnumerable<IClientRegulation> clientRegulations =
+                await _clientRegulationRepository.GetByClientIdAsync(clientId);
 
-        public async Task RemoveAvailableAsync(string clientId, string regulationId)
-        {
-            IClientRegulation currentClientRegulation = await _clientRegulationRepository.GetAsync(clientId);
-
-            if (currentClientRegulation?.RegulationId == regulationId)
+            if (clientRegulations.Any())
             {
-                throw new ServiceException($"Can not remove regulation '{regulationId}'. It is current regulation of client '{clientId}'.");
+                throw new ServiceException("Client already have regulations.");
             }
 
-            await _clientAvailableRegulationRepository.RemoveAsync(clientId, regulationId);
+            List<IWelcomeRegulationRule> welcomeRegulationRules =
+                (await _welcomeRegulationRuleRepository.GetAllAsync()).ToList();
+
+            IWelcomeRegulationRule welcomeRegulationRule = welcomeRegulationRules
+                .Where(o => o.Countries.Any(p => p.Equals(country, StringComparison.CurrentCultureIgnoreCase)))
+                .OrderByDescending(o => o.Priority)
+                .FirstOrDefault();
+
+            if (welcomeRegulationRule == null)
+            {
+                welcomeRegulationRule = welcomeRegulationRules
+                    .Where(o => !o.Countries.Any())
+                    .OrderByDescending(o => o.Priority)
+                    .FirstOrDefault();
+            }
+
+            if (welcomeRegulationRule == null)
+            {
+                throw new ServiceException("No default regulations for country.");
+            }
+
+            ClientRegulation defaultClientRegulation =
+                new ClientRegulation
+                {
+                    ClientId = clientId,
+                    RegulationId = welcomeRegulationRule.RegulationId,
+                    Active = welcomeRegulationRule.Active,
+                    Kyc = false
+                };
+
+            await _clientRegulationRepository.AddAsync(defaultClientRegulation);
+
+            await PublishOnChanged(clientId);
+        }
+
+        public async Task SetDefaultByPhoneNumberAsync(string clientId, string phoneNumber)
+        {
+            // TODO: Only for development! The country should be added to registration contract.
+            string countryCode = CountryCodeUtil.GetCountryCodeByPhoneNumber(phoneNumber);
+
+            if (string.IsNullOrEmpty(countryCode))
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegulationService), nameof(SetDefaultByPhoneNumberAsync),
+                    $"Can not find country code by phone number. {nameof(clientId)}: {clientId}. {nameof(phoneNumber)}: {phoneNumber}");
+
+                countryCode = "n/a";
+            }
+            
+            await SetDefaultAsync(clientId, CountryManager.Iso2ToIso3(countryCode));
+        }
+
+        public async Task UpdateKycAsync(string clientId, string regulationId, bool active)
+        {
+            IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
+
+            if (clientRegulation == null)
+            {
+                throw new ServiceException("Client regulation not found.");
+            }
+
+            clientRegulation.Kyc = active;
+
+            await _clientRegulationRepository.UpdateAsync(clientRegulation);
+
+            await PublishOnChanged(clientId);
+        }
+
+        public async Task UpdateActiveAsync(string clientId, string regulationId, bool state)
+        {
+            IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
+
+            if (clientRegulation == null)
+            {
+                throw new ServiceException("Client regulation not found.");
+            }
+
+            clientRegulation.Active = state;
+
+            await _clientRegulationRepository.UpdateAsync(clientRegulation);
+
+            await PublishOnChanged(clientId);
+        }
+
+        public async Task DeleteAsync(string clientId, string regulationId)
+        {
+            IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
+
+            if (clientRegulation == null)
+            {
+                throw new ServiceException("Client regulation not found.");
+            }
+
+            if (clientRegulation.Kyc)
+            {
+                throw new ServiceException("Can not delete KYC client regulation.");
+            }
+
+            if (clientRegulation.Active)
+            {
+                throw new ServiceException("Can not delete active client regulation.");
+            }
+
+            await _clientRegulationRepository.DeleteAsync(clientId, regulationId);
+
+            await PublishOnChanged(clientId);
+        }
+
+        private async Task PublishOnChanged(string clientId)
+        {
+            IEnumerable<IClientRegulation> clientRegulations =
+                await _clientRegulationRepository.GetByClientIdAsync(clientId);
+
+            var message = new ClientRegulationsMessage
+            {
+                ClientId = clientId,
+                Regulations = clientRegulations.Select(o => new Core.Contracts.ClientRegulation
+                {
+                    RegulationId = o.RegulationId,
+                    Kyc = o.Kyc,
+                    Active = o.Active
+                }).ToList()
+            };
+
+            await _clientRegulationPublisher.PublishAsync(message);
         }
     }
 }

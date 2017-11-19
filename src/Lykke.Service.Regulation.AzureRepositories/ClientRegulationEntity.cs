@@ -5,28 +5,14 @@ namespace Lykke.Service.Regulation.AzureRepositories
 {
     public class ClientRegulationEntity : TableEntity, IClientRegulation
     {
-        public string ClientId => RowKey;
+        public string Id => RowKey;
+
+        public string ClientId { get; set; }
 
         public string RegulationId { get; set; }
 
-        internal static string GeneratePartitionKey()
-        {
-            return "ClientRegulation";
-        }
+        public bool Kyc { get; set; }
 
-        internal static string GenerateRowKey(string clientId)
-        {
-            return clientId;
-        }
-
-        internal static ClientRegulationEntity Create(string clientId, string regulationId)
-        {
-            return new ClientRegulationEntity
-            {
-                RowKey = GenerateRowKey(clientId),
-                PartitionKey = GeneratePartitionKey(),
-                RegulationId = regulationId
-            };
-        }
+        public bool Active { get; set; }
     }
 }
