@@ -40,7 +40,7 @@ namespace Lykke.Service.Regulation.AzureRepositories
             => "Regulation";
 
         private static string GetRowKey(string regulationId)
-            => regulationId;
+            => regulationId.ToLower();
 
         private static RegulationEntity Create(string regulationId)
         {
