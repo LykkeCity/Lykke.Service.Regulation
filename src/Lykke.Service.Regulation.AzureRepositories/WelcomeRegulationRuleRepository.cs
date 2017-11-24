@@ -28,12 +28,15 @@ namespace Lykke.Service.Regulation.AzureRepositories
             return await _tableStorage.GetDataAsync(GetPartitionKey());
         }
 
+        public async Task<IEnumerable<IWelcomeRegulationRule>> GetDefaultAsync()
+        {
+            return await _tableStorage.GetDataAsync(GetPartitionKey(), entity => !entity.Countries.Any());
+        }
+
         public async Task<IEnumerable<IWelcomeRegulationRule>> GetByCountryAsync(string country)
         {
-            IEnumerable<IWelcomeRegulationRule> entities = await GetAllAsync();
-
-            return entities
-                .Where(o => o.Countries.Any(p => p.Equals(country, StringComparison.CurrentCultureIgnoreCase)));
+            return await _tableStorage.GetDataAsync(GetPartitionKey(),
+                entity => entity.Countries.Any(p => p.Equals(country, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         public async Task<IEnumerable<IWelcomeRegulationRule>> GetByRegulationIdAsync(string regulationId)

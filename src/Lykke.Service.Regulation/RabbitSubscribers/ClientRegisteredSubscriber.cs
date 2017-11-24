@@ -59,12 +59,13 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
         {
             try
             {
-                await _clientRegulationService.SetDefaultByPhoneNumberAsync(message.ClientId, message.Phone);
+                string countryCode = await _clientRegulationService.GetCountryCodeByPhoneAsync(message.Phone);
+                await _clientRegulationService.SetDefaultAsync(message.ClientId, countryCode);
             }
             catch (ServiceException exception)
             {
                 await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
-                    $"{exception.Message} {nameof(message)}: {message.ToJson()}.");
+                    $"{exception.Message} {nameof(message.ClientId)}: {message.ClientId}");
             }
         }
     }

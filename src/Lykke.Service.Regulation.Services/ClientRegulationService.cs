@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Common;
@@ -103,58 +102,75 @@ namespace Lykke.Service.Regulation.Services
             {
                 throw new ServiceException("Client already have regulations.");
             }
+            
+            IWelcomeRegulationRule welcomeRegulationRule = null;
 
-            List<IWelcomeRegulationRule> welcomeRegulationRules =
-                (await _welcomeRegulationRuleRepository.GetAllAsync()).ToList();
-
-            IWelcomeRegulationRule welcomeRegulationRule = welcomeRegulationRules
-                .Where(o => o.Countries.Any(p => p.Equals(country, StringComparison.CurrentCultureIgnoreCase)))
-                .OrderByDescending(o => o.Priority)
-                .FirstOrDefault();
-
-            if (welcomeRegulationRule == null)
+            if (!string.IsNullOrEmpty(country))
             {
+                IEnumerable<IWelcomeRegulationRule> welcomeRegulationRules =
+                    await _welcomeRegulationRuleRepository.GetByCountryAsync(country);
+
                 welcomeRegulationRule = welcomeRegulationRules
-                    .Where(o => !o.Countries.Any())
                     .OrderByDescending(o => o.Priority)
                     .FirstOrDefault();
             }
 
             if (welcomeRegulationRule == null)
             {
-                throw new ServiceException("No default regulations for country.");
+                IEnumerable<IWelcomeRegulationRule> welcomeRegulationRules =
+                    await _welcomeRegulationRuleRepository.GetDefaultAsync();
+
+                welcomeRegulationRule = welcomeRegulationRules
+                    .OrderByDescending(o => o.Priority)
+                    .FirstOrDefault();
             }
 
-            ClientRegulation defaultClientRegulation =
-                new ClientRegulation
-                {
-                    ClientId = clientId,
-                    RegulationId = welcomeRegulationRule.RegulationId,
-                    Active = welcomeRegulationRule.Active,
-                    Kyc = false
-                };
+            if (welcomeRegulationRule == null)
+            {
+                throw new ServiceException("No default regulations.");
+            }
+
+            var defaultClientRegulation = new ClientRegulation
+            {
+                ClientId = clientId,
+                RegulationId = welcomeRegulationRule.RegulationId,
+                Active = welcomeRegulationRule.Active,
+                Kyc = false
+            };
 
             await _clientRegulationRepository.AddAsync(defaultClientRegulation);
 
             await PublishOnChanged(clientId);
         }
 
-        public async Task SetDefaultByPhoneNumberAsync(string clientId, string phoneNumber)
+        public async Task<string> GetCountryCodeByPhoneAsync(string phoneNumber)
         {
-            // TODO: Only for development! The country should be added to registration contract.
-            string countryCode = CountryCodeUtil.GetCountryCodeByPhoneNumber(phoneNumber);
+            string countryCode = null;
 
-            if (string.IsNullOrEmpty(countryCode))
+            phoneNumber = phoneNumber?.Trim();
+
+            if (!string.IsNullOrEmpty(phoneNumber))
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationService), nameof(SetDefaultByPhoneNumberAsync),
-                    $"Can not find country code by phone number. {nameof(clientId)}: {clientId}. {nameof(phoneNumber)}: {phoneNumber}");
+                countryCode = CountryCodeUtil.GetCountryCodeByPhoneNumber(phoneNumber);
 
-                countryCode = "n/a";
+                if (string.IsNullOrEmpty(countryCode))
+                {
+                    int length = phoneNumber.Length;
+
+                    string value = length > 3 ? phoneNumber.Substring(0, 3).PadRight(length, '*') : phoneNumber;
+
+                    await _log.WriteWarningAsync(nameof(ClientRegulationService), nameof(GetCountryCodeByPhoneAsync),
+                        $"Can not find country code by phone number '{value}'.");
+                }
+                else
+                {
+                    countryCode = CountryManager.Iso2ToIso3(countryCode);
+                }
             }
-            
-            await SetDefaultAsync(clientId, CountryManager.Iso2ToIso3(countryCode));
-        }
 
+            return countryCode;
+        }
+        
         public async Task UpdateKycAsync(string clientId, string regulationId, bool active)
         {
             IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);
