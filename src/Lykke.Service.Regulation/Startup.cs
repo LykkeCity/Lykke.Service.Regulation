@@ -9,7 +9,7 @@ using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
 using Lykke.Service.Regulation.Core.Services;
-using Lykke.Service.Regulation.Core.Settings;
+using Lykke.Service.Regulation.Settings;
 using Lykke.Service.Regulation.Modules;
 using Lykke.SettingsReader;
 using Lykke.SlackNotification.AzureQueue;

@@ -22,9 +22,10 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// <summary>
         /// Initializes a new instance of the RegulationModel class.
         /// </summary>
-        public RegulationModel(string id = default(string))
+        public RegulationModel(string id = default(string), string profileType = default(string))
         {
             Id = id;
+            ProfileType = profileType;
             CustomInit();
         }
 
@@ -37,6 +38,11 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// </summary>
         [JsonProperty(PropertyName = "Id")]
         public string Id { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "ProfileType")]
+        public string ProfileType { get; set; }
 
     }
 }

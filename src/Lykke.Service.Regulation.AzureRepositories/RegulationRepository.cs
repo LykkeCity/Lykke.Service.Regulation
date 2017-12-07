@@ -28,7 +28,7 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public Task AddAsync(IRegulation regulation)
         {
-            return _tableStorage.InsertThrowConflict(Create(regulation.Id));
+            return _tableStorage.InsertThrowConflict(Create(regulation));
         }
 
         public async Task DeleteAsync(string regulationId)
@@ -42,12 +42,13 @@ namespace Lykke.Service.Regulation.AzureRepositories
         private static string GetRowKey(string regulationId)
             => regulationId.ToLower();
 
-        private static RegulationEntity Create(string regulationId)
+        private static RegulationEntity Create(IRegulation regulation)
         {
             return new RegulationEntity
             {
                 PartitionKey = GetPartitionKey(),
-                RowKey = GetRowKey(regulationId)
+                RowKey = GetRowKey(regulation.Id),
+                ProfileType = regulation.ProfileType
             };
         }
     }

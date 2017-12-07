@@ -8,7 +8,8 @@ namespace Lykke.Service.Regulation.Client
         {
             return new RegulationModel
             {
-                Id = model.Id
+                Id = model.Id,
+                ProfileType = model.ProfileType
             };
         }
 
@@ -19,8 +20,8 @@ namespace Lykke.Service.Regulation.Client
                 Id = model.Id,
                 ClientId = model.ClientId,
                 RegulationId = model.RegulationId,
-                Kyc = model.Kyc,
-                Active = model.Active
+                Kyc = model.Kyc ?? false,
+                Active = model.Active ?? false
             };
         }
 

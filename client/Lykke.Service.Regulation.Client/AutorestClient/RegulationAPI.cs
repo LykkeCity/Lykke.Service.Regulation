@@ -2289,6 +2289,10 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// </return>
         public async Task<HttpOperationResponse<ErrorResponse>> AddRegulationWithHttpMessagesAsync(NewRegulationModel model = default(NewRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (model != null)
+            {
+                model.Validate();
+            }
             // Tracing
             bool _shouldTrace = ServiceClientTracing.IsEnabled;
             string _invocationId = null;

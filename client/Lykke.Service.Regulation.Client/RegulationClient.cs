@@ -75,7 +75,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task AddRegulationAsync(RegulationModel model)
         {
             ErrorResponse errorResponse =
-                await _service.AddRegulationAsync(new NewRegulationModel(model.Id));
+                await _service.AddRegulationAsync(new NewRegulationModel(model.Id, model.ProfileType));
 
             if(errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);

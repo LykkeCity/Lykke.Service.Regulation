@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.Regulation.Core.Settings.ServiceSettings
+﻿namespace Lykke.Service.Regulation.Settings.ServiceSettings.Db
 {
     public class DbSettings
     {

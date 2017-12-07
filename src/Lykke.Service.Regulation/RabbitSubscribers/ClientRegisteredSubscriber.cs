@@ -7,7 +7,7 @@ using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Regulation.Core.Exceptions;
 using Lykke.Service.Regulation.Core.Services;
-using Lykke.Service.Regulation.Core.Settings.ServiceSettings;
+using Lykke.Service.Regulation.Settings.ServiceSettings.Rabbit;
 
 namespace Lykke.Service.Regulation.RabbitSubscribers
 {

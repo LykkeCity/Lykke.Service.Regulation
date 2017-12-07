@@ -6,7 +6,7 @@ using Common.Log;
 using Lykke.Service.Regulation.AzureRepositories;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
-using Lykke.Service.Regulation.Core.Settings.ServiceSettings;
+using Lykke.Service.Regulation.Settings.ServiceSettings;
 using Lykke.Service.Regulation.RabbitPublishers;
 using Lykke.Service.Regulation.RabbitSubscribers;
 using Lykke.Service.Regulation.Services;
