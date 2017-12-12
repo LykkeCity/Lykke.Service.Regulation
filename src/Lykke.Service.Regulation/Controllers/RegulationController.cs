@@ -83,10 +83,10 @@ namespace Lykke.Service.Regulation.Controllers
         /// <summary>
         /// Adds the regulation.
         /// </summary>
-        /// <param name="model">The model what describe a regulation.</param>
+        /// <param name="model">The model that describe a regulation.</param>
         /// <returns></returns>
         /// <response code="204">Regulation successfully added.</response>
-        /// <response code="400">Invalid model what describe a regulation.</response>
+        /// <response code="400">Invalid model that describe a regulation.</response>
         [HttpPost]
         [SwaggerOperation("AddRegulation")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -114,6 +114,43 @@ namespace Lykke.Service.Regulation.Controllers
             
             await _log.WriteInfoAsync(nameof(RegulationController), nameof(Add),
                 $"Regulation added. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Updates regulation.
+        /// </summary>
+        /// <param name="model">The model that describe a regulation.</param>
+        /// <response code="204">Regulation successfully updated.</response>
+        /// <response code="400">Invalid model that describe a regulation.</response>
+        [HttpPut]
+        [SwaggerOperation("UpdateRegulation")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Update([FromBody] NewRegulationModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ErrorResponse.Create("Invalid model.", ModelState));
+            }
+
+            var regulation = Mapper.Map<Core.Domain.Regulation>(model);
+
+            try
+            {
+                await _regulationService.UpdateAsync(regulation);
+            }
+            catch (ServiceException exception)
+            {
+                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Update),
+                    $"{exception.Message} {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
+
+            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Update),
+                $"Regulation updated. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
         }

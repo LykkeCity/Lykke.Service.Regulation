@@ -138,9 +138,9 @@ namespace Lykke.Service.Regulation.Controllers
         /// <summary>
         /// Adds the welcome regulation rule.
         /// </summary>
-        /// <param name="model">The model what describe a welcome regulation rule.</param>
+        /// <param name="model">The model that describe a welcome regulation rule.</param>
         /// <response code="204">Welcome regulation rule successfully added.</response>
-        /// <response code="400">Invalid model what describe a welcome regulation rule or specified regulation not found.</response>
+        /// <response code="400">Invalid model that describe a welcome regulation rule or specified regulation not found.</response>
         [HttpPost]
         [SwaggerOperation("AddWelcomeRegulationRule")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -175,9 +175,9 @@ namespace Lykke.Service.Regulation.Controllers
         /// <summary>
         /// Updates welcome regulation rule.
         /// </summary>
-        /// <param name="model">The model what describe a welcome regulation rule.</param>
+        /// <param name="model">The model that describe a welcome regulation rule.</param>
         /// <response code="204">Welcome regulation rule active state successfully updated.</response>
-        /// <response code="400">Invalid model what describe a welcome regulation rule or regulation rule not found or specified regulation not found.</response>
+        /// <response code="400">Invalid model that describe a welcome regulation rule or regulation rule not found or specified regulation not found.</response>
         [HttpPut]
         [Route("update")]
         [SwaggerOperation("UpdateWelcomeRegulationRule")]

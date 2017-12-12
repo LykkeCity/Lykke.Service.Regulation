@@ -69,7 +69,7 @@ namespace Lykke.Service.Regulation.Client
         /// <summary>
         /// Adds the regulation.
         /// </summary>
-        /// <param name="model">The model what describe a regulation.</param>
+        /// <param name="model">The model that describe a regulation.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         public async Task AddRegulationAsync(RegulationModel model)
@@ -78,6 +78,21 @@ namespace Lykke.Service.Regulation.Client
                 await _service.AddRegulationAsync(new NewRegulationModel(model.Id, model.ProfileType));
 
             if(errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Updates the regulation.
+        /// </summary>
+        /// <param name="model">The model that describe a regulation.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task UpdateRegulationAsync(RegulationModel model)
+        {
+            ErrorResponse errorResponse =
+                await _service.UpdateRegulationAsync(new NewRegulationModel(model.Id, model.ProfileType));
+
+            if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
         }
 
@@ -161,7 +176,7 @@ namespace Lykke.Service.Regulation.Client
         /// <summary>
         /// Adds the welcome regulation rule.
         /// </summary>
-        /// <param name="model">The model what describe a welcome regulation rule.</param>
+        /// <param name="model">The model that describe a welcome regulation rule.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         public async Task AddWelcomeRegulationRuleAsync(WelcomeRegulationRuleModel model)
@@ -184,7 +199,7 @@ namespace Lykke.Service.Regulation.Client
         /// <summary>
         /// Updates welcome regulation rule.
         /// </summary>
-        /// <param name="model">The model what describe a welcome regulation rule.</param>
+        /// <param name="model">The model that describe a welcome regulation rule.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         public async Task UpdateWelcomeRegulationRuleAsync(WelcomeRegulationRuleModel model)
@@ -299,7 +314,7 @@ namespace Lykke.Service.Regulation.Client
         /// <summary>
         /// Adds the client regulation.
         /// </summary>
-        /// <param name="model">The model what describe a client regulation.</param>
+        /// <param name="model">The model that describe a client regulation.</param>
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         public async Task AddClientRegulationAsync(ClientRegulationModel model)

@@ -129,7 +129,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// Adds the client regulation.
         /// </summary>
         /// <param name='model'>
-        /// The model what describe a client regulation.
+        /// The model that describe a client regulation.
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -261,10 +261,24 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         Task<HttpOperationResponse<IList<RegulationModel>>> GetRegulationsWithHttpMessagesAsync(Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
+        /// Updates regulation.
+        /// </summary>
+        /// <param name='model'>
+        /// The model that describe a regulation.
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<ErrorResponse>> UpdateRegulationWithHttpMessagesAsync(NewRegulationModel model = default(NewRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
         /// Adds the regulation.
         /// </summary>
         /// <param name='model'>
-        /// The model what describe a regulation.
+        /// The model that describe a regulation.
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -302,7 +316,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// Adds the welcome regulation rule.
         /// </summary>
         /// <param name='model'>
-        /// The model what describe a welcome regulation rule.
+        /// The model that describe a welcome regulation rule.
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
@@ -346,7 +360,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// Updates welcome regulation rule.
         /// </summary>
         /// <param name='model'>
-        /// The model what describe a welcome regulation rule.
+        /// The model that describe a welcome regulation rule.
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.

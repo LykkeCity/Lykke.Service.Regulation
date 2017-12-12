@@ -240,7 +240,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// The operations group for this extension method.
             /// </param>
             /// <param name='model'>
-            /// The model what describe a client regulation.
+            /// The model that describe a client regulation.
             /// </param>
             public static ErrorResponse AddClientRegulation(this IRegulationAPI operations, NewClientRegulationModel model = default(NewClientRegulationModel))
             {
@@ -254,7 +254,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// The operations group for this extension method.
             /// </param>
             /// <param name='model'>
-            /// The model what describe a client regulation.
+            /// The model that describe a client regulation.
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -558,13 +558,47 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             }
 
             /// <summary>
+            /// Updates regulation.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='model'>
+            /// The model that describe a regulation.
+            /// </param>
+            public static ErrorResponse UpdateRegulation(this IRegulationAPI operations, NewRegulationModel model = default(NewRegulationModel))
+            {
+                return operations.UpdateRegulationAsync(model).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Updates regulation.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='model'>
+            /// The model that describe a regulation.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<ErrorResponse> UpdateRegulationAsync(this IRegulationAPI operations, NewRegulationModel model = default(NewRegulationModel), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.UpdateRegulationWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Adds the regulation.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
             /// <param name='model'>
-            /// The model what describe a regulation.
+            /// The model that describe a regulation.
             /// </param>
             public static ErrorResponse AddRegulation(this IRegulationAPI operations, NewRegulationModel model = default(NewRegulationModel))
             {
@@ -578,7 +612,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// The operations group for this extension method.
             /// </param>
             /// <param name='model'>
-            /// The model what describe a regulation.
+            /// The model that describe a regulation.
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -658,7 +692,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// The operations group for this extension method.
             /// </param>
             /// <param name='model'>
-            /// The model what describe a welcome regulation rule.
+            /// The model that describe a welcome regulation rule.
             /// </param>
             public static ErrorResponse AddWelcomeRegulationRule(this IRegulationAPI operations, NewWelcomeRegulationRuleModel model = default(NewWelcomeRegulationRuleModel))
             {
@@ -672,7 +706,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// The operations group for this extension method.
             /// </param>
             /// <param name='model'>
-            /// The model what describe a welcome regulation rule.
+            /// The model that describe a welcome regulation rule.
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.
@@ -760,7 +794,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// The operations group for this extension method.
             /// </param>
             /// <param name='model'>
-            /// The model what describe a welcome regulation rule.
+            /// The model that describe a welcome regulation rule.
             /// </param>
             public static ErrorResponse UpdateWelcomeRegulationRule(this IRegulationAPI operations, WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel))
             {
@@ -774,7 +808,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// The operations group for this extension method.
             /// </param>
             /// <param name='model'>
-            /// The model what describe a welcome regulation rule.
+            /// The model that describe a welcome regulation rule.
             /// </param>
             /// <param name='cancellationToken'>
             /// The cancellation token.

@@ -51,6 +51,16 @@ namespace Lykke.Service.Regulation.Services
             await _regulationRepository.AddAsync(regulation);
         }
 
+        public async Task UpdateAsync(IRegulation regulation)
+        {
+            if (await _regulationRepository.GetAsync(regulation.Id) == null)
+            {
+                throw new ServiceException("Regulation not found.");
+            }
+
+            await _regulationRepository.UpdateAsync(regulation);
+        }
+
         public async Task DeleteAsync(string regulationId)
         {
             IRegulation regulation = await _regulationRepository.GetAsync(regulationId);

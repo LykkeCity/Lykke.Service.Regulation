@@ -159,10 +159,10 @@ namespace Lykke.Service.Regulation.Controllers
         /// <summary>
         /// Adds the client regulation.
         /// </summary>
-        /// <param name="model">The model what describe a client regulation.</param>
+        /// <param name="model">The model that describe a client regulation.</param>
         /// <returns></returns>
         /// <response code="204">Client regulation successfully added.</response>
-        /// <response code="400">Invalid model what describe a client regulation or regulation not found.</response>
+        /// <response code="400">Invalid model that describe a client regulation or regulation not found.</response>
         [HttpPost]
         [Route("add")]
         [SwaggerOperation("AddClientRegulation")]

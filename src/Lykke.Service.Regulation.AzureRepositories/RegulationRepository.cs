@@ -31,6 +31,15 @@ namespace Lykke.Service.Regulation.AzureRepositories
             return _tableStorage.InsertThrowConflict(Create(regulation));
         }
 
+        public Task UpdateAsync(IRegulation regulation)
+        {
+            return _tableStorage.MergeAsync(GetPartitionKey(), GetRowKey(regulation.Id), entity =>
+            {
+                entity.ProfileType = regulation.ProfileType;
+                return entity;
+            });
+        }
+
         public async Task DeleteAsync(string regulationId)
         {
             await _tableStorage.DeleteAsync(GetPartitionKey(), GetRowKey(regulationId));
