@@ -650,7 +650,7 @@ namespace Lykke.Service.Regulation.Tests
             await _service.GetCountryCodeByPhoneAsync(phoneNumber);
 
             // assert
-            Assert.Equal("Can not find country code by phone number '+01********'.", message);
+            Assert.Equal("Can not find country code by phone number '+0123******'.", message);
         }
 
         private WelcomeRegulationRule Create(string id, string regulation, string country, bool active, int priority)

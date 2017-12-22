@@ -90,7 +90,25 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.AddAsync(clientRegulation);
 
-            await PublishOnChanged(clientRegulation.ClientId);
+            await PublishOnChangedAsync(clientRegulation.ClientId);
+
+            await _log.WriteWarningAsync(nameof(ClientRegulationService), clientRegulation.ClientId, $"Regulation '{clientRegulation.RegulationId}' added for client.");
+        }
+
+        public async Task SetDefaultByPhoneNumberAsync(string clientId, string phoneNumber)
+        {
+            string countryCode = null;
+
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                await _log.WriteWarningAsync(nameof(ClientRegulationService), clientId, "No phone number.");
+            }
+            else
+            {
+                countryCode = await GetCountryCodeByPhoneAsync(phoneNumber);
+            }
+            
+            await SetDefaultAsync(clientId, countryCode);
         }
 
         public async Task SetDefaultAsync(string clientId, string country)
@@ -140,7 +158,10 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.AddAsync(defaultClientRegulation);
 
-            await PublishOnChanged(clientId);
+            await PublishOnChangedAsync(defaultClientRegulation.ClientId);
+
+            await _log.WriteWarningAsync(nameof(ClientRegulationService), defaultClientRegulation.ClientId,
+                $"Default regulation '{defaultClientRegulation.RegulationId}' added for client.");
         }
 
         public async Task<string> GetCountryCodeByPhoneAsync(string phoneNumber)
@@ -155,12 +176,8 @@ namespace Lykke.Service.Regulation.Services
 
                 if (string.IsNullOrEmpty(countryCode))
                 {
-                    int length = phoneNumber.Length;
-
-                    string value = length > 3 ? phoneNumber.Substring(0, 3).PadRight(length, '*') : phoneNumber;
-
                     await _log.WriteWarningAsync(nameof(ClientRegulationService), nameof(GetCountryCodeByPhoneAsync),
-                        $"Can not find country code by phone number '{value}'.");
+                        $"Can not find country code by phone number '{phoneNumber.SanitizePhone()}'.");
                 }
                 else
                 {
@@ -184,7 +201,7 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.UpdateAsync(clientRegulation);
 
-            await PublishOnChanged(clientId);
+            await PublishOnChangedAsync(clientId);
         }
 
         public async Task UpdateActiveAsync(string clientId, string regulationId, bool state)
@@ -200,7 +217,7 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.UpdateAsync(clientRegulation);
 
-            await PublishOnChanged(clientId);
+            await PublishOnChangedAsync(clientId);
         }
 
         public async Task DeleteAsync(string clientId, string regulationId)
@@ -224,10 +241,10 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.DeleteAsync(clientId, regulationId);
 
-            await PublishOnChanged(clientId);
+            await PublishOnChangedAsync(clientId);
         }
 
-        private async Task PublishOnChanged(string clientId)
+        private async Task PublishOnChangedAsync(string clientId)
         {
             IEnumerable<IClientRegulation> clientRegulations =
                 await _clientRegulationRepository.GetByClientIdAsync(clientId);

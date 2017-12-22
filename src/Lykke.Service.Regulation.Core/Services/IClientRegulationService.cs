@@ -18,6 +18,8 @@ namespace Lykke.Service.Regulation.Core.Services
 
         Task AddAsync(IClientRegulation clientRegulation);
 
+        Task SetDefaultByPhoneNumberAsync(string clientId, string phoneNumber);
+
         Task SetDefaultAsync(string clientId, string country);
 
         Task<string> GetCountryCodeByPhoneAsync(string phoneNumber);

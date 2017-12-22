@@ -9,7 +9,7 @@ using Lykke.Service.Regulation.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Lykke.Service.Regulation.Core.Domain;
-using Lykke.Service.Regulation.Extensions;
+using Lykke.Common.Extensions;
 using Lykke.Service.Regulation.Core.Exceptions;
 
 namespace Lykke.Service.Regulation.Controllers

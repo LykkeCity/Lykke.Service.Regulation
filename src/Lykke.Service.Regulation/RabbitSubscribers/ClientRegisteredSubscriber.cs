@@ -34,9 +34,7 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
             settings.DeadLetterExchangeName = null;
 
             _subscriber = new RabbitMqSubscriber<ClientRegisteredMessage>(settings,
-                    new ResilientErrorHandlingStrategy(_log, settings,
-                        TimeSpan.FromSeconds(10),
-                        next: new DeadQueueErrorHandlingStrategy(_log, settings)))
+                    new ResilientErrorHandlingStrategy(_log, settings, TimeSpan.FromSeconds(10)))
                 .SetMessageDeserializer(new JsonMessageDeserializer<ClientRegisteredMessage>())
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(ProcessMessageAsync)
@@ -59,13 +57,11 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
         {
             try
             {
-                string countryCode = await _clientRegulationService.GetCountryCodeByPhoneAsync(message.Phone);
-                await _clientRegulationService.SetDefaultAsync(message.ClientId, countryCode);
+                await _clientRegulationService.SetDefaultByPhoneNumberAsync(message.ClientId, message.Phone);
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
-                    $"{exception.Message} {nameof(message.ClientId)}: {message.ClientId}");
+                await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), message.ClientId, exception.Message);
             }
         }
     }
