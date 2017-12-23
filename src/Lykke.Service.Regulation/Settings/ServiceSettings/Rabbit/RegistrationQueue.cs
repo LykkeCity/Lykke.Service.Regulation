@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lykke.Service.Regulation.Core.Settings.ServiceSettings
+﻿namespace Lykke.Service.Regulation.Settings.ServiceSettings.Rabbit
 {
     public class RegistrationQueue
     {
