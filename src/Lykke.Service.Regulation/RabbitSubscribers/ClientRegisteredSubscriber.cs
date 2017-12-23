@@ -5,6 +5,8 @@ using Common;
 using Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
+using Lykke.Service.IpGeoLocation;
+using Lykke.Service.IpGeoLocation.Models;
 using Lykke.Service.Regulation.Core.Exceptions;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Settings.ServiceSettings.Rabbit;
@@ -15,13 +17,19 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
     {
         private readonly ILog _log;
         private readonly IClientRegulationService _clientRegulationService;
+        private readonly IIpGeoLocationClient _geoLocationClient;
         private readonly RegistrationQueue _settings;
         private RabbitMqSubscriber<ClientRegisteredMessage> _subscriber;
 
-        public ClientRegisteredSubscriber(ILog log, IClientRegulationService clientRegulationService, RegistrationQueue settings)
+        public ClientRegisteredSubscriber(
+            ILog log,
+            IClientRegulationService clientRegulationService,
+            IIpGeoLocationClient geoLocationClient,
+            RegistrationQueue settings)
         {
             _log = log;
             _clientRegulationService = clientRegulationService;
+            _geoLocationClient = geoLocationClient;
             _settings = settings;
         }
 
@@ -57,7 +65,23 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
         {
             try
             {
-                await _clientRegulationService.SetDefaultByPhoneNumberAsync(message.ClientId, message.Phone);
+                string countryCode = null;
+
+                if (string.IsNullOrEmpty(message.Ip))
+                {
+                    await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), message.ClientId, "No IP address.");
+                }
+                else
+                {
+                    IIpGeolocationData data = await _geoLocationClient.GetAsync(message.Ip);
+
+                    await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), message.ClientId,
+                        data == null ? "Can not find country by IP." : $"Country '{data.CountryCode}'.");
+
+                    countryCode = data?.CountryCode;
+                }
+
+                await _clientRegulationService.SetDefaultAsync(message.ClientId, countryCode);
             }
             catch (ServiceException exception)
             {

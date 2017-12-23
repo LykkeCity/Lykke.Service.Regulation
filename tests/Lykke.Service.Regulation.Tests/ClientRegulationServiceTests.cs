@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Log;
 using Lykke.Service.Regulation.Core.Contracts;
@@ -16,7 +15,6 @@ namespace Lykke.Service.Regulation.Tests
 {
     public class ClientRegulationServiceTests
     {
-        private readonly Mock<ILog> _logMock;
         private readonly Mock<IRegulationRepository> _regulationRepositoryMock;
         private readonly Mock<IClientRegulationRepository> _clientRegulationRepositoryMock;
         private readonly Mock<IWelcomeRegulationRuleRepository> _welcomeRegulationRuleRepositoryMock;
@@ -26,7 +24,7 @@ namespace Lykke.Service.Regulation.Tests
 
         public ClientRegulationServiceTests()
         {
-            _logMock = new Mock<ILog>();
+            var logMock = new Mock<ILog>();
             _regulationRepositoryMock = new Mock<IRegulationRepository>();
             _clientRegulationRepositoryMock = new Mock<IClientRegulationRepository>();
             _welcomeRegulationRuleRepositoryMock = new Mock<IWelcomeRegulationRuleRepository>();
@@ -37,7 +35,7 @@ namespace Lykke.Service.Regulation.Tests
                 _clientRegulationRepositoryMock.Object,
                 _welcomeRegulationRuleRepositoryMock.Object,
                 _clientRegulationPublisherMock.Object,
-                _logMock.Object);
+                logMock.Object);
         }
 
         [Fact]
@@ -577,80 +575,6 @@ namespace Lykke.Service.Regulation.Tests
             Assert.NotNull(result);
             Assert.Equal(result.RegulationId, rule2.RegulationId);
             Assert.Equal(result.Active, rule2.Active);
-        }
-
-        [Fact]
-        public async void GetCountryCodeByPhoneAsync_Phone_Null()
-        {
-            // arrange
-            string phoneNumber = null;
-
-            // act
-            string countryCode = await _service.GetCountryCodeByPhoneAsync(phoneNumber);
-
-            // assert
-            Assert.True(string.IsNullOrEmpty(countryCode));
-        }
-
-        [Fact]
-        public async void GetCountryCodeByPhoneAsync_Phone_Empty()
-        {
-            // arrange
-            string phoneNumber = string.Empty;
-
-            // act
-            string countryCode = await _service.GetCountryCodeByPhoneAsync(phoneNumber);
-
-            // assert
-            Assert.True(string.IsNullOrEmpty(countryCode));
-        }
-
-        [Fact]
-        public async void GetCountryCodeByPhoneAsync_Phone_White_Space()
-        {
-            // arrange
-            string phoneNumber = "   ";
-
-            // act
-            string countryCode = await _service.GetCountryCodeByPhoneAsync(phoneNumber);
-
-            // assert
-            Assert.True(string.IsNullOrEmpty(countryCode));
-        }
-
-        [Fact]
-        public async void GetCountryCodeByPhoneAsync_Phone_RUS()
-        {
-            // arrange
-            string phoneNumber = "+79001112233";
-
-            // act
-            string countryCode = await _service.GetCountryCodeByPhoneAsync(phoneNumber);
-
-            // assert
-            Assert.Equal("RUS", countryCode);
-        }
-
-        [Fact]
-        public async void GetCountryCodeByPhoneAsync_Can_Not_Find_Country_Log_Message()
-        {
-            // arrange
-            string phoneNumber = "+0123456789";
-
-            string message = null;
-
-            _logMock.Setup(o =>o.WriteWarningAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime?>()))
-                .Returns(Task.CompletedTask)
-                .Callback((string process, string context, string info, DateTime? dateTime) =>
-                {
-                    message = info;
-                });
-
-            // act
-            await _service.GetCountryCodeByPhoneAsync(phoneNumber);
-
-            // assert
-            Assert.Equal("Can not find country code by phone number '+0123******'.", message);
         }
 
         private WelcomeRegulationRule Create(string id, string regulation, string country, bool active, int priority)
