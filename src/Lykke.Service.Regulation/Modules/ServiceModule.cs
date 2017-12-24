@@ -1,33 +1,28 @@
 ﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using AzureStorage.Tables;
 using Common;
 using Common.Log;
+using Lykke.Service.IpGeoLocation;
 using Lykke.Service.Regulation.AzureRepositories;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
-using Lykke.Service.Regulation.Core.Settings.ServiceSettings;
 using Lykke.Service.Regulation.RabbitPublishers;
 using Lykke.Service.Regulation.RabbitSubscribers;
 using Lykke.Service.Regulation.Services;
+using Lykke.Service.Regulation.Settings;
 using Lykke.SettingsReader;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lykke.Service.Regulation.Modules
 {
     public class ServiceModule : Module
     {
-        private readonly IReloadingManager<RegulationSettings> _settings;
+        private readonly IReloadingManager<AppSettings> _settings;
         private readonly ILog _log;
-        // NOTE: you can remove it if you don't need to use IServiceCollection extensions to register service specific dependencies
-        private readonly IServiceCollection _services;
 
-        public ServiceModule(IReloadingManager<RegulationSettings> settings, ILog log)
+        public ServiceModule(IReloadingManager<AppSettings> settings, ILog log)
         {
             _settings = settings;
             _log = log;
-
-            _services = new ServiceCollection();
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -52,12 +47,12 @@ namespace Lykke.Service.Regulation.Modules
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
 
+            builder.RegisterIpGeoLocationClient(_settings.CurrentValue.IpGeoLocationServiceClient.ServiceUrl, _log);
+
             RegisterRepositories(builder);
             RegisterServices(builder);
             RegisterRabbitMqSubscribers(builder);
             RegisterRabbitMqPublishers(builder);
-
-            builder.Populate(_services);
         }
 
         private void RegisterRepositories(ContainerBuilder builder)
@@ -66,17 +61,17 @@ namespace Lykke.Service.Regulation.Modules
             const string clientRegulationsTableName = "ClientRegulations";
 
             builder.Register(c => new RegulationRepository(
-                    AzureTableStorage<RegulationEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
+                    AzureTableStorage<RegulationEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
                         regulationsTableName, _log)))
                 .As<IRegulationRepository>();
 
             builder.Register(c => new ClientRegulationRepository(
-                    AzureTableStorage<ClientRegulationEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
+                    AzureTableStorage<ClientRegulationEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
                         clientRegulationsTableName, _log)))
                 .As<IClientRegulationRepository>();
 
             builder.Register(c => new WelcomeRegulationRuleRepository(
-                    AzureTableStorage<WelcomeRegulationRuleEntity>.Create(_settings.ConnectionString(x => x.Db.DataConnString),
+                    AzureTableStorage<WelcomeRegulationRuleEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
                         regulationsTableName, _log)))
                 .As<IWelcomeRegulationRuleRepository>();
         }
@@ -101,7 +96,7 @@ namespace Lykke.Service.Regulation.Modules
                 .As<IStopable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.RabbitMq.RegistrationQueue));
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.RegulationService.RabbitMq.RegistrationQueue));
         }
 
         private void RegisterRabbitMqPublishers(ContainerBuilder builder)
@@ -112,7 +107,7 @@ namespace Lykke.Service.Regulation.Modules
                 .As<IStopable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.RabbitMq.RegulationExchange));
+                .WithParameter(TypedParameter.From(_settings.CurrentValue.RegulationService.RabbitMq.RegulationExchange));
         }
     }
 }

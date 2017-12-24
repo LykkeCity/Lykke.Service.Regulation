@@ -1,14 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Common;
 using Common.Log;
 using Lykke.Service.Regulation.Core.Contracts;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Exceptions;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
-using Lykke.Service.Regulation.Core.Utils;
 using ClientRegulation = Lykke.Service.Regulation.Core.Domain.ClientRegulation;
 
 namespace Lykke.Service.Regulation.Services
@@ -90,9 +88,12 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.AddAsync(clientRegulation);
 
-            await PublishOnChanged(clientRegulation.ClientId);
-        }
+            await PublishOnChangedAsync(clientRegulation.ClientId);
 
+            await _log.WriteInfoAsync(nameof(ClientRegulationService), nameof(AddAsync),
+                clientRegulation.ClientId, $"Regulation '{clientRegulation.RegulationId}' added for client.");
+        }
+        
         public async Task SetDefaultAsync(string clientId, string country)
         {
             IEnumerable<IClientRegulation> clientRegulations =
@@ -140,35 +141,11 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.AddAsync(defaultClientRegulation);
 
-            await PublishOnChanged(clientId);
-        }
+            await PublishOnChangedAsync(defaultClientRegulation.ClientId);
 
-        public async Task<string> GetCountryCodeByPhoneAsync(string phoneNumber)
-        {
-            string countryCode = null;
-
-            phoneNumber = phoneNumber?.Trim();
-
-            if (!string.IsNullOrEmpty(phoneNumber))
-            {
-                countryCode = CountryCodeUtil.GetCountryCodeByPhoneNumber(phoneNumber);
-
-                if (string.IsNullOrEmpty(countryCode))
-                {
-                    int length = phoneNumber.Length;
-
-                    string value = length > 3 ? phoneNumber.Substring(0, 3).PadRight(length, '*') : phoneNumber;
-
-                    await _log.WriteWarningAsync(nameof(ClientRegulationService), nameof(GetCountryCodeByPhoneAsync),
-                        $"Can not find country code by phone number '{value}'.");
-                }
-                else
-                {
-                    countryCode = CountryManager.Iso2ToIso3(countryCode);
-                }
-            }
-
-            return countryCode;
+            await _log.WriteInfoAsync(nameof(ClientRegulationService), nameof(SetDefaultAsync),
+                defaultClientRegulation.ClientId,
+                $"Default regulation '{defaultClientRegulation.RegulationId}' added for client.");
         }
         
         public async Task UpdateKycAsync(string clientId, string regulationId, bool active)
@@ -184,7 +161,7 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.UpdateAsync(clientRegulation);
 
-            await PublishOnChanged(clientId);
+            await PublishOnChangedAsync(clientId);
         }
 
         public async Task UpdateActiveAsync(string clientId, string regulationId, bool state)
@@ -200,7 +177,7 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.UpdateAsync(clientRegulation);
 
-            await PublishOnChanged(clientId);
+            await PublishOnChangedAsync(clientId);
         }
 
         public async Task DeleteAsync(string clientId, string regulationId)
@@ -224,10 +201,10 @@ namespace Lykke.Service.Regulation.Services
 
             await _clientRegulationRepository.DeleteAsync(clientId, regulationId);
 
-            await PublishOnChanged(clientId);
+            await PublishOnChangedAsync(clientId);
         }
 
-        private async Task PublishOnChanged(string clientId)
+        private async Task PublishOnChangedAsync(string clientId)
         {
             IEnumerable<IClientRegulation> clientRegulations =
                 await _clientRegulationRepository.GetByClientIdAsync(clientId);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -6,7 +7,7 @@ using Common;
 using Common.Log;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Services;
-using Lykke.Service.Regulation.Extensions;
+using Lykke.Common.Extensions;
 using Lykke.Service.Regulation.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -50,8 +51,8 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(Get),
-                    $"{exception.Message} Id: {welcomeRegulationRuleId}. IP: {HttpContext.GetIp()}");
+                await _log.WriteErrorAsync(nameof(WelcomeRegulationRuleContoller), nameof(Get),
+                    $"{nameof(welcomeRegulationRuleId)}: {welcomeRegulationRuleId}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
@@ -123,8 +124,8 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(GetByRegulationId),
-                    $"{exception.Message} {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+                await _log.WriteErrorAsync(nameof(WelcomeRegulationRuleContoller), nameof(GetByRegulationId),
+                    $"{nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
@@ -160,13 +161,13 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(Add),
-                    $"{exception.Message} {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+                await _log.WriteErrorAsync(nameof(WelcomeRegulationRuleContoller), nameof(Add),
+                    $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Add),
+            await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Add), model.RegulationId,
                 $"Welcome regulation rule added. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
@@ -198,13 +199,13 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(Update),
-                    $"{exception.Message} {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+                await _log.WriteErrorAsync(nameof(WelcomeRegulationRuleContoller), nameof(Update),
+                    $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Update),
+            await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Update), model.RegulationId,
                 $"Welcome regulation rule updated. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
@@ -229,13 +230,13 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(WelcomeRegulationRuleContoller), nameof(Delete),
-                    $"{exception.Message} RegulationRuleId: {regulationRuleId}. IP: {HttpContext.GetIp()}");
+                await _log.WriteErrorAsync(nameof(WelcomeRegulationRuleContoller), nameof(Delete),
+                    $"{nameof(regulationRuleId)}: {regulationRuleId}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
-            await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Delete),
-                $"Welcome regulation rule deleted. Id: {regulationRuleId}. IP: {HttpContext.GetIp()}");
+            await _log.WriteInfoAsync(nameof(WelcomeRegulationRuleContoller), nameof(Delete), regulationRuleId,
+                $"Welcome regulation rule deleted. IP: {HttpContext.GetIp()}");
 
             return NoContent();
         }

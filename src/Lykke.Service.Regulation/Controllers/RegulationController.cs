@@ -9,7 +9,7 @@ using Lykke.Service.Regulation.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Lykke.Service.Regulation.Core.Domain;
-using Lykke.Service.Regulation.Extensions;
+using Lykke.Common.Extensions;
 using Lykke.Service.Regulation.Core.Exceptions;
 
 namespace Lykke.Service.Regulation.Controllers
@@ -51,8 +51,8 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Get),
-                    $"{exception.Message} {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+                await _log.WriteErrorAsync(nameof(RegulationController), nameof(Get),
+                    $"{nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
@@ -106,13 +106,13 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Add),
-                    $"{exception.Message} {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+                await _log.WriteErrorAsync(nameof(RegulationController), nameof(Add),
+                    $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
             
-            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Add),
+            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Add), model.Id,
                 $"Regulation added. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
             return NoContent();
@@ -138,14 +138,14 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Delete),
-                    $"{exception.Message} {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+                await _log.WriteErrorAsync(nameof(RegulationController), nameof(Delete),
+                    $"{nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Delete),
-                $"Regulation deleted. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+            await _log.WriteInfoAsync(nameof(RegulationController), nameof(Delete), regulationId,
+                $"Regulation deleted. IP: {HttpContext.GetIp()}");
 
             return NoContent();
         }
