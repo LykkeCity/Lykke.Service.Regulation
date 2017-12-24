@@ -75,10 +75,18 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
                 {
                     IIpGeolocationData data = await _geoLocationClient.GetAsync(message.Ip);
 
-                    await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), message.ClientId,
-                        data == null ? "Can not find country by IP." : $"Country '{data.CountryCode}'.");
-
                     countryCode = data?.CountryCode;
+
+                    if (string.IsNullOrEmpty(countryCode))
+                    {
+                        await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), message.ClientId,
+                            $"Can not find country by IP address '{message.Ip}'.");
+                    }
+                    else
+                    {
+                        await _log.WriteInfoAsync(nameof(ClientRegisteredSubscriber), message.ClientId,
+                            $"Country '{data.CountryCode}'.");
+                    }
                 }
 
                 await _clientRegulationService.SetDefaultAsync(message.ClientId, countryCode);
