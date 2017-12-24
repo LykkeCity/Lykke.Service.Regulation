@@ -90,7 +90,7 @@ namespace Lykke.Service.Regulation.Services
 
             await PublishOnChangedAsync(clientRegulation.ClientId);
 
-            await _log.WriteWarningAsync(nameof(ClientRegulationService), clientRegulation.ClientId, $"Regulation '{clientRegulation.RegulationId}' added for client.");
+            await _log.WriteInfoAsync(nameof(ClientRegulationService), clientRegulation.ClientId, $"Regulation '{clientRegulation.RegulationId}' added for client.");
         }
         
         public async Task SetDefaultAsync(string clientId, string country)
@@ -142,7 +142,7 @@ namespace Lykke.Service.Regulation.Services
 
             await PublishOnChangedAsync(defaultClientRegulation.ClientId);
 
-            await _log.WriteWarningAsync(nameof(ClientRegulationService), defaultClientRegulation.ClientId,
+            await _log.WriteInfoAsync(nameof(ClientRegulationService), defaultClientRegulation.ClientId,
                 $"Default regulation '{defaultClientRegulation.RegulationId}' added for client.");
         }
         
