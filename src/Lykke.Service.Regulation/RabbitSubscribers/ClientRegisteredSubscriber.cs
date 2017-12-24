@@ -69,7 +69,8 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
 
                 if (string.IsNullOrEmpty(message.Ip))
                 {
-                    await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), message.ClientId, "No IP address.");
+                    await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
+                        message.ClientId, "No IP address.");
                 }
                 else
                 {
@@ -79,13 +80,13 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
 
                     if (string.IsNullOrEmpty(countryCode))
                     {
-                        await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), message.ClientId,
-                            $"Can not find country by IP address '{message.Ip}'.");
+                        await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
+                            message.ClientId, $"Can not find country by IP address '{message.Ip}'.");
                     }
                     else
                     {
-                        await _log.WriteInfoAsync(nameof(ClientRegisteredSubscriber), message.ClientId,
-                            $"Country '{data.CountryCode}'.");
+                        await _log.WriteInfoAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
+                            message.ClientId, $"Country '{data.CountryCode}'.");
                     }
                 }
 
@@ -93,7 +94,8 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientRegisteredSubscriber), message.ClientId, exception);
+                await _log.WriteErrorAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
+                    message.ClientId, exception);
             }
         }
     }
