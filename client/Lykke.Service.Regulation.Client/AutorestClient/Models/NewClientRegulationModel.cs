@@ -6,6 +6,7 @@
 
 namespace Lykke.Service.Regulation.Client.AutorestClient.Models
 {
+    using Microsoft.Rest;
     using Newtonsoft.Json;
     using System.Linq;
 
@@ -22,7 +23,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// <summary>
         /// Initializes a new instance of the NewClientRegulationModel class.
         /// </summary>
-        public NewClientRegulationModel(bool active, string clientId = default(string), string regulationId = default(string))
+        public NewClientRegulationModel(string clientId, string regulationId, bool active)
         {
             ClientId = clientId;
             RegulationId = regulationId;
@@ -53,12 +54,19 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// <summary>
         /// Validate the object.
         /// </summary>
-        /// <exception cref="Microsoft.Rest.ValidationException">
+        /// <exception cref="ValidationException">
         /// Thrown if validation fails
         /// </exception>
         public virtual void Validate()
         {
-            //Nothing to validate
+            if (ClientId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "ClientId");
+            }
+            if (RegulationId == null)
+            {
+                throw new ValidationException(ValidationRules.CannotBeNull, "RegulationId");
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// <summary>
         /// Initializes a new instance of the ClientRegulationModel class.
         /// </summary>
-        public ClientRegulationModel(bool kyc, bool active, string id = default(string), string clientId = default(string), string regulationId = default(string))
+        public ClientRegulationModel(string id = default(string), string clientId = default(string), string regulationId = default(string), bool? kyc = default(bool?), bool? active = default(bool?))
         {
             Id = id;
             ClientId = clientId;
@@ -55,22 +55,12 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Kyc")]
-        public bool Kyc { get; set; }
+        public bool? Kyc { get; set; }
 
         /// <summary>
         /// </summary>
         [JsonProperty(PropertyName = "Active")]
-        public bool Active { get; set; }
+        public bool? Active { get; set; }
 
-        /// <summary>
-        /// Validate the object.
-        /// </summary>
-        /// <exception cref="Microsoft.Rest.ValidationException">
-        /// Thrown if validation fails
-        /// </exception>
-        public virtual void Validate()
-        {
-            //Nothing to validate
-        }
     }
 }

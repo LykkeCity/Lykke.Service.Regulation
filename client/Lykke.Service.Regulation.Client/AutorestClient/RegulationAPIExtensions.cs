@@ -530,6 +530,42 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             }
 
             /// <summary>
+            /// Returns a regulation details by country code using welcome regulation
+            /// rules.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='country'>
+            /// The country code.
+            /// </param>
+            public static RegulationModel GetRegulationByCountry(this IRegulationAPI operations, string country)
+            {
+                return operations.GetRegulationByCountryAsync(country).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Returns a regulation details by country code using welcome regulation
+            /// rules.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='country'>
+            /// The country code.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<RegulationModel> GetRegulationByCountryAsync(this IRegulationAPI operations, string country, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.GetRegulationByCountryWithHttpMessagesAsync(country, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Returns all regulations.
             /// </summary>
             /// <param name='operations'>

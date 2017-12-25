@@ -36,6 +36,34 @@ namespace Lykke.Service.Regulation.Services
             return regulation;
         }
 
+        public async Task<IRegulation> GetByCountryAsync(string country)
+        {
+            if (string.IsNullOrEmpty(country))
+                return null;
+
+            IEnumerable<IWelcomeRegulationRule> welcomeRegulationRules =
+                await _welcomeRegulationRuleRepository.GetByCountryAsync(country);
+
+            IWelcomeRegulationRule welcomeRegulationRule = welcomeRegulationRules
+                .OrderByDescending(o => o.Priority)
+                .FirstOrDefault();
+
+            if (welcomeRegulationRule == null)
+            {
+                welcomeRegulationRules =
+                    await _welcomeRegulationRuleRepository.GetDefaultAsync();
+
+                welcomeRegulationRule = welcomeRegulationRules
+                    .OrderByDescending(o => o.Priority)
+                    .FirstOrDefault();
+            }
+
+            if (welcomeRegulationRule == null)
+                return null;
+
+            return await _regulationRepository.GetAsync(welcomeRegulationRule.RegulationId);
+        }
+
         public Task<IEnumerable<IRegulation>> GetAllAsync()
         {
             return _regulationRepository.GetAllAsync();
