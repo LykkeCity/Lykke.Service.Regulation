@@ -10,6 +10,8 @@ namespace Lykke.Service.Regulation.Core.Services
 
         Task<IEnumerable<IRegulation>> GetAllAsync();
 
+        Task<IRegulation> GetByCountryAsync(string country);
+
         Task AddAsync(IRegulation regulation);
 
         Task UpdateAsync(IRegulation regulation);

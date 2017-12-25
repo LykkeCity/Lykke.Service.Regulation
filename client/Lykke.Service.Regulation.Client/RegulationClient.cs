@@ -56,6 +56,18 @@ namespace Lykke.Service.Regulation.Client
         }
 
         /// <summary>
+        /// Returns a regulation details by country code using welcome regulation rules.
+        /// </summary>
+        /// <param name="country">The country code.</param>
+        /// <returns>The <see cref="RegulationModel"/>.</returns>
+        public async Task<RegulationModel> GetByCountry(string country)
+        {
+            AutorestClient.Models.RegulationModel result = await _service.GetRegulationByCountryAsync(country);
+
+            return result?.ToModel();
+        }
+
+        /// <summary>
         /// Returns all regulations.
         /// </summary>
         /// <returns>The list of regulations.</returns>
