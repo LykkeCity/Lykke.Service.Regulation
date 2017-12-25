@@ -24,7 +24,7 @@ namespace Lykke.Service.Regulation.Client
         /// </summary>
         /// <param name="country">The country code.</param>
         /// <returns>The <see cref="RegulationModel"/>.</returns>
-        Task<RegulationModel> GetByCountry(string country);
+        Task<RegulationModel> GetRegulationByCountryAsync(string country);
 
         /// <summary>
         /// Returns all regulations.
