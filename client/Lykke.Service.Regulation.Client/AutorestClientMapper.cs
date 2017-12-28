@@ -9,7 +9,10 @@ namespace Lykke.Service.Regulation.Client
             return new RegulationModel
             {
                 Id = model.Id,
-                ProfileType = model.ProfileType
+                ProfileType = model.ProfileType,
+                TermsOfUseUrl = model.TermsOfUseUrl,
+                RiskDescriptionUrl = model.RiskDescriptionUrl,
+                MarginTradingConditions = model.MarginTradingConditions
             };
         }
 

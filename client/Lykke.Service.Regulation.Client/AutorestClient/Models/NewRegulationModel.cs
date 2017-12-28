@@ -23,10 +23,13 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// <summary>
         /// Initializes a new instance of the NewRegulationModel class.
         /// </summary>
-        public NewRegulationModel(string id, string profileType)
+        public NewRegulationModel(string id, string profileType, string termsOfUseUrl = default(string), string riskDescriptionUrl = default(string), string marginTradingConditions = default(string))
         {
             Id = id;
             ProfileType = profileType;
+            TermsOfUseUrl = termsOfUseUrl;
+            RiskDescriptionUrl = riskDescriptionUrl;
+            MarginTradingConditions = marginTradingConditions;
             CustomInit();
         }
 
@@ -44,6 +47,21 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// </summary>
         [JsonProperty(PropertyName = "ProfileType")]
         public string ProfileType { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "TermsOfUseUrl")]
+        public string TermsOfUseUrl { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "RiskDescriptionUrl")]
+        public string RiskDescriptionUrl { get; set; }
+
+        /// <summary>
+        /// </summary>
+        [JsonProperty(PropertyName = "MarginTradingConditions")]
+        public string MarginTradingConditions { get; set; }
 
         /// <summary>
         /// Validate the object.
