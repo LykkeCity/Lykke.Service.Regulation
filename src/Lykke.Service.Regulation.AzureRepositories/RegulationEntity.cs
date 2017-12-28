@@ -8,5 +8,11 @@ namespace Lykke.Service.Regulation.AzureRepositories
         public string Id => RowKey;
 
         public string ProfileType { get; set; }
+
+        public string TermsOfUseUrl { get; set; }
+
+        public string RiskDescriptionUrl { get; set; }
+
+        public string MarginTradingConditions { get; set; }
     }
 }

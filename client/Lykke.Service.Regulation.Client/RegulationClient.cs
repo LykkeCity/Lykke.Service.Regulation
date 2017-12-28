@@ -87,7 +87,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task AddRegulationAsync(RegulationModel model)
         {
             ErrorResponse errorResponse =
-                await _service.AddRegulationAsync(new NewRegulationModel(model.Id, model.ProfileType));
+                await _service.AddRegulationAsync(new NewRegulationModel(model.Id, model.ProfileType, model.TermsOfUseUrl, model.RiskDescriptionUrl, model.MarginTradingConditions));
 
             if(errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
@@ -102,7 +102,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task UpdateRegulationAsync(RegulationModel model)
         {
             ErrorResponse errorResponse =
-                await _service.UpdateRegulationAsync(new NewRegulationModel(model.Id, model.ProfileType));
+                await _service.UpdateRegulationAsync(new NewRegulationModel(model.Id, model.ProfileType, model.TermsOfUseUrl, model.RiskDescriptionUrl, model.MarginTradingConditions));
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);

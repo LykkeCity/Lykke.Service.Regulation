@@ -36,6 +36,9 @@ namespace Lykke.Service.Regulation.AzureRepositories
             return _tableStorage.MergeAsync(GetPartitionKey(), GetRowKey(regulation.Id), entity =>
             {
                 entity.ProfileType = regulation.ProfileType;
+                entity.TermsOfUseUrl = regulation.TermsOfUseUrl;
+                entity.RiskDescriptionUrl = regulation.RiskDescriptionUrl;
+                entity.MarginTradingConditions = regulation.MarginTradingConditions;
                 return entity;
             });
         }
@@ -57,7 +60,10 @@ namespace Lykke.Service.Regulation.AzureRepositories
             {
                 PartitionKey = GetPartitionKey(),
                 RowKey = GetRowKey(regulation.Id),
-                ProfileType = regulation.ProfileType
+                ProfileType = regulation.ProfileType,
+                TermsOfUseUrl = regulation.TermsOfUseUrl,
+                RiskDescriptionUrl = regulation.RiskDescriptionUrl,
+                MarginTradingConditions = regulation.MarginTradingConditions
             };
         }
     }
