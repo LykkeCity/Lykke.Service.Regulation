@@ -19,8 +19,8 @@ namespace Lykke.Service.Regulation.Client
                 Id = model.Id,
                 ClientId = model.ClientId,
                 RegulationId = model.RegulationId,
-                Kyc = model.Kyc,
-                Active = model.Active
+                Kyc = model.Kyc ?? false,
+                Active = model.Active ?? false
             };
         }
 
@@ -33,6 +33,18 @@ namespace Lykke.Service.Regulation.Client
                 RegulationId = model.RegulationId,
                 Countries = model.Countries,
                 Active = model.Active,
+                Priority = model.Priority
+            };
+        }
+
+        public static MarginRegulationRuleModel ToModel(this AutorestClient.Models.MarginRegulationRuleModel model)
+        {
+            return new MarginRegulationRuleModel
+            {
+                Id = model.Id,
+                Name = model.Name,
+                RegulationId = model.RegulationId,
+                Countries = model.Countries,
                 Priority = model.Priority
             };
         }

@@ -8,6 +8,7 @@ using Lykke.Service.Regulation.Client.Exceptions;
 using WelcomeRegulationRuleModel = Lykke.Service.Regulation.Client.Models.WelcomeRegulationRuleModel;
 using ClientRegulationModel = Lykke.Service.Regulation.Client.Models.ClientRegulationModel;
 using RegulationModel = Lykke.Service.Regulation.Client.Models.RegulationModel;
+using MarginRegulationRuleModel = Lykke.Service.Regulation.Client.Models.MarginRegulationRuleModel;
 
 namespace Lykke.Service.Regulation.Client
 {
@@ -35,6 +36,8 @@ namespace Lykke.Service.Regulation.Client
             _service = null;
         }
 
+        #region Regulations
+
         /// <summary>
         /// Returns regulation details by specified id.
         /// </summary>
@@ -44,7 +47,7 @@ namespace Lykke.Service.Regulation.Client
         /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
         public async Task<RegulationModel> GetRegulationAsync(string regulationId)
         {
-            object result = await _service.GetRegulationAsync(regulationId);
+            object result = await _service.RegulationGetAsync(regulationId);
 
             if (result is AutorestClient.Models.RegulationModel regulationModel)
                 return regulationModel.ToModel();
@@ -61,7 +64,7 @@ namespace Lykke.Service.Regulation.Client
         /// <returns>The list of regulations.</returns>
         public async Task<IEnumerable<RegulationModel>> GetRegulationsAsync()
         {
-            IEnumerable<AutorestClient.Models.RegulationModel> regulations = await _service.GetRegulationsAsync();
+            IEnumerable<AutorestClient.Models.RegulationModel> regulations = await _service.RegulationGetAllAsync();
 
             return regulations.Select(o => o.ToModel());
         }
@@ -75,7 +78,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task AddRegulationAsync(RegulationModel model)
         {
             ErrorResponse errorResponse =
-                await _service.AddRegulationAsync(new NewRegulationModel(model.Id));
+                await _service.RegulationAddAsync(new NewRegulationModel(model.Id));
 
             if(errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
@@ -89,11 +92,15 @@ namespace Lykke.Service.Regulation.Client
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         public async Task DeleteRegulationAsync(string regulationId)
         {
-            ErrorResponse errorResponse = await _service.DeleteRegulationAsync(regulationId);
+            ErrorResponse errorResponse = await _service.RegulationDeleteAsync(regulationId);
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
         }
+
+        #endregion
+
+        #region Welcome regulation rules
 
         /// <summary>
         /// Returns welcome regulation rule by specified id.
@@ -104,7 +111,7 @@ namespace Lykke.Service.Regulation.Client
         /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
         public async Task<WelcomeRegulationRuleModel> GetWelcomeRegulationRuleByIdAsync(string welcomeRegulationRuleId)
         {
-            object result = await _service.GetWelcomeRegulationRuleByIdAsync(welcomeRegulationRuleId);
+            object result = await _service.WelcomeRegulationRuleGetByIdAsync(welcomeRegulationRuleId);
 
             if (result is AutorestClient.Models.WelcomeRegulationRuleModel regulationModel)
                 return regulationModel.ToModel();
@@ -122,7 +129,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task<IEnumerable<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesAsync()
         {
             IEnumerable<AutorestClient.Models.WelcomeRegulationRuleModel> regulations = 
-                await _service.GetWelcomeRegulationRulesAsync();
+                await _service.WelcomeRegulationRuleGetAllAsync();
 
             return regulations.Select(o => o.ToModel());
         }
@@ -135,7 +142,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task<IEnumerable<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesByCountryAsync(string country)
         {
             IEnumerable<AutorestClient.Models.WelcomeRegulationRuleModel> regulations =
-                await _service.GetWelcomeRegulationRulesByCountryAsync(country);
+                await _service.WelcomeRegulationRuleGetByCountryAsync(country);
 
             return regulations.Select(o => o.ToModel());
         }
@@ -147,7 +154,7 @@ namespace Lykke.Service.Regulation.Client
         /// <returns>The list of welcome regulation rules.</returns>
         public async Task<IEnumerable<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesByRegulationIdAsync(string regulationId)
         {
-            object result = await _service.GetWelcomeRegulationRulesByRegulationIdAsync(regulationId);
+            object result = await _service.WelcomeRegulationRuleGetByRegulationIdAsync(regulationId);
 
             if (result is IEnumerable<AutorestClient.Models.WelcomeRegulationRuleModel> regulations)
                 return regulations.Select(o => o.ToModel());
@@ -167,7 +174,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task AddWelcomeRegulationRuleAsync(WelcomeRegulationRuleModel model)
         {
             ErrorResponse errorResponse =
-                await _service.AddWelcomeRegulationRuleAsync(
+                await _service.WelcomeRegulationRuleAddAsync(
                     new NewWelcomeRegulationRuleModel
                     {
                         Name = model.Name,
@@ -190,7 +197,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task UpdateWelcomeRegulationRuleAsync(WelcomeRegulationRuleModel model)
         {
             ErrorResponse errorResponse =
-                await _service.UpdateWelcomeRegulationRuleAsync(new AutorestClient.Models.WelcomeRegulationRuleModel
+                await _service.WelcomeRegulationRuleUpdateAsync(new AutorestClient.Models.WelcomeRegulationRuleModel
                 {
                     Id = model.Id,
                     Name = model.Name,
@@ -212,11 +219,15 @@ namespace Lykke.Service.Regulation.Client
         public async Task DeleteWelcomeRegulationRuleAsync(string regulationRuleId)
         {
             ErrorResponse errorResponse =
-                await _service.DeleteWelcomeRegulationRuleAsync(regulationRuleId);
+                await _service.WelcomeRegulationRuleDeleteAsync(regulationRuleId);
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
         }
+
+        #endregion
+
+        #region Client regulations
 
         /// <summary>
         /// Returns a client regulation by specified client id and regulation id.
@@ -228,7 +239,7 @@ namespace Lykke.Service.Regulation.Client
         /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
         public async Task<ClientRegulationModel> GetClientRegulationAsync(string clientId, string regulationId)
         {
-            object result = await _service.GetClientRegulationAsync(clientId, regulationId);
+            object result = await _service.ClientRegulationGetAsync(clientId, regulationId);
 
             if (result is AutorestClient.Models.ClientRegulationModel regulation)
                 return regulation.ToModel();
@@ -247,7 +258,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task<IEnumerable<ClientRegulationModel>> GetClientRegulationsByClientIdAsync(string clientId)
         {
             IEnumerable<AutorestClient.Models.ClientRegulationModel> regulations
-                = await _service.GetClientRegulationsByClientIdAsync(clientId);
+                = await _service.ClientRegulationGetByClientIdAsync(clientId);
 
             return regulations.Select(o => o.ToModel());
         }
@@ -259,7 +270,7 @@ namespace Lykke.Service.Regulation.Client
         /// <returns>The list of client regulations.</returns>
         public async Task<IEnumerable<ClientRegulationModel>> GetClientRegulationsByRegulationIdAsync(string regulationId)
         {
-            object result = await _service.GetClientRegulationsByRegulationIdAsync(regulationId);
+            object result = await _service.ClientRegulationGetByRegulationIdAsync(regulationId);
 
             if (result is IEnumerable<AutorestClient.Models.ClientRegulationModel> regulations)
                 return regulations.Select(o => o.ToModel());
@@ -278,7 +289,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task<IEnumerable<ClientRegulationModel>> GetActiveClientRegulationsByClientIdAsync(string clientId)
         {
             IEnumerable<AutorestClient.Models.ClientRegulationModel> regulations
-                = await _service.GetActiveClientRegulationsByClientIdAsync(clientId);
+                = await _service.ClientRegulationGetActiveByClientIdAsync(clientId);
 
             return regulations.Select(o => o.ToModel());
         }
@@ -291,7 +302,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task<IEnumerable<ClientRegulationModel>> GetAvailableClientRegulationsByClientIdAsync(string clientId)
         {
             IEnumerable<AutorestClient.Models.ClientRegulationModel> regulations
-                = await _service.GetAvailableClientRegulationsByClientIdAsync(clientId);
+                = await _service.ClientRegulationGetAvailableByClientIdAsync(clientId);
 
             return regulations.Select(o => o.ToModel());
         }
@@ -305,13 +316,28 @@ namespace Lykke.Service.Regulation.Client
         public async Task AddClientRegulationAsync(ClientRegulationModel model)
         {
             ErrorResponse errorResponse =
-                await _service.AddClientRegulationAsync(
+                await _service.ClientRegulationAddAsync(
                     new NewClientRegulationModel
                     {
                         ClientId = model.ClientId,
                         RegulationId = model.RegulationId,
                         Active = model.Active
                     });
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Removes existing client regulations and adds new one.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task SetClientRegulationAsync(string clientId, string regulationId)
+        {
+            ErrorResponse errorResponse = await _service.ClientRegulationSetAsync(clientId, regulationId);
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
@@ -327,7 +353,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task SetDefaultClientRegulationsAsync(string clientId, string country)
         {
             ErrorResponse errorResponse =
-                await _service.SetDefaultClientRegulationsAsync(clientId, country);
+                await _service.ClientRegulationSetDefaultAsync(clientId, country);
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
@@ -344,7 +370,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task UpdateClientRegulationKycAsync(string clientId, string regulationId, bool active)
         {
             ErrorResponse errorResponse =
-                await _service.UpdateClientRegulationKycAsync(clientId, regulationId, active);
+                await _service.ClientRegulationUpdateKycAsync(clientId, regulationId, active);
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
@@ -360,7 +386,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task ActivateClientRegulationAsync(string clientId, string regulationId)
         {
             ErrorResponse errorResponse =
-                await _service.ActivateClientRegulationAsync(clientId, regulationId);
+                await _service.ClientRegulationActivateAsync(clientId, regulationId);
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
@@ -376,7 +402,7 @@ namespace Lykke.Service.Regulation.Client
         public async Task DeactivateClientRegulationAsync(string clientId, string regulationId)
         {
             ErrorResponse errorResponse =
-                await _service.DeactivateClientRegulationAsync(clientId, regulationId);
+                await _service.ClientRegulationDeactivateAsync(clientId, regulationId);
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
@@ -391,10 +417,161 @@ namespace Lykke.Service.Regulation.Client
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         public async Task DeleteClientRegulationAsync(string clientId, string regulationId)
         {
-            ErrorResponse errorResponse = await _service.DeleteClientRegulationAsync(clientId, regulationId);
+            ErrorResponse errorResponse = await _service.ClientRegulationDeleteAsync(clientId, regulationId);
 
             if (errorResponse != null)
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
         }
+
+        #endregion
+
+        #region Margin regulation rules
+
+        /// <summary>
+        /// Returns margin regulation rule by specified id.
+        /// </summary>
+        /// <param name="id">The margin regulation rule id.</param>
+        /// <returns>The <see cref="MarginRegulationRuleModel"/>.</returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
+        public async Task<MarginRegulationRuleModel> GetMarginRegulationRuleByIdAsync(string id)
+        {
+            object result = await _service.MarginRegulationRuleGetByIdAsync(id);
+
+            if (result is AutorestClient.Models.MarginRegulationRuleModel regulationModel)
+                return regulationModel.ToModel();
+
+            if (result is ErrorResponse errorResponse)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+
+            throw new InvalidOperationException($"Unexpected response type: {result?.GetType()}");
+        }
+
+        /// <summary>
+        /// Returns all margin regulation rules.
+        /// </summary>
+        /// <returns>The collection of margin regulation rules</returns>
+        public async Task<IEnumerable<MarginRegulationRuleModel>> GetMarginRegulationRulesAsync()
+        {
+            IEnumerable<AutorestClient.Models.MarginRegulationRuleModel> regulations =
+                await _service.MarginRegulationRuleGetAllAsync();
+
+            return regulations.Select(o => o.ToModel());
+        }
+
+
+        /// <summary>
+        /// Adds a margin regulation rule.
+        /// </summary>
+        /// <param name="model">The model what describe a margin regulation rule.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task AddMarginRegulationRuleAsync(MarginRegulationRuleModel model)
+        {
+            ErrorResponse errorResponse =
+                await _service.MarginRegulationRuleAddAsync(
+                    new NewMarginRegulationRuleModel
+                    {
+                        Name = model.Name,
+                        RegulationId = model.RegulationId,
+                        Countries = model.Countries,
+                        Priority = model.Priority
+                    });
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Updates a margin regulation rule.
+        /// </summary>
+        /// <param name="model">The model what describes a margin regulation rule.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task UpdateMarginRegulationRuleAsync(MarginRegulationRuleModel model)
+        {
+            ErrorResponse errorResponse =
+                await _service.MarginRegulationRuleUpdateAsync(new AutorestClient.Models.MarginRegulationRuleModel
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    RegulationId = model.RegulationId,
+                    Countries = model.Countries,
+                    Priority = model.Priority
+                });
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Deletes the margin regulation rule by specified id.
+        /// </summary>
+        /// <param name="id">The margin regulation rule id.</param>
+        /// <returns></returns>
+        public async Task DeleteMarginRegulationRuleAsync(string id)
+        {
+            ErrorResponse errorResponse =
+                await _service.MarginRegulationRuleDeleteAsync(id);
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        #endregion
+
+        #region Client margin regulations
+
+        /// <summary>
+        /// Returns a client margin regulation by specified client id.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns>Client margin regulation id.</returns>
+        public async Task<string> GetClientMarginRegulationAsync(string clientId)
+        {
+            return await _service.ClientMarginRegulationGetByClientIdAsync(clientId);
+        }
+
+        /// <summary>
+        /// Adds the client margin regulation.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task AddClientMarginRegulationAsync(string clientId, string regulationId)
+        {
+            ErrorResponse errorResponse = await _service.ClientMarginRegulationAddAsync(clientId, regulationId);
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Removes existing client margin regulation and adds new one.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        public async Task SetClientMarginRegulationAsync(string clientId, string regulationId)
+        {
+            ErrorResponse errorResponse = await _service.ClientMarginRegulationSetAsync(clientId, regulationId);
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
+        /// <summary>
+        /// Deletes a client margin regulation.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns></returns>
+        public async Task DeleteClientmarginRegulationAsync(string clientId)
+        {
+            await _service.ClientMarginRegulationDeleteAsync(clientId);
+        }
+
+        #endregion
     }
 }

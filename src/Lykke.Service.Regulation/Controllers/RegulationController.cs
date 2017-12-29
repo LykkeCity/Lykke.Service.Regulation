@@ -38,7 +38,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="400">Regulation not found.</response>
         [HttpGet]
         [Route("{regulationId}")]
-        [SwaggerOperation("GetRegulation")]
+        [SwaggerOperation("RegulationGet")]
         [ProducesResponseType(typeof(RegulationModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Get(string regulationId)
@@ -68,7 +68,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <returns>The list of regulations.</returns>
         /// <response code="200">The list of regulations.</response>
         [HttpGet]
-        [SwaggerOperation("GetRegulations")]
+        [SwaggerOperation("RegulationGetAll")]
         [ProducesResponseType(typeof(IEnumerable<RegulationModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAll()
         {
@@ -88,7 +88,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="204">Regulation successfully added.</response>
         /// <response code="400">Invalid model what describe a regulation.</response>
         [HttpPost]
-        [SwaggerOperation("AddRegulation")]
+        [SwaggerOperation("RegulationAdd")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Add([FromBody] NewRegulationModel model)
@@ -127,7 +127,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="400">Can not delete regulation associated with client or welcome regulation rule or regulation not found.</response>
         [HttpDelete]
         [Route("{regulationId}")]
-        [SwaggerOperation("DeleteRegulation")]
+        [SwaggerOperation("RegulationDelete")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Delete(string regulationId)

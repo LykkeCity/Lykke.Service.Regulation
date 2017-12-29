@@ -12,26 +12,26 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
     using System.Collections.Generic;
     using System.Linq;
 
-    public partial class WelcomeRegulationRuleModel
+    public partial class NewMarginRegulationRuleModel
     {
         /// <summary>
-        /// Initializes a new instance of the WelcomeRegulationRuleModel class.
+        /// Initializes a new instance of the NewMarginRegulationRuleModel
+        /// class.
         /// </summary>
-        public WelcomeRegulationRuleModel()
+        public NewMarginRegulationRuleModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the WelcomeRegulationRuleModel class.
+        /// Initializes a new instance of the NewMarginRegulationRuleModel
+        /// class.
         /// </summary>
-        public WelcomeRegulationRuleModel(string id, string name, IList<string> countries, string regulationId, bool active, int priority)
+        public NewMarginRegulationRuleModel(string name, IList<string> countries, string regulationId, int priority)
         {
-            Id = id;
             Name = name;
             Countries = countries;
             RegulationId = regulationId;
-            Active = active;
             Priority = priority;
             CustomInit();
         }
@@ -40,11 +40,6 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// An initialization method that performs custom operations like setting defaults
         /// </summary>
         partial void CustomInit();
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "Id")]
-        public string Id { get; set; }
 
         /// <summary>
         /// </summary>
@@ -63,11 +58,6 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
 
         /// <summary>
         /// </summary>
-        [JsonProperty(PropertyName = "Active")]
-        public bool Active { get; set; }
-
-        /// <summary>
-        /// </summary>
         [JsonProperty(PropertyName = "Priority")]
         public int Priority { get; set; }
 
@@ -79,10 +69,6 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// </exception>
         public virtual void Validate()
         {
-            if (Id == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "Id");
-            }
             if (Name == null)
             {
                 throw new ValidationException(ValidationRules.CannotBeNull, "Name");

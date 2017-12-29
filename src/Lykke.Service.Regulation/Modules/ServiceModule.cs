@@ -59,6 +59,7 @@ namespace Lykke.Service.Regulation.Modules
         {
             const string regulationsTableName = "Regulations";
             const string clientRegulationsTableName = "ClientRegulations";
+            const string clientMarginRegulationsTableName = "ClientMarginRegulations";
 
             builder.Register(c => new RegulationRepository(
                     AzureTableStorage<RegulationEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
@@ -74,6 +75,16 @@ namespace Lykke.Service.Regulation.Modules
                     AzureTableStorage<WelcomeRegulationRuleEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
                         regulationsTableName, _log)))
                 .As<IWelcomeRegulationRuleRepository>();
+
+            builder.Register(c => new ClientMarginRegulationRepository(
+                    AzureTableStorage<ClientMarginRegulationEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
+                        clientMarginRegulationsTableName, _log)))
+                .As<IClientMarginRegulationRepository>();
+
+            builder.Register(c => new MarginRegulationRuleRepository(
+                    AzureTableStorage<MarginRegulationRuleEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
+                        regulationsTableName, _log)))
+                .As<IMarginRegulationRuleRepository>();
         }
 
         private void RegisterServices(ContainerBuilder builder)
@@ -86,6 +97,12 @@ namespace Lykke.Service.Regulation.Modules
 
             builder.RegisterType<RegulationService>()
                 .As<IRegulationService>();
+
+            builder.RegisterType<MarginRegulationRuleService>()
+                .As<IMarginRegulationRuleService>();
+
+            builder.RegisterType<ClientMarginRegulationService>()
+                .As<IClientMarginRegulationService>();
         }
 
         private void RegisterRabbitMqSubscribers(ContainerBuilder builder)

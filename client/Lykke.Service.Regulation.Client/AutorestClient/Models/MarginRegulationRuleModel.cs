@@ -12,26 +12,25 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
     using System.Collections.Generic;
     using System.Linq;
 
-    public partial class WelcomeRegulationRuleModel
+    public partial class MarginRegulationRuleModel
     {
         /// <summary>
-        /// Initializes a new instance of the WelcomeRegulationRuleModel class.
+        /// Initializes a new instance of the MarginRegulationRuleModel class.
         /// </summary>
-        public WelcomeRegulationRuleModel()
+        public MarginRegulationRuleModel()
         {
             CustomInit();
         }
 
         /// <summary>
-        /// Initializes a new instance of the WelcomeRegulationRuleModel class.
+        /// Initializes a new instance of the MarginRegulationRuleModel class.
         /// </summary>
-        public WelcomeRegulationRuleModel(string id, string name, IList<string> countries, string regulationId, bool active, int priority)
+        public MarginRegulationRuleModel(string id, string name, IList<string> countries, string regulationId, int priority)
         {
             Id = id;
             Name = name;
             Countries = countries;
             RegulationId = regulationId;
-            Active = active;
             Priority = priority;
             CustomInit();
         }
@@ -60,11 +59,6 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
         /// </summary>
         [JsonProperty(PropertyName = "RegulationId")]
         public string RegulationId { get; set; }
-
-        /// <summary>
-        /// </summary>
-        [JsonProperty(PropertyName = "Active")]
-        public bool Active { get; set; }
 
         /// <summary>
         /// </summary>
