@@ -18,6 +18,151 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
     public static partial class RegulationAPIExtensions
     {
             /// <summary>
+            /// Returns a client margin regulation by specified client id.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            public static string ClientMarginRegulationGetByClientId(this IRegulationAPI operations, string clientId)
+            {
+                return operations.ClientMarginRegulationGetByClientIdAsync(clientId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Returns a client margin regulation by specified client id.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<string> ClientMarginRegulationGetByClientIdAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.ClientMarginRegulationGetByClientIdWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Deletes a client margin regulation.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            public static void ClientMarginRegulationDelete(this IRegulationAPI operations, string clientId)
+            {
+                operations.ClientMarginRegulationDeleteAsync(clientId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Deletes a client margin regulation.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task ClientMarginRegulationDeleteAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                (await operations.ClientMarginRegulationDeleteWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false)).Dispose();
+            }
+
+            /// <summary>
+            /// Removes existing client margin regulation and adds new one.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='regulationId'>
+            /// The regulation id.
+            /// </param>
+            public static ErrorResponse ClientMarginRegulationSet(this IRegulationAPI operations, string clientId, string regulationId)
+            {
+                return operations.ClientMarginRegulationSetAsync(clientId, regulationId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Removes existing client margin regulation and adds new one.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='regulationId'>
+            /// The regulation id.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<ErrorResponse> ClientMarginRegulationSetAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.ClientMarginRegulationSetWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Adds the client margin regulation.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='regulationId'>
+            /// The regulation id.
+            /// </param>
+            public static ErrorResponse ClientMarginRegulationAdd(this IRegulationAPI operations, string clientId, string regulationId)
+            {
+                return operations.ClientMarginRegulationAddAsync(clientId, regulationId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Adds the client margin regulation.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='regulationId'>
+            /// The regulation id.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<ErrorResponse> ClientMarginRegulationAddAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.ClientMarginRegulationAddWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Returns a client regulation by specified client id and regulation id.
             /// </summary>
             /// <param name='operations'>
@@ -29,9 +174,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='regulationId'>
             /// The regulation id.
             /// </param>
-            public static object GetClientRegulation(this IRegulationAPI operations, string clientId, string regulationId)
+            public static object ClientRegulationGet(this IRegulationAPI operations, string clientId, string regulationId)
             {
-                return operations.GetClientRegulationAsync(clientId, regulationId).GetAwaiter().GetResult();
+                return operations.ClientRegulationGetAsync(clientId, regulationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -49,9 +194,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetClientRegulationAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> ClientRegulationGetAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetClientRegulationWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationGetWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -69,9 +214,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='regulationId'>
             /// The id of regulation to delete.
             /// </param>
-            public static ErrorResponse DeleteClientRegulation(this IRegulationAPI operations, string clientId, string regulationId)
+            public static ErrorResponse ClientRegulationDelete(this IRegulationAPI operations, string clientId, string regulationId)
             {
-                return operations.DeleteClientRegulationAsync(clientId, regulationId).GetAwaiter().GetResult();
+                return operations.ClientRegulationDeleteAsync(clientId, regulationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -89,9 +234,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> DeleteClientRegulationAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> ClientRegulationDeleteAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.DeleteClientRegulationWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationDeleteWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -106,9 +251,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='clientId'>
             /// The client id.
             /// </param>
-            public static IList<ClientRegulationModel> GetClientRegulationsByClientId(this IRegulationAPI operations, string clientId)
+            public static IList<ClientRegulationModel> ClientRegulationGetByClientId(this IRegulationAPI operations, string clientId)
             {
-                return operations.GetClientRegulationsByClientIdAsync(clientId).GetAwaiter().GetResult();
+                return operations.ClientRegulationGetByClientIdAsync(clientId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -123,9 +268,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<ClientRegulationModel>> GetClientRegulationsByClientIdAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<IList<ClientRegulationModel>> ClientRegulationGetByClientIdAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetClientRegulationsByClientIdWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationGetByClientIdWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -140,9 +285,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='regulationId'>
             /// The regulation id.
             /// </param>
-            public static object GetClientRegulationsByRegulationId(this IRegulationAPI operations, string regulationId)
+            public static object ClientRegulationGetByRegulationId(this IRegulationAPI operations, string regulationId)
             {
-                return operations.GetClientRegulationsByRegulationIdAsync(regulationId).GetAwaiter().GetResult();
+                return operations.ClientRegulationGetByRegulationIdAsync(regulationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -157,9 +302,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetClientRegulationsByRegulationIdAsync(this IRegulationAPI operations, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> ClientRegulationGetByRegulationIdAsync(this IRegulationAPI operations, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetClientRegulationsByRegulationIdWithHttpMessagesAsync(regulationId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationGetByRegulationIdWithHttpMessagesAsync(regulationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -174,9 +319,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='clientId'>
             /// The client id.
             /// </param>
-            public static IList<ClientRegulationModel> GetActiveClientRegulationsByClientId(this IRegulationAPI operations, string clientId)
+            public static IList<ClientRegulationModel> ClientRegulationGetActiveByClientId(this IRegulationAPI operations, string clientId)
             {
-                return operations.GetActiveClientRegulationsByClientIdAsync(clientId).GetAwaiter().GetResult();
+                return operations.ClientRegulationGetActiveByClientIdAsync(clientId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -191,9 +336,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<ClientRegulationModel>> GetActiveClientRegulationsByClientIdAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<IList<ClientRegulationModel>> ClientRegulationGetActiveByClientIdAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetActiveClientRegulationsByClientIdWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationGetActiveByClientIdWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -208,9 +353,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='clientId'>
             /// The client id.
             /// </param>
-            public static IList<ClientRegulationModel> GetAvailableClientRegulationsByClientId(this IRegulationAPI operations, string clientId)
+            public static IList<ClientRegulationModel> ClientRegulationGetAvailableByClientId(this IRegulationAPI operations, string clientId)
             {
-                return operations.GetAvailableClientRegulationsByClientIdAsync(clientId).GetAwaiter().GetResult();
+                return operations.ClientRegulationGetAvailableByClientIdAsync(clientId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -225,9 +370,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<ClientRegulationModel>> GetAvailableClientRegulationsByClientIdAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<IList<ClientRegulationModel>> ClientRegulationGetAvailableByClientIdAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetAvailableClientRegulationsByClientIdWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationGetAvailableByClientIdWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -242,9 +387,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='model'>
             /// The model that describe a client regulation.
             /// </param>
-            public static ErrorResponse AddClientRegulation(this IRegulationAPI operations, NewClientRegulationModel model = default(NewClientRegulationModel))
+            public static ErrorResponse ClientRegulationAdd(this IRegulationAPI operations, NewClientRegulationModel model = default(NewClientRegulationModel))
             {
-                return operations.AddClientRegulationAsync(model).GetAwaiter().GetResult();
+                return operations.ClientRegulationAddAsync(model).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -259,9 +404,49 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> AddClientRegulationAsync(this IRegulationAPI operations, NewClientRegulationModel model = default(NewClientRegulationModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> ClientRegulationAddAsync(this IRegulationAPI operations, NewClientRegulationModel model = default(NewClientRegulationModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.AddClientRegulationWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationAddWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Removes existing client regulationы and adds new one.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='regulationId'>
+            /// The regulation id.
+            /// </param>
+            public static ErrorResponse ClientRegulationSet(this IRegulationAPI operations, string clientId, string regulationId)
+            {
+                return operations.ClientRegulationSetAsync(clientId, regulationId).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Removes existing client regulationы and adds new one.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='regulationId'>
+            /// The regulation id.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<ErrorResponse> ClientRegulationSetAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.ClientRegulationSetWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -279,9 +464,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='country'>
             /// The country name.
             /// </param>
-            public static ErrorResponse SetDefaultClientRegulations(this IRegulationAPI operations, string clientId, string country)
+            public static ErrorResponse ClientRegulationSetDefault(this IRegulationAPI operations, string clientId, string country)
             {
-                return operations.SetDefaultClientRegulationsAsync(clientId, country).GetAwaiter().GetResult();
+                return operations.ClientRegulationSetDefaultAsync(clientId, country).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -299,9 +484,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> SetDefaultClientRegulationsAsync(this IRegulationAPI operations, string clientId, string country, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> ClientRegulationSetDefaultAsync(this IRegulationAPI operations, string clientId, string country, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.SetDefaultClientRegulationsWithHttpMessagesAsync(clientId, country, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationSetDefaultWithHttpMessagesAsync(clientId, country, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -322,9 +507,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='active'>
             /// The client regulation KYC status.
             /// </param>
-            public static ErrorResponse UpdateClientRegulationKyc(this IRegulationAPI operations, string clientId, string regulationId, bool active)
+            public static ErrorResponse ClientRegulationUpdateKyc(this IRegulationAPI operations, string clientId, string regulationId, bool active)
             {
-                return operations.UpdateClientRegulationKycAsync(clientId, regulationId, active).GetAwaiter().GetResult();
+                return operations.ClientRegulationUpdateKycAsync(clientId, regulationId, active).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -345,9 +530,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> UpdateClientRegulationKycAsync(this IRegulationAPI operations, string clientId, string regulationId, bool active, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> ClientRegulationUpdateKycAsync(this IRegulationAPI operations, string clientId, string regulationId, bool active, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.UpdateClientRegulationKycWithHttpMessagesAsync(clientId, regulationId, active, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationUpdateKycWithHttpMessagesAsync(clientId, regulationId, active, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -365,9 +550,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='regulationId'>
             /// The regulation id.
             /// </param>
-            public static ErrorResponse ActivateClientRegulation(this IRegulationAPI operations, string clientId, string regulationId)
+            public static ErrorResponse ClientRegulationActivate(this IRegulationAPI operations, string clientId, string regulationId)
             {
-                return operations.ActivateClientRegulationAsync(clientId, regulationId).GetAwaiter().GetResult();
+                return operations.ClientRegulationActivateAsync(clientId, regulationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -385,9 +570,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> ActivateClientRegulationAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> ClientRegulationActivateAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.ActivateClientRegulationWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationActivateWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -405,9 +590,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='regulationId'>
             /// The regulation id.
             /// </param>
-            public static ErrorResponse DeactivateClientRegulation(this IRegulationAPI operations, string clientId, string regulationId)
+            public static ErrorResponse ClientRegulationDeactivate(this IRegulationAPI operations, string clientId, string regulationId)
             {
-                return operations.DeactivateClientRegulationAsync(clientId, regulationId).GetAwaiter().GetResult();
+                return operations.ClientRegulationDeactivateAsync(clientId, regulationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -425,9 +610,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> DeactivateClientRegulationAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> ClientRegulationDeactivateAsync(this IRegulationAPI operations, string clientId, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.DeactivateClientRegulationWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.ClientRegulationDeactivateWithHttpMessagesAsync(clientId, regulationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -462,6 +647,168 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             }
 
             /// <summary>
+            /// Returns margin regulation rule by specified id.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='id'>
+            /// </param>
+            public static object MarginRegulationRuleGetById(this IRegulationAPI operations, string id)
+            {
+                return operations.MarginRegulationRuleGetByIdAsync(id).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Returns margin regulation rule by specified id.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='id'>
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<object> MarginRegulationRuleGetByIdAsync(this IRegulationAPI operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.MarginRegulationRuleGetByIdWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Deletes the margin regulation rule by specified id.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='id'>
+            /// The margin regulation rule id.
+            /// </param>
+            public static ErrorResponse MarginRegulationRuleDelete(this IRegulationAPI operations, string id)
+            {
+                return operations.MarginRegulationRuleDeleteAsync(id).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Deletes the margin regulation rule by specified id.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='id'>
+            /// The margin regulation rule id.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<ErrorResponse> MarginRegulationRuleDeleteAsync(this IRegulationAPI operations, string id, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.MarginRegulationRuleDeleteWithHttpMessagesAsync(id, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Returns all margin regulation rules.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            public static IList<MarginRegulationRuleModel> MarginRegulationRuleGetAll(this IRegulationAPI operations)
+            {
+                return operations.MarginRegulationRuleGetAllAsync().GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Returns all margin regulation rules.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<IList<MarginRegulationRuleModel>> MarginRegulationRuleGetAllAsync(this IRegulationAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.MarginRegulationRuleGetAllWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Updates a margin regulation rule.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='model'>
+            /// The model what describes a margin regulation rule.
+            /// </param>
+            public static ErrorResponse MarginRegulationRuleUpdate(this IRegulationAPI operations, MarginRegulationRuleModel model = default(MarginRegulationRuleModel))
+            {
+                return operations.MarginRegulationRuleUpdateAsync(model).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Updates a margin regulation rule.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='model'>
+            /// The model what describes a margin regulation rule.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<ErrorResponse> MarginRegulationRuleUpdateAsync(this IRegulationAPI operations, MarginRegulationRuleModel model = default(MarginRegulationRuleModel), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.MarginRegulationRuleUpdateWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
+            /// Adds a margin regulation rule.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='model'>
+            /// The model what describe a margin regulation rule.
+            /// </param>
+            public static ErrorResponse MarginRegulationRuleAdd(this IRegulationAPI operations, NewMarginRegulationRuleModel model = default(NewMarginRegulationRuleModel))
+            {
+                return operations.MarginRegulationRuleAddAsync(model).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Adds a margin regulation rule.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='model'>
+            /// The model what describe a margin regulation rule.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<ErrorResponse> MarginRegulationRuleAddAsync(this IRegulationAPI operations, NewMarginRegulationRuleModel model = default(NewMarginRegulationRuleModel), CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.MarginRegulationRuleAddWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Returns a regulation details by specified id.
             /// </summary>
             /// <param name='operations'>
@@ -470,9 +817,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='regulationId'>
             /// The regulation id.
             /// </param>
-            public static object GetRegulation(this IRegulationAPI operations, string regulationId)
+            public static object RegulationGet(this IRegulationAPI operations, string regulationId)
             {
-                return operations.GetRegulationAsync(regulationId).GetAwaiter().GetResult();
+                return operations.RegulationGetAsync(regulationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -487,9 +834,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetRegulationAsync(this IRegulationAPI operations, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> RegulationGetAsync(this IRegulationAPI operations, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetRegulationWithHttpMessagesAsync(regulationId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.RegulationGetWithHttpMessagesAsync(regulationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -504,9 +851,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='regulationId'>
             /// The id of regulation to delete.
             /// </param>
-            public static ErrorResponse DeleteRegulation(this IRegulationAPI operations, string regulationId)
+            public static ErrorResponse RegulationDelete(this IRegulationAPI operations, string regulationId)
             {
-                return operations.DeleteRegulationAsync(regulationId).GetAwaiter().GetResult();
+                return operations.RegulationDeleteAsync(regulationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -521,9 +868,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> DeleteRegulationAsync(this IRegulationAPI operations, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> RegulationDeleteAsync(this IRegulationAPI operations, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.DeleteRegulationWithHttpMessagesAsync(regulationId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.RegulationDeleteWithHttpMessagesAsync(regulationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -571,9 +918,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static IList<RegulationModel> GetRegulations(this IRegulationAPI operations)
+            public static IList<RegulationModel> RegulationGetAll(this IRegulationAPI operations)
             {
-                return operations.GetRegulationsAsync().GetAwaiter().GetResult();
+                return operations.RegulationGetAllAsync().GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -585,9 +932,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<RegulationModel>> GetRegulationsAsync(this IRegulationAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<IList<RegulationModel>> RegulationGetAllAsync(this IRegulationAPI operations, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetRegulationsWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.RegulationGetAllWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -636,9 +983,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='model'>
             /// The model that describe a regulation.
             /// </param>
-            public static ErrorResponse AddRegulation(this IRegulationAPI operations, NewRegulationModel model = default(NewRegulationModel))
+            public static ErrorResponse RegulationAdd(this IRegulationAPI operations, NewRegulationModel model = default(NewRegulationModel))
             {
-                return operations.AddRegulationAsync(model).GetAwaiter().GetResult();
+                return operations.RegulationAddAsync(model).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -653,9 +1000,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> AddRegulationAsync(this IRegulationAPI operations, NewRegulationModel model = default(NewRegulationModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> RegulationAddAsync(this IRegulationAPI operations, NewRegulationModel model = default(NewRegulationModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.AddRegulationWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.RegulationAddWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -669,9 +1016,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// </param>
             /// <param name='welcomeRegulationRuleId'>
             /// </param>
-            public static object GetWelcomeRegulationRuleById(this IRegulationAPI operations, string welcomeRegulationRuleId)
+            public static object WelcomeRegulationRuleGetById(this IRegulationAPI operations, string welcomeRegulationRuleId)
             {
-                return operations.GetWelcomeRegulationRuleByIdAsync(welcomeRegulationRuleId).GetAwaiter().GetResult();
+                return operations.WelcomeRegulationRuleGetByIdAsync(welcomeRegulationRuleId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -685,9 +1032,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetWelcomeRegulationRuleByIdAsync(this IRegulationAPI operations, string welcomeRegulationRuleId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> WelcomeRegulationRuleGetByIdAsync(this IRegulationAPI operations, string welcomeRegulationRuleId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetWelcomeRegulationRuleByIdWithHttpMessagesAsync(welcomeRegulationRuleId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.WelcomeRegulationRuleGetByIdWithHttpMessagesAsync(welcomeRegulationRuleId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -699,9 +1046,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='operations'>
             /// The operations group for this extension method.
             /// </param>
-            public static IList<WelcomeRegulationRuleModel> GetWelcomeRegulationRules(this IRegulationAPI operations)
+            public static IList<WelcomeRegulationRuleModel> WelcomeRegulationRuleGetAll(this IRegulationAPI operations)
             {
-                return operations.GetWelcomeRegulationRulesAsync().GetAwaiter().GetResult();
+                return operations.WelcomeRegulationRuleGetAllAsync().GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -713,9 +1060,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesAsync(this IRegulationAPI operations, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<IList<WelcomeRegulationRuleModel>> WelcomeRegulationRuleGetAllAsync(this IRegulationAPI operations, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetWelcomeRegulationRulesWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.WelcomeRegulationRuleGetAllWithHttpMessagesAsync(null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -730,9 +1077,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='model'>
             /// The model that describe a welcome regulation rule.
             /// </param>
-            public static ErrorResponse AddWelcomeRegulationRule(this IRegulationAPI operations, NewWelcomeRegulationRuleModel model = default(NewWelcomeRegulationRuleModel))
+            public static ErrorResponse WelcomeRegulationRuleAdd(this IRegulationAPI operations, NewWelcomeRegulationRuleModel model = default(NewWelcomeRegulationRuleModel))
             {
-                return operations.AddWelcomeRegulationRuleAsync(model).GetAwaiter().GetResult();
+                return operations.WelcomeRegulationRuleAddAsync(model).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -747,9 +1094,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> AddWelcomeRegulationRuleAsync(this IRegulationAPI operations, NewWelcomeRegulationRuleModel model = default(NewWelcomeRegulationRuleModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> WelcomeRegulationRuleAddAsync(this IRegulationAPI operations, NewWelcomeRegulationRuleModel model = default(NewWelcomeRegulationRuleModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.AddWelcomeRegulationRuleWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.WelcomeRegulationRuleAddWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -764,9 +1111,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='country'>
             /// The country name.
             /// </param>
-            public static IList<WelcomeRegulationRuleModel> GetWelcomeRegulationRulesByCountry(this IRegulationAPI operations, string country)
+            public static IList<WelcomeRegulationRuleModel> WelcomeRegulationRuleGetByCountry(this IRegulationAPI operations, string country)
             {
-                return operations.GetWelcomeRegulationRulesByCountryAsync(country).GetAwaiter().GetResult();
+                return operations.WelcomeRegulationRuleGetByCountryAsync(country).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -781,9 +1128,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<IList<WelcomeRegulationRuleModel>> GetWelcomeRegulationRulesByCountryAsync(this IRegulationAPI operations, string country, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<IList<WelcomeRegulationRuleModel>> WelcomeRegulationRuleGetByCountryAsync(this IRegulationAPI operations, string country, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetWelcomeRegulationRulesByCountryWithHttpMessagesAsync(country, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.WelcomeRegulationRuleGetByCountryWithHttpMessagesAsync(country, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -798,9 +1145,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='regulationId'>
             /// The regulation id.
             /// </param>
-            public static object GetWelcomeRegulationRulesByRegulationId(this IRegulationAPI operations, string regulationId)
+            public static object WelcomeRegulationRuleGetByRegulationId(this IRegulationAPI operations, string regulationId)
             {
-                return operations.GetWelcomeRegulationRulesByRegulationIdAsync(regulationId).GetAwaiter().GetResult();
+                return operations.WelcomeRegulationRuleGetByRegulationIdAsync(regulationId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -815,9 +1162,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<object> GetWelcomeRegulationRulesByRegulationIdAsync(this IRegulationAPI operations, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> WelcomeRegulationRuleGetByRegulationIdAsync(this IRegulationAPI operations, string regulationId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.GetWelcomeRegulationRulesByRegulationIdWithHttpMessagesAsync(regulationId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.WelcomeRegulationRuleGetByRegulationIdWithHttpMessagesAsync(regulationId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -832,9 +1179,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='model'>
             /// The model that describe a welcome regulation rule.
             /// </param>
-            public static ErrorResponse UpdateWelcomeRegulationRule(this IRegulationAPI operations, WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel))
+            public static ErrorResponse WelcomeRegulationRuleUpdate(this IRegulationAPI operations, WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel))
             {
-                return operations.UpdateWelcomeRegulationRuleAsync(model).GetAwaiter().GetResult();
+                return operations.WelcomeRegulationRuleUpdateAsync(model).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -849,9 +1196,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> UpdateWelcomeRegulationRuleAsync(this IRegulationAPI operations, WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel), CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> WelcomeRegulationRuleUpdateAsync(this IRegulationAPI operations, WelcomeRegulationRuleModel model = default(WelcomeRegulationRuleModel), CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.UpdateWelcomeRegulationRuleWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.WelcomeRegulationRuleUpdateWithHttpMessagesAsync(model, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }
@@ -866,9 +1213,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='regulationRuleId'>
             /// The welcome regulation rule id.
             /// </param>
-            public static ErrorResponse DeleteWelcomeRegulationRule(this IRegulationAPI operations, string regulationRuleId)
+            public static ErrorResponse WelcomeRegulationRuleDelete(this IRegulationAPI operations, string regulationRuleId)
             {
-                return operations.DeleteWelcomeRegulationRuleAsync(regulationRuleId).GetAwaiter().GetResult();
+                return operations.WelcomeRegulationRuleDeleteAsync(regulationRuleId).GetAwaiter().GetResult();
             }
 
             /// <summary>
@@ -883,9 +1230,9 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<ErrorResponse> DeleteWelcomeRegulationRuleAsync(this IRegulationAPI operations, string regulationRuleId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<ErrorResponse> WelcomeRegulationRuleDeleteAsync(this IRegulationAPI operations, string regulationRuleId, CancellationToken cancellationToken = default(CancellationToken))
             {
-                using (var _result = await operations.DeleteWelcomeRegulationRuleWithHttpMessagesAsync(regulationRuleId, null, cancellationToken).ConfigureAwait(false))
+                using (var _result = await operations.WelcomeRegulationRuleDeleteWithHttpMessagesAsync(regulationRuleId, null, cancellationToken).ConfigureAwait(false))
                 {
                     return _result.Body;
                 }

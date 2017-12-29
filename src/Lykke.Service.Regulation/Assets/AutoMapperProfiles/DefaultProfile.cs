@@ -20,6 +20,11 @@ namespace Lykke.Service.Regulation.Assets.AutoMapperProfiles
             CreateMap<NewClientRegulationModel, ClientRegulation>()
                 .ForMember(model => model.Id, option => option.Ignore())
                 .ForMember(model => model.Kyc, option => option.Ignore());
+
+            CreateMap<IMarginRegulationRule, MarginRegulationRuleModel>();
+            CreateMap<MarginRegulationRuleModel, MarginRegulationRule>();
+            CreateMap<NewMarginRegulationRuleModel, MarginRegulationRule>()
+                .ForMember(model => model.Id, option => option.Ignore());
         }
 
         public override string ProfileName => "Default profile";

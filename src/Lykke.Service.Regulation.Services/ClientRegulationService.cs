@@ -93,7 +93,40 @@ namespace Lykke.Service.Regulation.Services
             await _log.WriteInfoAsync(nameof(ClientRegulationService), nameof(AddAsync),
                 clientRegulation.ClientId, $"Regulation '{clientRegulation.RegulationId}' added for client.");
         }
-        
+
+        public async Task SetAsync(string clientId, string regulationId)
+        {
+            IRegulation result = await _regulationRepository.GetAsync(regulationId);
+
+            if (result == null)
+            {
+                throw new ServiceException("Regulation not found.");
+            }
+
+            IEnumerable<IClientRegulation> clientRegulations =
+                await _clientRegulationRepository.GetByClientIdAsync(clientId);
+
+            foreach (IClientRegulation regulation in clientRegulations)
+            {
+                await _clientRegulationRepository.DeleteAsync(clientId, regulation.RegulationId);
+            }
+
+            var clientRegulation = new ClientRegulation
+            {
+                ClientId = clientId,
+                RegulationId = regulationId,
+                Active = true,
+                Kyc = false
+            };
+
+            await _clientRegulationRepository.AddAsync(clientRegulation);
+
+            await PublishOnChangedAsync(clientId);
+
+            await _log.WriteInfoAsync(nameof(ClientRegulationService), nameof(SetAsync),
+                clientId, $"Client regulations were replaced with '{regulationId}'.");
+        }
+
         public async Task SetDefaultAsync(string clientId, string country)
         {
             IEnumerable<IClientRegulation> clientRegulations =

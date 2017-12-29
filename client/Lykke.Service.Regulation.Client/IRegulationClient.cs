@@ -153,6 +153,15 @@ namespace Lykke.Service.Regulation.Client
         Task AddClientRegulationAsync(ClientRegulationModel model);
 
         /// <summary>
+        /// Removes existing client regulations and adds new one.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        Task SetClientRegulationAsync(string clientId, string regulationId);
+
+        /// <summary>
         /// Adds default regulations to client associated with country.
         /// </summary>
         /// <param name="clientId">The client id.</param>
@@ -197,5 +206,75 @@ namespace Lykke.Service.Regulation.Client
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         Task DeleteClientRegulationAsync(string clientId, string regulationId);
+
+        /// <summary>
+        /// Returns margin regulation rule by specified id.
+        /// </summary>
+        /// <param name="id">The margin regulation rule id.</param>
+        /// <returns>The <see cref="MarginRegulationRuleModel"/>.</returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
+        Task<MarginRegulationRuleModel> GetMarginRegulationRuleByIdAsync(string id);
+
+        /// <summary>
+        /// Returns all margin regulation rules.
+        /// </summary>
+        /// <returns>The collection of margin regulation rules</returns>
+        Task<IEnumerable<MarginRegulationRuleModel>> GetMarginRegulationRulesAsync();
+
+        /// <summary>
+        /// Adds a margin regulation rule.
+        /// </summary>
+        /// <param name="model">The model what describe a margin regulation rule.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        Task AddMarginRegulationRuleAsync(MarginRegulationRuleModel model);
+
+        /// <summary>
+        /// Updates a margin regulation rule.
+        /// </summary>
+        /// <param name="model">The model what describes a margin regulation rule.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        Task UpdateMarginRegulationRuleAsync(MarginRegulationRuleModel model);
+
+        /// <summary>
+        /// Deletes the margin regulation rule by specified id.
+        /// </summary>
+        /// <param name="id">The margin regulation rule id.</param>
+        /// <returns></returns>
+        Task DeleteMarginRegulationRuleAsync(string id);
+
+        /// <summary>
+        /// Returns a client margin regulation by specified client id.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns>Client margin regulation id.</returns>
+        Task<string> GetClientMarginRegulationAsync(string clientId);
+
+        /// <summary>
+        /// Adds the client margin regulation.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        Task AddClientMarginRegulationAsync(string clientId, string regulationId);
+
+        /// <summary>
+        /// Removes existing client margin regulation and adds new one.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="regulationId">The regulation id.</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        Task SetClientMarginRegulationAsync(string clientId, string regulationId);
+
+        /// <summary>
+        /// Deletes a client margin regulation.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <returns></returns>
+        Task DeleteClientmarginRegulationAsync(string clientId);
     }
 }

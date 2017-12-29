@@ -40,5 +40,17 @@ namespace Lykke.Service.Regulation.Client
                 Priority = model.Priority
             };
         }
+
+        public static MarginRegulationRuleModel ToModel(this AutorestClient.Models.MarginRegulationRuleModel model)
+        {
+            return new MarginRegulationRuleModel
+            {
+                Id = model.Id,
+                Name = model.Name,
+                RegulationId = model.RegulationId,
+                Countries = model.Countries,
+                Priority = model.Priority
+            };
+        }
     }
 }

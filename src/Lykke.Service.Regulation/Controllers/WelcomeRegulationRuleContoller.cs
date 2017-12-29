@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -38,10 +37,10 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="400">Regulation rule with specified id not found.</response>
         [HttpGet]
         [Route("{welcomeRegulationRuleId}")]
-        [SwaggerOperation("GetWelcomeRegulationRuleById")]
+        [SwaggerOperation("WelcomeRegulationRuleGetById")]
         [ProducesResponseType(typeof(WelcomeRegulationRuleModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Get(string welcomeRegulationRuleId)
+        public async Task<IActionResult> GetById(string welcomeRegulationRuleId)
         {
             IWelcomeRegulationRule regulationRule;
 
@@ -51,7 +50,7 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(WelcomeRegulationRuleContoller), nameof(Get),
+                await _log.WriteErrorAsync(nameof(WelcomeRegulationRuleContoller), nameof(GetById),
                     $"{nameof(welcomeRegulationRuleId)}: {welcomeRegulationRuleId}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
@@ -69,7 +68,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <returns>The list of welcome regulation rules.</returns>
         /// <response code="200">The list of welcome regulation rules.</response>
         [HttpGet]
-        [SwaggerOperation("GetWelcomeRegulationRules")]
+        [SwaggerOperation("WelcomeRegulationRuleGetAll")]
         [ProducesResponseType(typeof(IEnumerable<WelcomeRegulationRuleModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAll()
         {
@@ -89,7 +88,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="200">The list of welcome regulation rules.</response>
         [HttpGet]
         [Route("country/{country}")]
-        [SwaggerOperation("GetWelcomeRegulationRulesByCountry")]
+        [SwaggerOperation("WelcomeRegulationRuleGetByCountry")]
         [ProducesResponseType(typeof(IEnumerable<WelcomeRegulationRuleModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetByCountry(string country)
         {
@@ -111,7 +110,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="400">Regulation with specified id not found.</response>
         [HttpGet]
         [Route("regulation/{regulationId}")]
-        [SwaggerOperation("GetWelcomeRegulationRulesByRegulationId")]
+        [SwaggerOperation("WelcomeRegulationRuleGetByRegulationId")]
         [ProducesResponseType(typeof(IEnumerable<WelcomeRegulationRuleModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> GetByRegulationId(string regulationId)
@@ -143,7 +142,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="204">Welcome regulation rule successfully added.</response>
         /// <response code="400">Invalid model that describe a welcome regulation rule or specified regulation not found.</response>
         [HttpPost]
-        [SwaggerOperation("AddWelcomeRegulationRule")]
+        [SwaggerOperation("WelcomeRegulationRuleAdd")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Add([FromBody] NewWelcomeRegulationRuleModel model)
@@ -181,7 +180,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="400">Invalid model that describe a welcome regulation rule or regulation rule not found or specified regulation not found.</response>
         [HttpPut]
         [Route("update")]
-        [SwaggerOperation("UpdateWelcomeRegulationRule")]
+        [SwaggerOperation("WelcomeRegulationRuleUpdate")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Update([FromBody] WelcomeRegulationRuleModel model)
@@ -219,7 +218,7 @@ namespace Lykke.Service.Regulation.Controllers
         /// <response code="400">Regulation rule not found.</response>
         [HttpDelete]
         [Route("{regulationRuleId}")]
-        [SwaggerOperation("DeleteWelcomeRegulationRule")]
+        [SwaggerOperation("WelcomeRegulationRuleDelete")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Delete(string regulationRuleId)
