@@ -26,7 +26,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='clientId'>
             /// The client id.
             /// </param>
-            public static string ClientMarginRegulationGetByClientId(this IRegulationAPI operations, string clientId)
+            public static object ClientMarginRegulationGetByClientId(this IRegulationAPI operations, string clientId)
             {
                 return operations.ClientMarginRegulationGetByClientIdAsync(clientId).GetAwaiter().GetResult();
             }
@@ -43,7 +43,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             /// <param name='cancellationToken'>
             /// The cancellation token.
             /// </param>
-            public static async Task<string> ClientMarginRegulationGetByClientIdAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
+            public static async Task<object> ClientMarginRegulationGetByClientIdAsync(this IRegulationAPI operations, string clientId, CancellationToken cancellationToken = default(CancellationToken))
             {
                 using (var _result = await operations.ClientMarginRegulationGetByClientIdWithHttpMessagesAsync(clientId, null, cancellationToken).ConfigureAwait(false))
                 {
@@ -413,7 +413,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             }
 
             /// <summary>
-            /// Removes existing client regulationы and adds new one.
+            /// Removes existing client regulations and adds new one.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.
@@ -430,7 +430,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             }
 
             /// <summary>
-            /// Removes existing client regulationы and adds new one.
+            /// Removes existing client regulations and adds new one.
             /// </summary>
             /// <param name='operations'>
             /// The operations group for this extension method.

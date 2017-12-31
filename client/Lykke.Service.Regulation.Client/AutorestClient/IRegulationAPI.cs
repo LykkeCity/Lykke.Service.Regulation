@@ -46,7 +46,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         /// <param name='cancellationToken'>
         /// The cancellation token.
         /// </param>
-        Task<HttpOperationResponse<string>> ClientMarginRegulationGetByClientIdWithHttpMessagesAsync(string clientId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<HttpOperationResponse<object>> ClientMarginRegulationGetByClientIdWithHttpMessagesAsync(string clientId, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Deletes a client margin regulation.
@@ -202,7 +202,7 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         Task<HttpOperationResponse<ErrorResponse>> ClientRegulationAddWithHttpMessagesAsync(NewClientRegulationModel model = default(NewClientRegulationModel), Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Removes existing client regulationы and adds new one.
+        /// Removes existing client regulations and adds new one.
         /// </summary>
         /// <param name='clientId'>
         /// The client id.

@@ -554,9 +554,19 @@ namespace Lykke.Service.Regulation.Client
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <returns>Client margin regulation id.</returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
         public async Task<string> GetClientMarginRegulationAsync(string clientId)
         {
-            return await _service.ClientMarginRegulationGetByClientIdAsync(clientId);
+            object result = await _service.ClientMarginRegulationGetByClientIdAsync(clientId);
+
+            if (result is ClientMarginRegulationModel model)
+                return model.RegulationId;
+
+            if (result is ErrorResponse errorResponse)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+
+            throw new InvalidOperationException($"Unexpected response type: {result?.GetType()}");
         }
 
         /// <summary>
