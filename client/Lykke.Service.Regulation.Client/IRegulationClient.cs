@@ -235,6 +235,8 @@ namespace Lykke.Service.Regulation.Client
         /// </summary>
         /// <param name="clientId">The client id.</param>
         /// <returns>Client margin regulation id.</returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        /// <exception cref="InvalidOperationException">Thrown if an unexpected response received.</exception>
         Task<string> GetClientMarginRegulationAsync(string clientId);
 
         /// <summary>

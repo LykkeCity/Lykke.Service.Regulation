@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using Common.Log;
 using Lykke.Common.Extensions;
 using Lykke.Service.Regulation.Core.Domain;
@@ -34,15 +35,22 @@ namespace Lykke.Service.Regulation.Controllers
         /// <param name="clientId">The client id.</param>
         /// <returns>The client margin regulation.</returns>
         /// <response code="200">The client margin regulation.</response>
+        /// <response code="404">Client margin regulation not found.</response>
         [HttpGet]
         [Route("client/{clientId}")]
         [SwaggerOperation("ClientMarginRegulationGetByClientId")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ClientMarginRegulationModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetByClientIdAsync(string clientId)
         {
             IClientMarginRegulation clientMarginRegulation = await _clientMarginRegulationService.GetAsync(clientId);
 
-            return Ok(clientMarginRegulation?.RegulationId);
+            if (clientMarginRegulation == null)
+                return NotFound(ErrorResponse.Create("Client margin regulation not found"));
+
+            var model = Mapper.Map<ClientMarginRegulationModel>(clientMarginRegulation);
+
+            return Ok(model);
         }
 
         /// <summary>
