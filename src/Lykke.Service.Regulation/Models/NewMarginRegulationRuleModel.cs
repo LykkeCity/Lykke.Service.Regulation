@@ -9,6 +9,7 @@ namespace Lykke.Service.Regulation.Models
         public string Name { get; set; }
 
         [Required]
+        [MinLength(1)]
         public List<string> Countries { get; set; }
 
         [Required]
