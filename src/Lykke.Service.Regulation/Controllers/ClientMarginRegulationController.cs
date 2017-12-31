@@ -40,13 +40,13 @@ namespace Lykke.Service.Regulation.Controllers
         [Route("client/{clientId}")]
         [SwaggerOperation("ClientMarginRegulationGetByClientId")]
         [ProducesResponseType(typeof(ClientMarginRegulationModel), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> GetByClientIdAsync(string clientId)
         {
             IClientMarginRegulation clientMarginRegulation = await _clientMarginRegulationService.GetAsync(clientId);
 
             if (clientMarginRegulation == null)
-                return NotFound(ErrorResponse.Create("Client margin regulation not found"));
+                return NotFound();
 
             var model = Mapper.Map<ClientMarginRegulationModel>(clientMarginRegulation);
 
