@@ -63,6 +63,30 @@ namespace Lykke.Service.Regulation.Controllers
         }
 
         /// <summary>
+        /// Returns a margin regulation details by country code using margin regulation rules.
+        /// </summary>
+        /// <param name="country">The country code.</param>
+        /// <returns>The margin regulation if exists, otherwise <c>null</c>.</returns>
+        /// <response code="200">The margin regulation.</response>
+        /// <response code="404">Margin regulation not found.</response>
+        [HttpGet]
+        [Route("country/{country}/margin")]
+        [SwaggerOperation("RegulationGetMarginByCountry")]
+        [ProducesResponseType(typeof(RegulationModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> GetMarginByCountry(string country)
+        {
+            IRegulation regulation = await _regulationService.GetMarginByCountryAsync(country);
+
+            if (regulation == null)
+                return NotFound();
+
+            var model = Mapper.Map<RegulationModel>(regulation);
+
+            return Ok(model);
+        }
+
+        /// <summary>
         /// Returns all regulations.
         /// </summary>
         /// <returns>The list of regulations.</returns>

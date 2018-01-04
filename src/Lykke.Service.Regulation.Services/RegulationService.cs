@@ -13,15 +13,18 @@ namespace Lykke.Service.Regulation.Services
         private readonly IRegulationRepository _regulationRepository;
         private readonly IClientRegulationRepository _clientRegulationRepository;
         private readonly IWelcomeRegulationRuleRepository _welcomeRegulationRuleRepository;
+        private readonly IMarginRegulationRuleRepository _marginRegulationRuleRepository;
 
         public RegulationService(
             IRegulationRepository regulationRepository,
             IClientRegulationRepository clientRegulationRepository,
-            IWelcomeRegulationRuleRepository welcomeRegulationRuleRepository)
+            IWelcomeRegulationRuleRepository welcomeRegulationRuleRepository,
+            IMarginRegulationRuleRepository marginRegulationRuleRepository)
         {
             _regulationRepository = regulationRepository;
             _clientRegulationRepository = clientRegulationRepository;
             _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
+            _marginRegulationRuleRepository = marginRegulationRuleRepository;
         }
         
         public async Task<IRegulation> GetAsync(string regulationId)
@@ -39,6 +42,24 @@ namespace Lykke.Service.Regulation.Services
         public Task<IEnumerable<IRegulation>> GetAllAsync()
         {
             return _regulationRepository.GetAllAsync();
+        }
+
+        public async Task<IRegulation> GetMarginByCountryAsync(string country)
+        {
+            if (string.IsNullOrEmpty(country))
+                return null;
+
+            IEnumerable<IMarginRegulationRule> marginRegulationRules =
+                await _marginRegulationRuleRepository.GetByCountryAsync(country);
+
+            IMarginRegulationRule marginRegulationRule = marginRegulationRules
+                .OrderByDescending(o => o.Priority)
+                .FirstOrDefault();
+
+            if (marginRegulationRule == null)
+                return null;
+
+            return await _regulationRepository.GetAsync(marginRegulationRule.RegulationId);
         }
 
         public async Task AddAsync(IRegulation regulation)

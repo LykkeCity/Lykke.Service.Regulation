@@ -14,6 +14,7 @@ namespace Lykke.Service.Regulation.Tests
         private readonly Mock<IRegulationRepository> _regulationRepositoryMock;
         private readonly Mock<IClientRegulationRepository> _clientRegulationRepositoryMock;
         private readonly Mock<IWelcomeRegulationRuleRepository> _welcomeRegulationRuleRepositoryMock;
+        private readonly Mock<IMarginRegulationRuleRepository> _marginRegulationRuleRepositoryMock;
 
         private readonly RegulationService _service;
 
@@ -22,11 +23,13 @@ namespace Lykke.Service.Regulation.Tests
             _regulationRepositoryMock = new Mock<IRegulationRepository>();
             _clientRegulationRepositoryMock = new Mock<IClientRegulationRepository>();
             _welcomeRegulationRuleRepositoryMock = new Mock<IWelcomeRegulationRuleRepository>();
+            _marginRegulationRuleRepositoryMock = new Mock<IMarginRegulationRuleRepository>();
 
             _service = new RegulationService(
                 _regulationRepositoryMock.Object,
                 _clientRegulationRepositoryMock.Object,
-                _welcomeRegulationRuleRepositoryMock.Object);
+                _welcomeRegulationRuleRepositoryMock.Object,
+                _marginRegulationRuleRepositoryMock.Object);
         }
 
         [Fact]
