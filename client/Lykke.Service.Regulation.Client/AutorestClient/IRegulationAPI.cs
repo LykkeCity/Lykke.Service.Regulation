@@ -410,6 +410,21 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         Task<HttpOperationResponse<RegulationModel>> GetRegulationByCountryWithHttpMessagesAsync(string country, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
+        /// Returns a margin regulation details by country code using margin
+        /// regulation rules.
+        /// </summary>
+        /// <param name='country'>
+        /// The country code.
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<RegulationModel>> RegulationGetMarginByCountryWithHttpMessagesAsync(string country, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
         /// Returns all regulations.
         /// </summary>
         /// <param name='customHeaders'>

@@ -71,6 +71,18 @@ namespace Lykke.Service.Regulation.Client
         }
 
         /// <summary>
+        /// Returns a margin regulation details by country code using margin regulation rules.
+        /// </summary>
+        /// <param name="country">The country code.</param>
+        /// <returns>The <see cref="RegulationModel"/>.</returns>
+        public async Task<RegulationModel> GetMarginRegulationByCountryAsync(string country)
+        {
+            AutorestClient.Models.RegulationModel result = await _service.RegulationGetMarginByCountryAsync(country);
+
+            return result?.ToModel();
+        }
+
+        /// <summary>
         /// Returns all regulations.
         /// </summary>
         /// <returns>The list of regulations.</returns>
