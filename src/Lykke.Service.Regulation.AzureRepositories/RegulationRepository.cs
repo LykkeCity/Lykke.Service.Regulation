@@ -33,7 +33,7 @@ namespace Lykke.Service.Regulation.AzureRepositories
 
         public Task UpdateAsync(IRegulation regulation)
         {
-            return _tableStorage.MergeAsync(GetPartitionKey(), GetRowKey(regulation.Id), entity =>
+            return _tableStorage.ReplaceAsync(GetPartitionKey(), GetRowKey(regulation.Id), entity =>
             {
                 entity.ProfileType = regulation.ProfileType;
                 entity.TermsOfUseUrl = regulation.TermsOfUseUrl;
