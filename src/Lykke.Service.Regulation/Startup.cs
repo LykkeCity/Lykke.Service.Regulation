@@ -113,7 +113,7 @@ namespace Lykke.Service.Regulation
             }
             catch (Exception ex)
             {
-                Log?.WriteFatalErrorAsync(nameof(Startup), nameof(ConfigureServices), "", ex).Wait();
+                Log?.WriteFatalErrorAsync(nameof(Startup), nameof(Configure), "", ex).Wait();
                 throw;
             }
         }
@@ -122,7 +122,7 @@ namespace Lykke.Service.Regulation
         {
             try
             {
-                // NOTE: Service not yet recieve and process requests here
+                // NOTE: Service not yet receive and process requests here
 
                 await ApplicationContainer.Resolve<IStartupManager>().StartAsync();
 
@@ -139,7 +139,7 @@ namespace Lykke.Service.Regulation
         {
             try
             {
-                // NOTE: Service still can recieve and process requests here, so take care about it if you add logic here.
+                // NOTE: Service still can receive and process requests here, so take care about it if you add logic here.
 
                 await ApplicationContainer.Resolve<IShutdownManager>().StopAsync();
             }
@@ -157,7 +157,7 @@ namespace Lykke.Service.Regulation
         {
             try
             {
-                // NOTE: Service can't recieve and process requests here, so you can destroy all resources
+                // NOTE: Service can't receive and process requests here, so you can destroy all resources
 
                 if (Log != null)
                 {
@@ -193,7 +193,7 @@ namespace Lykke.Service.Regulation
             var dbLogConnectionStringManager = settings.Nested(x => x.RegulationService.Db.LogsConnString);
             var dbLogConnectionString = dbLogConnectionStringManager.CurrentValue;
 
-            // Creating azure storage logger, which logs own messages to concole log
+            // Creating azure storage logger, which logs own messages to console log
             if (!string.IsNullOrEmpty(dbLogConnectionString) &&
                 !(dbLogConnectionString.StartsWith("${") && dbLogConnectionString.EndsWith("}")))
             {
