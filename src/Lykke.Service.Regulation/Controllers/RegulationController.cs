@@ -51,7 +51,7 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(RegulationController), nameof(Get),
+                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Get),
                     $"{nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
@@ -154,7 +154,7 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(RegulationController), nameof(Add),
+                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Add),
                     $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
@@ -223,7 +223,7 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(RegulationController), nameof(Delete),
+                await _log.WriteWarningAsync(nameof(RegulationController), nameof(Delete),
                     $"{nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}", exception);
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
