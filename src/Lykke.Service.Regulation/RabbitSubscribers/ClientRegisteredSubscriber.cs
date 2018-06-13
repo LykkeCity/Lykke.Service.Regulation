@@ -94,7 +94,7 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
+                await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
                     message.ClientId, exception);
             }
         }
