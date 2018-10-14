@@ -333,6 +333,15 @@ namespace Lykke.Service.Regulation.Client
                 throw new ErrorResponseException(errorResponse.ErrorMessage);
         }
 
+        public async Task ChangeClientRegulationAsync(string clientId, string country)
+        {
+            ErrorResponse errorResponse =
+                await _service.ChangeClientRegulationAsync(clientId, country);
+
+            if (errorResponse != null)
+                throw new ErrorResponseException(errorResponse.ErrorMessage);
+        }
+
         /// <summary>
         /// Sets the client regulation KYC status to <c>true</c>.
         /// </summary>

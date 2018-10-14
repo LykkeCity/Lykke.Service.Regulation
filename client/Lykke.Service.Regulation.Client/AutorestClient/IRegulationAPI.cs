@@ -157,6 +157,23 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
         Task<HttpOperationResponse<ErrorResponse>> SetDefaultClientRegulationsWithHttpMessagesAsync(string clientId, string country, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
+        /// Change client regulations using rules associated with country.
+        /// </summary>
+        /// <param name='clientId'>
+        /// The client id.
+        /// </param>
+        /// <param name='country'>
+        /// The country name.
+        /// </param>
+        /// <param name='customHeaders'>
+        /// The headers that will be added to request.
+        /// </param>
+        /// <param name='cancellationToken'>
+        /// The cancellation token.
+        /// </param>
+        Task<HttpOperationResponse<ErrorResponse>> ChangeClientRegulationWithHttpMessagesAsync(string clientId, string country, Dictionary<string, List<string>> customHeaders = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
         /// Updates the client regulation KYC status.
         /// </summary>
         /// <param name='clientId'>

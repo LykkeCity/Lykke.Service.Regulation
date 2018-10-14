@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Common.Log;
-using Lykke.Service.Regulation.Core.Services;
+using Lykke.Common.Log;
+using Lykke.Cqrs;
+using Lykke.Sdk;
 
 namespace Lykke.Service.Regulation.Services
 {
@@ -13,17 +14,15 @@ namespace Lykke.Service.Regulation.Services
 
     public class StartupManager : IStartupManager
     {
-        private readonly ILog _log;
+        private readonly ILogFactory _logFactory;
 
-        public StartupManager(ILog log)
+        public StartupManager(ILogFactory logFactory)
         {
-            _log = log;
+            _logFactory = logFactory;
         }
 
         public async Task StartAsync()
         {
-            // TODO: Implement your startup logic here. Good idea is to log every step
-
             await Task.CompletedTask;
         }
     }

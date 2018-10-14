@@ -308,6 +308,46 @@ namespace Lykke.Service.Regulation.Client.AutorestClient
             }
 
             /// <summary>
+            /// Change client regulations using rules associated with country.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='country'>
+            /// The country name.
+            /// </param>
+            public static ErrorResponse ChangeClientRegulation(this IRegulationAPI operations, string clientId, string country)
+            {
+                return operations.ChangeClientRegulationAsync(clientId, country).GetAwaiter().GetResult();
+            }
+
+            /// <summary>
+            /// Change client regulations using rules associated with country.
+            /// </summary>
+            /// <param name='operations'>
+            /// The operations group for this extension method.
+            /// </param>
+            /// <param name='clientId'>
+            /// The client id.
+            /// </param>
+            /// <param name='country'>
+            /// The country name.
+            /// </param>
+            /// <param name='cancellationToken'>
+            /// The cancellation token.
+            /// </param>
+            public static async Task<ErrorResponse> ChangeClientRegulationAsync(this IRegulationAPI operations, string clientId, string country, CancellationToken cancellationToken = default(CancellationToken))
+            {
+                using (var _result = await operations.ChangeClientRegulationWithHttpMessagesAsync(clientId, country, null, cancellationToken).ConfigureAwait(false))
+                {
+                    return _result.Body;
+                }
+            }
+
+            /// <summary>
             /// Updates the client regulation KYC status.
             /// </summary>
             /// <param name='operations'>

@@ -1,7 +1,9 @@
 ﻿using Autofac;
 using AzureStorage.Tables;
 using Common;
-using Common.Log;
+using JetBrains.Annotations;
+using Lykke.Common.Log;
+using Lykke.Sdk;
 using Lykke.Service.IpGeoLocation;
 using Lykke.Service.Regulation.AzureRepositories;
 using Lykke.Service.Regulation.Core.Repositories;
@@ -14,40 +16,29 @@ using Lykke.SettingsReader;
 
 namespace Lykke.Service.Regulation.Modules
 {
+    [UsedImplicitly]
     public class ServiceModule : Module
     {
         private readonly IReloadingManager<AppSettings> _settings;
-        private readonly ILog _log;
 
-        public ServiceModule(IReloadingManager<AppSettings> settings, ILog log)
+        public ServiceModule(IReloadingManager<AppSettings> settings)
         {
             _settings = settings;
-            _log = log;
         }
 
         protected override void Load(ContainerBuilder builder)
         {
-            // TODO: Do not register entire settings in container, pass necessary settings to services which requires them
-            // ex:
-            //  builder.RegisterType<QuotesPublisher>()
-            //      .As<IQuotesPublisher>()
-            //      .WithParameter(TypedParameter.From(_settings.CurrentValue.QuotesPublication))
-
-            builder.RegisterInstance(_log)
-                .As<ILog>()
-                .SingleInstance();
-
-            builder.RegisterType<HealthService>()
-                .As<IHealthService>()
-                .SingleInstance();
-
             builder.RegisterType<StartupManager>()
                 .As<IStartupManager>();
 
             builder.RegisterType<ShutdownManager>()
                 .As<IShutdownManager>();
 
-            builder.RegisterIpGeoLocationClient(_settings.CurrentValue.IpGeoLocationServiceClient.ServiceUrl, _log);
+            builder.Register(c => 
+                new IpGeoLocationClient(_settings.CurrentValue.IpGeoLocationServiceClient.ServiceUrl, 
+                    c.Resolve<ILogFactory>().CreateLog(nameof(IpGeoLocationClient))))
+                .As<IIpGeoLocationClient>()
+                .SingleInstance();
 
             RegisterRepositories(builder);
             RegisterServices(builder);
@@ -59,20 +50,19 @@ namespace Lykke.Service.Regulation.Modules
         {
             const string regulationsTableName = "Regulations";
             const string clientRegulationsTableName = "ClientRegulations";
-
             builder.Register(c => new RegulationRepository(
                     AzureTableStorage<RegulationEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
-                        regulationsTableName, _log)))
+                        regulationsTableName, c.Resolve<ILogFactory>())))
                 .As<IRegulationRepository>();
 
             builder.Register(c => new ClientRegulationRepository(
                     AzureTableStorage<ClientRegulationEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
-                        clientRegulationsTableName, _log)))
+                        clientRegulationsTableName, c.Resolve<ILogFactory>())))
                 .As<IClientRegulationRepository>();
 
             builder.Register(c => new WelcomeRegulationRuleRepository(
                     AzureTableStorage<WelcomeRegulationRuleEntity>.Create(_settings.ConnectionString(x => x.RegulationService.Db.DataConnString),
-                        regulationsTableName, _log)))
+                        regulationsTableName, c.Resolve<ILogFactory>())))
                 .As<IWelcomeRegulationRuleRepository>();
         }
 

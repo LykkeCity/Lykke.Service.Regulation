@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Service.Regulation.Core.Contracts;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Exceptions;
@@ -24,13 +25,13 @@ namespace Lykke.Service.Regulation.Services
             IClientRegulationRepository clientRegulationRepository,
             IWelcomeRegulationRuleRepository welcomeRegulationRuleRepository,
             IClientRegulationPublisher clientRegulationPublisher,
-            ILog log)
+            ILogFactory logFactory)
         {
             _regulationRepository = regulationRepository;
             _clientRegulationRepository = clientRegulationRepository;
             _welcomeRegulationRuleRepository = welcomeRegulationRuleRepository;
             _clientRegulationPublisher = clientRegulationPublisher;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         public async Task<IClientRegulation> GetAsync(string clientId, string regulationId)
@@ -90,8 +91,7 @@ namespace Lykke.Service.Regulation.Services
 
             await PublishOnChangedAsync(clientRegulation.ClientId);
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationService), nameof(AddAsync),
-                clientRegulation.ClientId, $"Regulation '{clientRegulation.RegulationId}' added for client.");
+            _log.Info(nameof(AddAsync), $"Regulation '{clientRegulation.RegulationId}' added for client.", clientRegulation.ClientId);
         }
         
         public async Task SetDefaultAsync(string clientId, string country)
@@ -143,11 +143,40 @@ namespace Lykke.Service.Regulation.Services
 
             await PublishOnChangedAsync(defaultClientRegulation.ClientId);
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationService), nameof(SetDefaultAsync),
-                defaultClientRegulation.ClientId,
-                $"Default regulation '{defaultClientRegulation.RegulationId}' added for client.");
+            _log.Info(nameof(SetDefaultAsync), $"Default regulation '{defaultClientRegulation.RegulationId}' added for client.", 
+                defaultClientRegulation.ClientId);
         }
-        
+
+        public async Task ChangeRegulationAsync(string clientId, string country)
+        {
+            List<IClientRegulation> clientRegulations = 
+                (await _clientRegulationRepository.GetByClientIdAsync(clientId)).ToList();
+            
+            IWelcomeRegulationRule welcomeRegulationRule =
+                (await _welcomeRegulationRuleRepository.GetByCountryAsync(country))
+                .OrderByDescending(o => o.Priority)
+                .FirstOrDefault();
+
+            if (welcomeRegulationRule != null &&
+                clientRegulations.All(item => item.RegulationId != welcomeRegulationRule.RegulationId))
+            {
+                foreach (var regulation in clientRegulations.Where(item => item.Kyc == false))
+                {
+                    await _clientRegulationRepository.DeleteAsync(clientId, regulation.RegulationId);
+                }
+                
+                var newRegulation = new ClientRegulation
+                {
+                    ClientId = clientId,
+                    RegulationId = welcomeRegulationRule.RegulationId,
+                    Active = welcomeRegulationRule.Active,
+                    Kyc = false
+                };
+
+                await _clientRegulationRepository.AddAsync(newRegulation);
+            }
+        }
+
         public async Task UpdateKycAsync(string clientId, string regulationId, bool active)
         {
             IClientRegulation clientRegulation = await _clientRegulationRepository.GetAsync(clientId, regulationId);

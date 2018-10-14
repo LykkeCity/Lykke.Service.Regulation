@@ -145,6 +145,15 @@ namespace Lykke.Service.Regulation.Client
         /// <returns></returns>
         /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
         Task SetDefaultClientRegulationsAsync(string clientId, string country);
+        
+        /// <summary>
+        /// Changes regulation associated with country for a client.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="country">The country name (iso3).</param>
+        /// <returns></returns>
+        /// <exception cref="ErrorResponseException">Thrown if an error response received from service.</exception>
+        Task ChangeClientRegulationAsync(string clientId, string country);
 
         /// <summary>
         /// Sets the client regulation KYC status to <c>true</c>.
