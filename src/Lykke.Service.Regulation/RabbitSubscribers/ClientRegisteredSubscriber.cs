@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using Autofac;
 using Common;
 using Common.Log;
+using Lykke.Common.Log;
 using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.IpGeoLocation;
 using Lykke.Service.IpGeoLocation.Models;
+using Lykke.Service.Registration.Contract.Events;
 using Lykke.Service.Regulation.Core.Exceptions;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Settings.ServiceSettings.Rabbit;
@@ -16,18 +18,20 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
     public class ClientRegisteredSubscriber : IStartable, IStopable
     {
         private readonly ILog _log;
+        private readonly ILogFactory _logFactory;
         private readonly IClientRegulationService _clientRegulationService;
         private readonly IIpGeoLocationClient _geoLocationClient;
         private readonly RegistrationQueue _settings;
-        private RabbitMqSubscriber<ClientRegisteredMessage> _subscriber;
+        private RabbitMqSubscriber<ClientRegisteredEvent> _subscriber;
 
         public ClientRegisteredSubscriber(
-            ILog log,
+            ILogFactory logFactory,
             IClientRegulationService clientRegulationService,
             IIpGeoLocationClient geoLocationClient,
             RegistrationQueue settings)
         {
-            _log = log;
+            _logFactory = logFactory;
+            _log = logFactory.CreateLog(this);
             _clientRegulationService = clientRegulationService;
             _geoLocationClient = geoLocationClient;
             _settings = settings;
@@ -41,13 +45,12 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
 
             settings.DeadLetterExchangeName = null;
 
-            _subscriber = new RabbitMqSubscriber<ClientRegisteredMessage>(settings,
-                    new ResilientErrorHandlingStrategy(_log, settings, TimeSpan.FromSeconds(10)))
-                .SetMessageDeserializer(new JsonMessageDeserializer<ClientRegisteredMessage>())
+            _subscriber = new RabbitMqSubscriber<ClientRegisteredEvent>(_logFactory, settings,
+                    new ResilientErrorHandlingStrategy(_logFactory, settings, TimeSpan.FromSeconds(10)))
+                .SetMessageDeserializer(new JsonMessageDeserializer<ClientRegisteredEvent>())
                 .SetMessageReadStrategy(new MessageReadQueueStrategy())
                 .Subscribe(ProcessMessageAsync)
                 .CreateDefaultBinding()
-                .SetLogger(_log)
                 .Start();
         }
 
@@ -61,18 +64,17 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
             _subscriber.Stop();
         }
 
-        private async Task ProcessMessageAsync(ClientRegisteredMessage message)
+        private async Task ProcessMessageAsync(ClientRegisteredEvent message)
         {
             try
             {
                 string countryCode = null;
 
-                if (string.IsNullOrEmpty(message.Ip))
+                if (!string.IsNullOrEmpty(message.CountryFromPOA))
                 {
-                    await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
-                        message.ClientId, "No IP address.");
+                    countryCode = message.CountryFromPOA;
                 }
-                else
+                else if (!string.IsNullOrEmpty(message.Ip))
                 {
                     IIpGeolocationData data = await _geoLocationClient.GetAsync(message.Ip);
 
@@ -80,13 +82,11 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
 
                     if (string.IsNullOrEmpty(countryCode))
                     {
-                        await _log.WriteWarningAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
-                            message.ClientId, $"Can not find country by IP address '{message.Ip}'.");
+                        _log.Warning(nameof(ProcessMessageAsync), $"Can not find country by IP address '{message.Ip}'.", context: message.ClientId);
                     }
                     else
                     {
-                        await _log.WriteInfoAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
-                            message.ClientId, $"Country '{data.CountryCode}'.");
+                        _log.Info(nameof(ProcessMessageAsync), $"Country '{data.CountryCode}'.", message.ClientId);
                     }
                 }
 
@@ -94,8 +94,7 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientRegisteredSubscriber), nameof(ProcessMessageAsync),
-                    message.ClientId, exception);
+                _log.Error(nameof(ProcessMessageAsync), exception, context: message.ClientId);
             }
         }
     }
