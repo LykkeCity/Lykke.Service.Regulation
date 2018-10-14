@@ -5,6 +5,7 @@ using AutoMapper;
 using Common;
 using Common.Log;
 using Lykke.Common.Extensions;
+using Lykke.Common.Log;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.Models;
@@ -23,10 +24,10 @@ namespace Lykke.Service.Regulation.Controllers
         private readonly IClientRegulationService _clientRegulationService;
         private readonly ILog _log;
 
-        public ClientRegulationController(IClientRegulationService clientRegulationService, ILog log)
+        public ClientRegulationController(IClientRegulationService clientRegulationService, ILogFactory logFactory)
         {
             _clientRegulationService = clientRegulationService;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         /// <summary>
@@ -52,9 +53,8 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Get),
-                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(Get), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
@@ -106,9 +106,8 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(GetByRegulationId),
-                    $"{nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(GetByRegulationId), exception,
+                    $"{nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
@@ -185,16 +184,14 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Add),
-                    $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(Add), exception,
+                    $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Add),
-                model.ClientId,
-                $"Client regulation added. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(Add), $"Client regulation added. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}",
+                model.ClientId);
 
             return NoContent();
         }
@@ -254,15 +251,44 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(SetDefault),
-                    $"{nameof(clientId)}: {clientId}. {nameof(country)}: {country}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(SetDefault), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(country)}: {country}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(SetDefault), clientId,
+            _log.Info(nameof(SetDefault), clientId,
                 $"Default regulations was assigned for client. {nameof(country)}: {country}. IP: {HttpContext.GetIp()}");
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Change client regulations using rules associated with country.
+        /// </summary>
+        /// <param name="clientId">The client id.</param>
+        /// <param name="country">The country name.</param>
+        /// <returns></returns>
+        /// <response code="204">Default regulations successfully added to client.</response>
+        /// <response code="400">Client already have regulations or no default regulations for specified country.</response>
+        [HttpPost]
+        [Route("change/{clientId}/{country}")]
+        [SwaggerOperation("ChangeClientRegulation")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ChangeClientRegulation(string clientId, string country)
+        {
+            try
+            {
+                await _clientRegulationService.ChangeRegulationAsync(clientId, country);
+            }
+            catch (ServiceException exception)
+            {
+                _log.Error(nameof(ChangeClientRegulation), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(country)}: {country}. IP: {HttpContext.GetIp()}");
+
+                return BadRequest(ErrorResponse.Create(exception.Message));
+            }
 
             return NoContent();
         }
@@ -289,15 +315,14 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(UpdateKyc),
-                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. {nameof(active)}: {active}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(UpdateKyc), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. {nameof(active)}: {active}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(UpdateKyc), clientId,
-                $"Client regulation KYC updated. {nameof(regulationId)}: {regulationId}. {nameof(active)}: {active}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(UpdateKyc), $"Client regulation KYC updated. {nameof(regulationId)}: {regulationId}. {nameof(active)}: {active}. IP: {HttpContext.GetIp()}",
+                clientId);
 
             return NoContent();
         }
@@ -323,15 +348,14 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Activate),
-                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(Activate), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Activate), clientId,
-                $"Client regulation activated. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(Activate), $"Client regulation activated. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
+                clientId);
 
             return NoContent();
         }
@@ -357,15 +381,14 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Deactivate),
-                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(Deactivate), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Deactivate), clientId,
-                $"Client regulation deactivated. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(Deactivate), $"Client regulation deactivated. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
+                clientId);
 
             return NoContent();
         }
@@ -391,15 +414,14 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteWarningAsync(nameof(ClientRegulationController), nameof(Delete),
-                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(Delete), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(Delete), clientId,
-                $"Client current regulation deleted. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(Delete), $"Client current regulation deleted. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
+                clientId);
 
             return NoContent();
         }

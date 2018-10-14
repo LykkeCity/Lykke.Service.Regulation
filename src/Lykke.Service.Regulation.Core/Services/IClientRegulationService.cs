@@ -21,6 +21,8 @@ namespace Lykke.Service.Regulation.Core.Services
         Task SetAsync(string clientId, string regulationId);
 
         Task SetDefaultAsync(string clientId, string country);
+        
+        Task ChangeRegulationAsync(string clientId, string country);
 
         Task UpdateKycAsync(string clientId, string regulationId, bool active);
 

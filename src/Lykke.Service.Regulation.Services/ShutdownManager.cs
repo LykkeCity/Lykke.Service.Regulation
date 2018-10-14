@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Common.Log;
-using Lykke.Service.Regulation.Core.Services;
+using Lykke.Common.Log;
+using Lykke.Sdk;
 
 namespace Lykke.Service.Regulation.Services
 {
@@ -11,11 +11,11 @@ namespace Lykke.Service.Regulation.Services
     
     public class ShutdownManager : IShutdownManager
     {
-        private readonly ILog _log;
+        private readonly ILogFactory _logFactory;
 
-        public ShutdownManager(ILog log)
+        public ShutdownManager(ILogFactory logFactory)
         {
-            _log = log;
+            _logFactory = logFactory;
         }
 
         public async Task StopAsync()

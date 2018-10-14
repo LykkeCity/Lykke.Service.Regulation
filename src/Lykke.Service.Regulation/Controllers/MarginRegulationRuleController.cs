@@ -5,6 +5,7 @@ using AutoMapper;
 using Common;
 using Common.Log;
 using Lykke.Common.Extensions;
+using Lykke.Common.Log;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Exceptions;
 using Lykke.Service.Regulation.Core.Services;
@@ -25,10 +26,10 @@ namespace Lykke.Service.Regulation.Controllers
 
         public MarginRegulationRuleController(
             IMarginRegulationRuleService marginRegulationRuleService,
-            ILog log)
+            ILogFactory logFactory)
         {
             _marginRegulationRuleService = marginRegulationRuleService;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         /// <summary>
@@ -52,8 +53,7 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(MarginRegulationRuleController), nameof(GetByIdAsync),
-                    $"{nameof(id)}: {id}. IP: {HttpContext.GetIp()}", exception);
+                _log.Error(nameof(GetByIdAsync), exception, $"{nameof(id)}: {id}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
@@ -105,14 +105,12 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(MarginRegulationRuleController), nameof(AddAsync),
-                    $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}", exception);
+                _log.Error(nameof(AddAsync), exception, $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(MarginRegulationRuleController), nameof(AddAsync), model.RegulationId,
-                $"Margin regulation rule added. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(AddAsync), $"Margin regulation rule added. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}", model.RegulationId);
 
             return NoContent();
         }
@@ -142,14 +140,12 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(MarginRegulationRuleController), nameof(UpdateAsync),
-                    $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}", exception);
+                _log.Error(nameof(UpdateAsync), exception, $"{nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(MarginRegulationRuleController), nameof(UpdateAsync), model.RegulationId,
-                $"Margin regulation rule updated. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(UpdateAsync), $"Margin regulation rule updated. {nameof(model)}: {model.ToJson()}. IP: {HttpContext.GetIp()}", model.RegulationId);
 
             return NoContent();
         }
@@ -173,13 +169,12 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(MarginRegulationRuleController), nameof(DeleteAsync),
-                    $"{nameof(id)}: {id}. IP: {HttpContext.GetIp()}", exception);
+                _log.Error(nameof(DeleteAsync), exception, $"{nameof(id)}: {id}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
-            await _log.WriteInfoAsync(nameof(MarginRegulationRuleController), nameof(DeleteAsync), id,
-                $"Margin regulation rule deleted. IP: {HttpContext.GetIp()}");
+
+            _log.Info(nameof(DeleteAsync), $"Margin regulation rule deleted. IP: {HttpContext.GetIp()}", id);
 
             return NoContent();
         }

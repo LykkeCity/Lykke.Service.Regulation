@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Common.Log;
 using Lykke.Common.Extensions;
+using Lykke.Common.Log;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Exceptions;
 using Lykke.Service.Regulation.Core.Services;
@@ -23,10 +24,10 @@ namespace Lykke.Service.Regulation.Controllers
 
         public ClientMarginRegulationController(
             IClientMarginRegulationService clientMarginRegulationService,
-            ILog log)
+            ILogFactory logFactory)
         {
             _clientMarginRegulationService = clientMarginRegulationService;
-            _log = log;
+            _log = logFactory.CreateLog(this);
         }
 
         /// <summary>
@@ -74,15 +75,14 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientMarginRegulationController), nameof(AddAsync),
-                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(AddAsync), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientMarginRegulationController), nameof(AddAsync),
-                clientId, $"Client regulation added. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(AddAsync),
+                $"Client regulation added. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}", clientId);
 
             return NoContent();
         }
@@ -108,15 +108,14 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientMarginRegulationController), nameof(SetAsync),
-                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(SetAsync), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientMarginRegulationController), nameof(SetAsync),
-                clientId, $"Client mrgin regulation updated. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(SetAsync),
+                $"Client mrgin regulation updated. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}", clientId);
 
             return NoContent();
         }
@@ -135,8 +134,7 @@ namespace Lykke.Service.Regulation.Controllers
         {
             await _clientMarginRegulationService.DeleteAsync(clientId);
 
-            await _log.WriteInfoAsync(nameof(ClientMarginRegulationController), nameof(DeleteAsync), clientId,
-                $"Client margin regulation deleted. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(DeleteAsync), $"Client margin regulation deleted. IP: {HttpContext.GetIp()}", clientId);
 
             return NoContent();
         }

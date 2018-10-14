@@ -6,7 +6,8 @@
     <Version>1.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Lykke.Common" Version="6.8.5" />
+    <PackageReference Include="Lykke.Common" Version="7.1.0" />
+    <PackageReference Include="Lykke.Sdk" Version="5.3.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.Regulation.Core\Lykke.Service.Regulation.Core.csproj" />

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Service.Regulation.Core.Contracts;
 using Lykke.Service.Regulation.Core.Domain;
 using Lykke.Service.Regulation.Core.Repositories;
@@ -24,7 +25,8 @@ namespace Lykke.Service.Regulation.Tests
 
         public ClientRegulationServiceTests()
         {
-            var logMock = new Mock<ILog>();
+            var logMock = new Mock<ILogFactory>();
+            logMock.Setup(x => x.CreateLog(It.IsAny<object>())).Returns(EmptyLog.Instance);
             _regulationRepositoryMock = new Mock<IRegulationRepository>();
             _clientRegulationRepositoryMock = new Mock<IClientRegulationRepository>();
             _welcomeRegulationRuleRepositoryMock = new Mock<IWelcomeRegulationRuleRepository>();
