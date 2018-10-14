@@ -217,15 +217,13 @@ namespace Lykke.Service.Regulation.Controllers
             }
             catch (ServiceException exception)
             {
-                await _log.WriteErrorAsync(nameof(ClientRegulationController), nameof(SetAsync),
-                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}",
-                    exception);
+                _log.Error(nameof(SetAsync), exception,
+                    $"{nameof(clientId)}: {clientId}. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
 
                 return BadRequest(ErrorResponse.Create(exception.Message));
             }
 
-            await _log.WriteInfoAsync(nameof(ClientRegulationController), nameof(SetAsync),
-                clientId, $"Client regulation updated. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}");
+            _log.Info(nameof(Add), $"Client regulation updated. {nameof(regulationId)}: {regulationId}. IP: {HttpContext.GetIp()}", clientId);
 
             return NoContent();
         }

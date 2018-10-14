@@ -72,10 +72,12 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
 
                 if (!string.IsNullOrEmpty(message.CountryFromPOA))
                 {
+                    _log.Info(nameof(ProcessMessageAsync), $"Getting country '{message.CountryFromPOA}' from the message", message.ClientId);
                     countryCode = message.CountryFromPOA;
                 }
                 else if (!string.IsNullOrEmpty(message.Ip))
                 {
+                    _log.Info(nameof(ProcessMessageAsync), $"Try to get country by IP address '{message.Ip}'", message.ClientId);
                     IIpGeolocationData data = await _geoLocationClient.GetAsync(message.Ip);
 
                     countryCode = data?.CountryCode;
@@ -90,7 +92,8 @@ namespace Lykke.Service.Regulation.RabbitSubscribers
                     }
                 }
 
-                await _clientRegulationService.SetDefaultAsync(message.ClientId, countryCode);
+                if (!string.IsNullOrEmpty(countryCode))
+                    await _clientRegulationService.SetDefaultAsync(message.ClientId, countryCode);
             }
             catch (ServiceException exception)
             {
