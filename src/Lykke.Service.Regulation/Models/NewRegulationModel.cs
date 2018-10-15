@@ -7,7 +7,6 @@ namespace Lykke.Service.Regulation.Models
         [Required]
         public string Id { get; set; }
 
-        [Required]
         public string ProfileType { get; set; }
 
         public string TermsOfUseUrl { get; set; }
