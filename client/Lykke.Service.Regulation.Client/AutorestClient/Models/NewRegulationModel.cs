@@ -75,10 +75,6 @@ namespace Lykke.Service.Regulation.Client.AutorestClient.Models
             {
                 throw new ValidationException(ValidationRules.CannotBeNull, "Id");
             }
-            if (ProfileType == null)
-            {
-                throw new ValidationException(ValidationRules.CannotBeNull, "ProfileType");
-            }
         }
     }
 }
