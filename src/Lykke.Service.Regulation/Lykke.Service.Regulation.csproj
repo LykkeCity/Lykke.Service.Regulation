@@ -1,20 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputType>Exe</OutputType>
     <Version>1.0.1</Version>
     <AssemblyName>Lykke.Service.Regulation</AssemblyName>
     <RootNamespace>Lykke.Service.Regulation</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.0\Lykke.Service.Regulation.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.1\Lykke.Service.Regulation.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.0\Lykke.Service.Regulation.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\Lykke.Service.Regulation.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
   
@@ -25,26 +26,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="6.2.2" />
-    <PackageReference Include="Lykke.Common" Version="6.6.0" />
-    <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.7.0" />
-    <PackageReference Include="Lykke.Logs" Version="4.3.0" />
-    <PackageReference Include="Lykke.RabbitMq.Azure" Version="5.0.1" />
-    <PackageReference Include="Lykke.Service.IpGeoLocation" Version="1.0.5" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="Lykke.Common" Version="7.1.0" />
+    <PackageReference Include="Lykke.Common.ApiLibrary" Version="1.10.2" />
+    <PackageReference Include="Lykke.Logs" Version="7.0.0" />
+    <PackageReference Include="Lykke.Messaging" Version="6.2.0" />
+    <PackageReference Include="Lykke.Messaging.RabbitMq" Version="2.1.0" />
+    <PackageReference Include="Lykke.RabbitMq.Azure" Version="5.2.0" />
+    <PackageReference Include="Lykke.Sdk" Version="5.3.1" />
+    <PackageReference Include="Lykke.Service.IpGeoLocation" Version="1.1.2" />
+    <PackageReference Include="Lykke.Service.Registration.Contract" Version="1.2.0" />
     <PackageReference Include="Lykke.Service.Session" Version="1.0.33" />
-    <PackageReference Include="Lykke.SettingsReader" Version="2.3.1" />
-    <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.2" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.2.1" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.1" />
+    <PackageReference Include="Lykke.SettingsReader" Version="4.1.1" />
+    <PackageReference Include="Lykke.SlackNotification.AzureQueue" Version="2.0.5" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.4.1" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="1.1.0" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
   
   <ItemGroup>
@@ -55,10 +54,6 @@
   
   <ItemGroup>
     <Folder Include="Responses\" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="RabbitSubscribers\ClientRegisteredSubscriber.cs" />
   </ItemGroup>
 
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">

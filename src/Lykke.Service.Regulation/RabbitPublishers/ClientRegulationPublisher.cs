@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Autofac;
 using Common;
-using Common.Log;
+using Lykke.Common.Log;
 using Lykke.RabbitMqBroker.Publisher;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.Regulation.Core.Contracts;
@@ -12,13 +12,13 @@ namespace Lykke.Service.Regulation.RabbitPublishers
 {
     public class ClientRegulationPublisher : IClientRegulationPublisher, IStartable, IStopable
     {
-        private readonly ILog _log;
+        private readonly ILogFactory _logFactory;
         private readonly RegulationExchange _settings;
         private RabbitMqPublisher<ClientRegulationsMessage> _publisher;
 
-        public ClientRegulationPublisher(ILog log, RegulationExchange settings)
+        public ClientRegulationPublisher(ILogFactory logFactory, RegulationExchange settings)
         {
-            _log = log;
+            _logFactory = logFactory;
             _settings = settings;
         }
 
@@ -28,11 +28,10 @@ namespace Lykke.Service.Regulation.RabbitPublishers
                 .CreateForPublisher(_settings.ConnectionString, "regulation")
                 .MakeDurable();
 
-            _publisher = new RabbitMqPublisher<ClientRegulationsMessage>(settings)
+            _publisher = new RabbitMqPublisher<ClientRegulationsMessage>(_logFactory, settings)
                 .SetSerializer(new JsonMessageSerializer<ClientRegulationsMessage>())
                 .SetPublishStrategy(new DefaultFanoutPublishStrategy(settings))
                 .PublishSynchronously()
-                .SetLogger(_log)
                 .Start();
         }
 
