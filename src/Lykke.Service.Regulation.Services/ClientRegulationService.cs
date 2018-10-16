@@ -156,6 +156,16 @@ namespace Lykke.Service.Regulation.Services
                 (await _welcomeRegulationRuleRepository.GetByCountryAsync(country))
                 .OrderByDescending(o => o.Priority)
                 .FirstOrDefault();
+            
+            if (welcomeRegulationRule == null)
+            {
+                IEnumerable<IWelcomeRegulationRule> welcomeRegulationRules =
+                    await _welcomeRegulationRuleRepository.GetDefaultAsync();
+
+                welcomeRegulationRule = welcomeRegulationRules
+                    .OrderByDescending(o => o.Priority)
+                    .FirstOrDefault();
+            }
 
             if (welcomeRegulationRule != null &&
                 clientRegulations.All(item => item.RegulationId != welcomeRegulationRule.RegulationId))
