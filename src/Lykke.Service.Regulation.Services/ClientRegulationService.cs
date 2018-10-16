@@ -174,6 +174,8 @@ namespace Lykke.Service.Regulation.Services
                 };
 
                 await _clientRegulationRepository.AddAsync(newRegulation);
+                
+                await PublishOnChangedAsync(clientId);
             }
         }
 
