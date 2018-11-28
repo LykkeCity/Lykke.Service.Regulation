@@ -10,5 +10,6 @@ namespace Lykke.Service.Regulation.Settings
     {
         public RegulationSettings RegulationService { get; set; }
         public IpGeoLocationServiceClientSettings IpGeoLocationServiceClient { get; set; }
+        public SagasRabbitMqSettings SagasRabbitMq { get; set; }
     }
 }

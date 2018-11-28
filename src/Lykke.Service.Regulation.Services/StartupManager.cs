@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Lykke.Common.Log;
+using Lykke.Cqrs;
 using Lykke.Sdk;
 
 namespace Lykke.Service.Regulation.Services
@@ -13,16 +13,18 @@ namespace Lykke.Service.Regulation.Services
 
     public class StartupManager : IStartupManager
     {
-        private readonly ILogFactory _logFactory;
+        private readonly ICqrsEngine _cqrsEngine;
 
-        public StartupManager(ILogFactory logFactory)
+        public StartupManager(ICqrsEngine cqrsEngine)
         {
-            _logFactory = logFactory;
+            _cqrsEngine = cqrsEngine;
         }
 
-        public async Task StartAsync()
+        public Task StartAsync()
         {
-            await Task.CompletedTask;
+            _cqrsEngine.StartSubscribers();
+
+            return Task.CompletedTask;
         }
     }
 }

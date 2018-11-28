@@ -9,7 +9,6 @@ using Lykke.Service.Regulation.AzureRepositories;
 using Lykke.Service.Regulation.Core.Repositories;
 using Lykke.Service.Regulation.Core.Services;
 using Lykke.Service.Regulation.RabbitPublishers;
-using Lykke.Service.Regulation.RabbitSubscribers;
 using Lykke.Service.Regulation.Services;
 using Lykke.Service.Regulation.Settings;
 using Lykke.SettingsReader;
@@ -42,7 +41,6 @@ namespace Lykke.Service.Regulation.Modules
 
             RegisterRepositories(builder);
             RegisterServices(builder);
-            RegisterRabbitMqSubscribers(builder);
             RegisterRabbitMqPublishers(builder);
         }
 
@@ -93,17 +91,6 @@ namespace Lykke.Service.Regulation.Modules
 
             builder.RegisterType<ClientMarginRegulationService>()
                 .As<IClientMarginRegulationService>();
-        }
-
-        private void RegisterRabbitMqSubscribers(ContainerBuilder builder)
-        {
-            builder.RegisterType<ClientRegisteredSubscriber>()
-                .AsSelf()
-                .As<IStartable>()
-                .As<IStopable>()
-                .AutoActivate()
-                .SingleInstance()
-                .WithParameter(TypedParameter.From(_settings.CurrentValue.RegulationService.RabbitMq.RegistrationQueue));
         }
 
         private void RegisterRabbitMqPublishers(ContainerBuilder builder)
