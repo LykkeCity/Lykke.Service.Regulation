@@ -2,8 +2,6 @@
 {
     public class RabbitMqSettings
     {
-        public RegistrationQueue RegistrationQueue { get; set; }
-
         public RegulationExchange RegulationExchange { get; set; }
     }
 }
