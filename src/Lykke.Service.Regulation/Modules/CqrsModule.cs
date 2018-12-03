@@ -73,6 +73,7 @@ namespace Lykke.Service.Regulation.Modules
                     );
                 })
                 .As<ICqrsEngine>()
+                .AutoActivate()
                 .SingleInstance();
         }
     }
